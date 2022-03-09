@@ -7,6 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7272836727B2AE6900021CD4 /* ShowStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836527B2AE6900021CD4 /* ShowStore.swift */; };
+		7272836A27B2BF5E00021CD4 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836827B2BF5E00021CD4 /* ProgramView.swift */; };
+		7272836C27B2C4D100021CD4 /* ShowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836B27B2C4D100021CD4 /* ShowView.swift */; };
+		7272837027B319AB00021CD4 /* SingleSongView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836F27B319AB00021CD4 /* SingleSongView.swift */; };
+		7272837227B3207D00021CD4 /* Play Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272837127B3207D00021CD4 /* Play Fixture.swift */; };
+		7272837427B322C800021CD4 /* Show Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272837327B322C800021CD4 /* Show Fixture.swift */; };
+		72873BEA27A8D21500132B62 /* KEXPPower.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFFECB522C95E6100E3378C /* KEXPPower.framework */; };
+		72873BEB27A8D21500132B62 /* KEXPPower.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFFECB522C95E6100E3378C /* KEXPPower.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		72873C0827A8D3C200132B62 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873C0727A8D3C200132B62 /* Tests_iOS.swift */; };
+		72873C0A27A8D3C200132B62 /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873C0927A8D3C200132B62 /* Tests_iOSLaunchTests.swift */; };
+		72873C1427A8D3C200132B62 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873C1327A8D3C200132B62 /* Tests_macOS.swift */; };
+		72873C1627A8D3C200132B62 /* Tests_macOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873C1527A8D3C200132B62 /* Tests_macOSLaunchTests.swift */; };
+		72873C1727A8D3C200132B62 /* KEXPPowerExampleSwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873BF027A8D3C100132B62 /* KEXPPowerExampleSwiftUIApp.swift */; };
+		72873C1927A8D3C200132B62 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873BF127A8D3C100132B62 /* ContentView.swift */; };
+		72873C1B27A8D3C200132B62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72873BF227A8D3C200132B62 /* Assets.xcassets */; };
+		72873C2927A8D47700132B62 /* KEXPPower.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFFECB522C95E6100E3378C /* KEXPPower.framework */; };
+		72873C2A27A8D47700132B62 /* KEXPPower.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFFECB522C95E6100E3378C /* KEXPPower.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		72873C3427A9936700132B62 /* SongView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873C3327A9936700132B62 /* SongView.swift */; };
+		72873C3627A998E400132B62 /* PlayResultStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873C3527A998E400132B62 /* PlayResultStore.swift */; };
+		72873C3827A99C7000132B62 /* PlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873C3727A99C7000132B62 /* PlayView.swift */; };
+		728DA59427B33C8E00EE38A4 /* PlayResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */; };
+		728DA59627B33D1700EE38A4 /* ShowResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */; };
 		8B159DC1233C66E500BCB7AB /* ArchiveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B159DC0233C66E500BCB7AB /* ArchiveManager.swift */; };
 		8B3C37AD234021E800413329 /* ArchiveShow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3C37AC234021E800413329 /* ArchiveShow.swift */; };
 		8B437FAF234EE3CE002EDB91 /* ArchiveStreamSample.json in Resources */ = {isa = PBXBuildFile; fileRef = 8B437FAE234EE3CE002EDB91 /* ArchiveStreamSample.json */; };
@@ -48,6 +70,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		72873BEC27A8D21500132B62 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BFFECB422C95E6100E3378C;
+			remoteInfo = KEXPPower;
+		};
+		72873C0427A8D3C200132B62 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72873BF627A8D3C200132B62;
+			remoteInfo = "KEXPPowerExampleSwiftUI (iOS)";
+		};
+		72873C2B27A8D47700132B62 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BFFECB422C95E6100E3378C;
+			remoteInfo = KEXPPower;
+		};
 		8BFFECC022C95E6100E3378C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
@@ -57,7 +100,56 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		72873BEE27A8D21500132B62 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				72873BEB27A8D21500132B62 /* KEXPPower.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72873C2D27A8D47800132B62 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				72873C2A27A8D47700132B62 /* KEXPPower.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		7272836427B1BBAC00021CD4 /* KEXPPowerExampleSwiftUI (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "KEXPPowerExampleSwiftUI (iOS).entitlements"; sourceTree = "<group>"; };
+		7272836527B2AE6900021CD4 /* ShowStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowStore.swift; sourceTree = "<group>"; };
+		7272836827B2BF5E00021CD4 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
+		7272836B27B2C4D100021CD4 /* ShowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowView.swift; sourceTree = "<group>"; };
+		7272836F27B319AB00021CD4 /* SingleSongView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleSongView.swift; sourceTree = "<group>"; };
+		7272837127B3207D00021CD4 /* Play Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Play Fixture.swift"; sourceTree = "<group>"; };
+		7272837327B322C800021CD4 /* Show Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Show Fixture.swift"; sourceTree = "<group>"; };
+		72873BF027A8D3C100132B62 /* KEXPPowerExampleSwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KEXPPowerExampleSwiftUIApp.swift; sourceTree = "<group>"; };
+		72873BF127A8D3C100132B62 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		72873BF227A8D3C200132B62 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		72873BF727A8D3C200132B62 /* KEXPPowerExampleSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KEXPPowerExampleSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		72873BFE27A8D3C200132B62 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
+		72873C0327A8D3C200132B62 /* Tests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		72873C0727A8D3C200132B62 /* Tests_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOS.swift; sourceTree = "<group>"; };
+		72873C0927A8D3C200132B62 /* Tests_iOSLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOSLaunchTests.swift; sourceTree = "<group>"; };
+		72873C0F27A8D3C200132B62 /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		72873C1327A8D3C200132B62 /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
+		72873C1527A8D3C200132B62 /* Tests_macOSLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOSLaunchTests.swift; sourceTree = "<group>"; };
+		72873C3327A9936700132B62 /* SongView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongView.swift; sourceTree = "<group>"; };
+		72873C3527A998E400132B62 /* PlayResultStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayResultStore.swift; sourceTree = "<group>"; };
+		72873C3727A99C7000132B62 /* PlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayView.swift; sourceTree = "<group>"; };
+		72873C3D27AB7CDC00132B62 /* To Add.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "To Add.md"; sourceTree = "<group>"; };
+		728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayResult Fixture.swift"; sourceTree = "<group>"; };
+		728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShowResult Fixture.swift"; sourceTree = "<group>"; };
 		8B159DC0233C66E500BCB7AB /* ArchiveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveManager.swift; sourceTree = "<group>"; };
 		8B3C37AC234021E800413329 /* ArchiveShow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveShow.swift; sourceTree = "<group>"; };
 		8B437FAE234EE3CE002EDB91 /* ArchiveStreamSample.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ArchiveStreamSample.json; sourceTree = "<group>"; };
@@ -105,6 +197,28 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		72873BF427A8D3C200132B62 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72873C2927A8D47700132B62 /* KEXPPower.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72873C0027A8D3C200132B62 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72873C0C27A8D3C200132B62 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BFFECB222C95E6100E3378C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -124,12 +238,80 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72873BEA27A8D21500132B62 /* KEXPPower.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7272836D27B2C77900021CD4 /* Song List */ = {
+			isa = PBXGroup;
+			children = (
+				72873C3727A99C7000132B62 /* PlayView.swift */,
+				72873C3327A9936700132B62 /* SongView.swift */,
+				7272836F27B319AB00021CD4 /* SingleSongView.swift */,
+				72873C3527A998E400132B62 /* PlayResultStore.swift */,
+			);
+			path = "Song List";
+			sourceTree = "<group>";
+		};
+		7272836E27B2C78D00021CD4 /* Show Information */ = {
+			isa = PBXGroup;
+			children = (
+				7272836B27B2C4D100021CD4 /* ShowView.swift */,
+				7272836827B2BF5E00021CD4 /* ProgramView.swift */,
+				7272836527B2AE6900021CD4 /* ShowStore.swift */,
+			);
+			path = "Show Information";
+			sourceTree = "<group>";
+		};
+		72873BE927A8D21500132B62 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		72873BEF27A8D3C100132B62 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				72873BF027A8D3C100132B62 /* KEXPPowerExampleSwiftUIApp.swift */,
+				72873BF127A8D3C100132B62 /* ContentView.swift */,
+				7272836D27B2C77900021CD4 /* Song List */,
+				7272836E27B2C78D00021CD4 /* Show Information */,
+				72873BF227A8D3C200132B62 /* Assets.xcassets */,
+				72873C3D27AB7CDC00132B62 /* To Add.md */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		72873BFD27A8D3C200132B62 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				72873BFE27A8D3C200132B62 /* macOS.entitlements */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
+		72873C0627A8D3C200132B62 /* Tests iOS */ = {
+			isa = PBXGroup;
+			children = (
+				72873C0727A8D3C200132B62 /* Tests_iOS.swift */,
+				72873C0927A8D3C200132B62 /* Tests_iOSLaunchTests.swift */,
+			);
+			path = "Tests iOS";
+			sourceTree = "<group>";
+		};
+		72873C1227A8D3C200132B62 /* Tests macOS */ = {
+			isa = PBXGroup;
+			children = (
+				72873C1327A8D3C200132B62 /* Tests_macOS.swift */,
+				72873C1527A8D3C200132B62 /* Tests_macOSLaunchTests.swift */,
+			);
+			path = "Tests macOS";
+			sourceTree = "<group>";
+		};
 		8B159DBF233C665200BCB7AB /* Archive */ = {
 			isa = PBXGroup;
 			children = (
@@ -159,7 +341,11 @@
 				8BEA9AD023555C0900C5F010 /* ArchiveShowStart.swift */,
 				8B437FB0234EE45B002EDB91 /* ArchiveStreamResult.swift */,
 				8B45123C240F6C7000EAFEFC /* PlayResult.swift */,
+				728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */,
+				7272837127B3207D00021CD4 /* Play Fixture.swift */,
 				8B451232240F5C1300EAFEFC /* ShowResult.swift */,
+				728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */,
+				7272837327B322C800021CD4 /* Show Fixture.swift */,
 				8B46C4B922DD9B03003E5277 /* Configuration.swift */,
 			);
 			path = KEXP;
@@ -187,10 +373,16 @@
 		8BFFECAB22C95E6100E3378C = {
 			isa = PBXGroup;
 			children = (
+				7272836427B1BBAC00021CD4 /* KEXPPowerExampleSwiftUI (iOS).entitlements */,
 				8BFFECB722C95E6100E3378C /* KEXPPower */,
 				8BFFECC222C95E6100E3378C /* KEXPPowerTests */,
 				8BFFECD422C95FB300E3378C /* KEXPPowerExample */,
+				72873BEF27A8D3C100132B62 /* Shared */,
+				72873BFD27A8D3C200132B62 /* macOS */,
+				72873C0627A8D3C200132B62 /* Tests iOS */,
+				72873C1227A8D3C200132B62 /* Tests macOS */,
 				8BFFECB622C95E6100E3378C /* Products */,
+				72873BE927A8D21500132B62 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -200,6 +392,9 @@
 				8BFFECB522C95E6100E3378C /* KEXPPower.framework */,
 				8BFFECBE22C95E6100E3378C /* KEXPPowerTests.xctest */,
 				8BFFECD322C95FB300E3378C /* KEXPPowerExample.app */,
+				72873BF727A8D3C200132B62 /* KEXPPowerExampleSwiftUI.app */,
+				72873C0327A8D3C200132B62 /* Tests iOS.xctest */,
+				72873C0F27A8D3C200132B62 /* Tests macOS.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -314,6 +509,60 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		72873BF627A8D3C200132B62 /* KEXPPowerExampleSwiftUI (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72873C1D27A8D3C200132B62 /* Build configuration list for PBXNativeTarget "KEXPPowerExampleSwiftUI (iOS)" */;
+			buildPhases = (
+				72873BF327A8D3C200132B62 /* Sources */,
+				72873BF427A8D3C200132B62 /* Frameworks */,
+				72873BF527A8D3C200132B62 /* Resources */,
+				72873C2D27A8D47800132B62 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				72873C2C27A8D47700132B62 /* PBXTargetDependency */,
+			);
+			name = "KEXPPowerExampleSwiftUI (iOS)";
+			productName = "KEXPPowerExampleSwiftUI (iOS)";
+			productReference = 72873BF727A8D3C200132B62 /* KEXPPowerExampleSwiftUI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		72873C0227A8D3C200132B62 /* Tests iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72873C2327A8D3C200132B62 /* Build configuration list for PBXNativeTarget "Tests iOS" */;
+			buildPhases = (
+				72873BFF27A8D3C200132B62 /* Sources */,
+				72873C0027A8D3C200132B62 /* Frameworks */,
+				72873C0127A8D3C200132B62 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				72873C0527A8D3C200132B62 /* PBXTargetDependency */,
+			);
+			name = "Tests iOS";
+			productName = "Tests iOS";
+			productReference = 72873C0327A8D3C200132B62 /* Tests iOS.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		72873C0E27A8D3C200132B62 /* Tests macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72873C2627A8D3C200132B62 /* Build configuration list for PBXNativeTarget "Tests macOS" */;
+			buildPhases = (
+				72873C0B27A8D3C200132B62 /* Sources */,
+				72873C0C27A8D3C200132B62 /* Frameworks */,
+				72873C0D27A8D3C200132B62 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Tests macOS";
+			productName = "Tests macOS";
+			productReference = 72873C0F27A8D3C200132B62 /* Tests macOS.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		8BFFECB422C95E6100E3378C /* KEXPPower */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8BFFECC922C95E6200E3378C /* Build configuration list for PBXNativeTarget "KEXPPower" */;
@@ -357,10 +606,12 @@
 				8BFFECCF22C95FB300E3378C /* Sources */,
 				8BFFECD022C95FB300E3378C /* Frameworks */,
 				8BFFECD122C95FB300E3378C /* Resources */,
+				72873BEE27A8D21500132B62 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				72873BED27A8D21500132B62 /* PBXTargetDependency */,
 			);
 			name = KEXPPowerExample;
 			productName = KEXPPowerExample;
@@ -373,10 +624,21 @@
 		8BFFECAC22C95E6100E3378C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1020;
-				LastUpgradeCheck = 1220;
+				LastSwiftUpdateCheck = 1320;
+				LastUpgradeCheck = 1320;
 				ORGANIZATIONNAME = KEXP;
 				TargetAttributes = {
+					72873BF627A8D3C200132B62 = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
+					72873C0227A8D3C200132B62 = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = 72873BF627A8D3C200132B62;
+					};
+					72873C0E27A8D3C200132B62 = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = 72873BFB27A8D3C200132B62;
+					};
 					8BFFECB422C95E6100E3378C = {
 						CreatedOnToolsVersion = 10.2.1;
 						LastSwiftMigration = 1020;
@@ -405,11 +667,36 @@
 				8BFFECB422C95E6100E3378C /* KEXPPower */,
 				8BFFECBD22C95E6100E3378C /* KEXPPowerTests */,
 				8BFFECD222C95FB300E3378C /* KEXPPowerExample */,
+				72873BF627A8D3C200132B62 /* KEXPPowerExampleSwiftUI (iOS) */,
+				72873C0227A8D3C200132B62 /* Tests iOS */,
+				72873C0E27A8D3C200132B62 /* Tests macOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		72873BF527A8D3C200132B62 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72873C1B27A8D3C200132B62 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72873C0127A8D3C200132B62 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72873C0D27A8D3C200132B62 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BFFECB322C95E6100E3378C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -443,17 +730,54 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		72873BF327A8D3C200132B62 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72873C3427A9936700132B62 /* SongView.swift in Sources */,
+				7272837027B319AB00021CD4 /* SingleSongView.swift in Sources */,
+				72873C1927A8D3C200132B62 /* ContentView.swift in Sources */,
+				7272836727B2AE6900021CD4 /* ShowStore.swift in Sources */,
+				7272836A27B2BF5E00021CD4 /* ProgramView.swift in Sources */,
+				72873C3627A998E400132B62 /* PlayResultStore.swift in Sources */,
+				7272836C27B2C4D100021CD4 /* ShowView.swift in Sources */,
+				72873C3827A99C7000132B62 /* PlayView.swift in Sources */,
+				72873C1727A8D3C200132B62 /* KEXPPowerExampleSwiftUIApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72873BFF27A8D3C200132B62 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72873C0A27A8D3C200132B62 /* Tests_iOSLaunchTests.swift in Sources */,
+				72873C0827A8D3C200132B62 /* Tests_iOS.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72873C0B27A8D3C200132B62 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72873C1627A8D3C200132B62 /* Tests_macOSLaunchTests.swift in Sources */,
+				72873C1427A8D3C200132B62 /* Tests_macOS.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8BFFECB122C95E6100E3378C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				8B159DC1233C66E500BCB7AB /* ArchiveManager.swift in Sources */,
+				7272837427B322C800021CD4 /* Show Fixture.swift in Sources */,
 				8BFFED0522D43EE700E3378C /* NetworkManager.swift in Sources */,
 				8BD1638224551394006BF61F /* GenreShows.swift in Sources */,
+				728DA59627B33D1700EE38A4 /* ShowResult Fixture.swift in Sources */,
 				8B46C4C022DEC811003E5277 /* UIImageView+Loading.swift in Sources */,
 				8BFFED0822D43F3800E3378C /* KEXPPower.swift in Sources */,
 				8BB9AF642454E85E004DCD20 /* ShowNameShows.swift in Sources */,
 				8BEA9AD123555C0900C5F010 /* ArchiveShowStart.swift in Sources */,
+				728DA59427B33C8E00EE38A4 /* PlayResult Fixture.swift in Sources */,
 				8B437FB1234EE45B002EDB91 /* ArchiveStreamResult.swift in Sources */,
 				8BB9AF622454C71C004DCD20 /* DateShows.swift in Sources */,
 				8B81465A23628A1B008EDF50 /* AppleMusicResult.swift in Sources */,
@@ -463,6 +787,7 @@
 				8B45123D240F6C7000EAFEFC /* PlayResult.swift in Sources */,
 				8BB9AF6624551133004DCD20 /* HostNameShows.swift in Sources */,
 				8B46C4BA22DD9B03003E5277 /* Configuration.swift in Sources */,
+				7272837227B3207D00021CD4 /* Play Fixture.swift in Sources */,
 				8B46C4C422DEE016003E5277 /* Reachability.swift in Sources */,
 				8BFFECFC22CB073100E3378C /* DateFormatter+StandardFormatters.swift in Sources */,
 			);
@@ -494,6 +819,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		72873BED27A8D21500132B62 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BFFECB422C95E6100E3378C /* KEXPPower */;
+			targetProxy = 72873BEC27A8D21500132B62 /* PBXContainerItemProxy */;
+		};
+		72873C0527A8D3C200132B62 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72873BF627A8D3C200132B62 /* KEXPPowerExampleSwiftUI (iOS) */;
+			targetProxy = 72873C0427A8D3C200132B62 /* PBXContainerItemProxy */;
+		};
+		72873C2C27A8D47700132B62 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BFFECB422C95E6100E3378C /* KEXPPower */;
+			targetProxy = 72873C2B27A8D47700132B62 /* PBXContainerItemProxy */;
+		};
 		8BFFECC122C95E6100E3378C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8BFFECB422C95E6100E3378C /* KEXPPower */;
@@ -502,6 +842,153 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		72873C1E27A8D3C200132B62 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_ENTITLEMENTS = "KEXPPowerExampleSwiftUI (iOS).entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.KEXPPowerExampleSwiftUI;
+				PRODUCT_NAME = KEXPPowerExampleSwiftUI;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		72873C1F27A8D3C200132B62 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_ENTITLEMENTS = "KEXPPowerExampleSwiftUI (iOS).entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.KEXPPowerExampleSwiftUI;
+				PRODUCT_NAME = KEXPPowerExampleSwiftUI;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		72873C2427A8D3C200132B62 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "KEXPPowerExampleSwiftUI (iOS)";
+			};
+			name = Debug;
+		};
+		72873C2527A8D3C200132B62 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "KEXPPowerExampleSwiftUI (iOS)";
+			};
+			name = Release;
+		};
+		72873C2727A8D3C200132B62 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-macOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "KEXPPowerExampleSwiftUI (macOS)";
+			};
+			name = Debug;
+		};
+		72873C2827A8D3C200132B62 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-macOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "KEXPPowerExampleSwiftUI (macOS)";
+			};
+			name = Release;
+		};
 		8BFFECC722C95E6200E3378C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -732,7 +1219,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7F4LVTRHRM;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				INFOPLIST_FILE = KEXPPowerExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -752,7 +1239,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7F4LVTRHRM;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				INFOPLIST_FILE = KEXPPowerExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -770,6 +1257,33 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		72873C1D27A8D3C200132B62 /* Build configuration list for PBXNativeTarget "KEXPPowerExampleSwiftUI (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72873C1E27A8D3C200132B62 /* Debug */,
+				72873C1F27A8D3C200132B62 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		72873C2327A8D3C200132B62 /* Build configuration list for PBXNativeTarget "Tests iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72873C2427A8D3C200132B62 /* Debug */,
+				72873C2527A8D3C200132B62 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		72873C2627A8D3C200132B62 /* Build configuration list for PBXNativeTarget "Tests macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72873C2727A8D3C200132B62 /* Debug */,
+				72873C2827A8D3C200132B62 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		8BFFECAF22C95E6100E3378C /* Build configuration list for PBXProject "KEXPPower" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

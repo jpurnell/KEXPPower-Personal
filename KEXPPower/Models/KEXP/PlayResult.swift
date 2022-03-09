@@ -9,7 +9,8 @@
 import Foundation
 
 // MARK: - PlayResult
-public struct PlayResult: Decodable {
+public struct PlayResult: Decodable, Identifiable {
+    public var id = UUID()
     public let next: String?
     public let previous: String?
     public let plays: [Play]?
@@ -22,7 +23,7 @@ public struct PlayResult: Decodable {
 }
 
 // MARK: - Result
-public struct Play: Decodable {
+public struct Play: Decodable, Identifiable {
     public let id: Int?
     public let uri: String?
     public let airdate: Date?

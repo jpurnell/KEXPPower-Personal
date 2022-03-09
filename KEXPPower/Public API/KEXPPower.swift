@@ -82,4 +82,12 @@ public class KEXPPower {
     }
 
     private init(){}
+    
+    public static func fixture(kexpBaseURL: String? = "https://api.kexp.org",
+                               availableStreams: [AvailableStream]  = [AvailableStream(streamName: "128 Kbps", streamURL: URL(string: "https://kexp-mp3-128.streamguys1.com/kexp128.mp3")!)],
+                               selectedArchiveBitRate: ArchiveBitRate = .oneTwentyEight) -> KEXPPower {
+        let sharedInstance = KEXPPower()
+        sharedInstance.setup(kexpBaseURL: kexpBaseURL!, configurationURL: nil, availableStreams: availableStreams, archiveStreams: nil, selectedArchiveBitRate: selectedArchiveBitRate)
+        return sharedInstance
+    }
 }
