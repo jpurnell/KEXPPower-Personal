@@ -30,7 +30,10 @@ struct SingleSongView: View {
             Text(play.artist ?? "").font(.caption)
             Text(play.album ?? "").font(.caption).foregroundColor(.gray)
             Divider()
-            Text(play.comment ?? "").font(.caption).padding()
+            ScrollView(.vertical, showsIndicators: false) {
+                Text(.init(stringLiteral: play.comment ?? ""))
+                            .font(.caption)
+            }.padding()
             Spacer()
         }
     }

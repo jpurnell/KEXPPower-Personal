@@ -27,7 +27,7 @@ public struct NetworkManager {
 
     public func getPlay(
         airdateBefore: String? = nil,
-        limit: Int = 20,
+        limit: Int = 2000,
         offset: Int = 0,
         queue: DispatchQueue = .main,
         completion: @escaping PlayCompletion)

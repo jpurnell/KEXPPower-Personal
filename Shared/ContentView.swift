@@ -20,7 +20,8 @@ struct ContentView: View {
         NavigationView {
             VStack(alignment: .center) {
                 ShowView(show: showResults.shows.first)
-                List(playResults.results.first?.plays ?? []) { play in
+//                List(playResults.results.first?.plays ?? []) { play in
+                List(playResults.results.flatMap({$0.plays ?? []})) { play in
                     NavigationLink(destination: {
                         SingleSongView(play: play) },
                                    label: {

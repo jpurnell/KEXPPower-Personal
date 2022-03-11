@@ -48,9 +48,10 @@ struct SongView: View {
                 }
                 .frame(minWidth: 100, idealWidth: 200, maxWidth: 200, minHeight: 20, idealHeight: 100, maxHeight: 200, alignment: .topLeading)
             }.padding(.bottom, 5)
-            VStack(alignment: .leading) {
-                Text(comments).font(.caption)
-            }.padding(.leastNonzeroMagnitude)
+            ScrollView(.vertical, showsIndicators: true) {
+                Text(.init(stringLiteral: comments))
+                    .font(.caption)
+            }.padding(.vertical)
         }
     }
 }

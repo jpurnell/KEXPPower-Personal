@@ -50,7 +50,7 @@ class PlayResultStore: ObservableObject, Identifiable {
         self.$results
             .dropFirst()
             .map { results in
-                results.first?.plays ?? []
+                results.flatMap({$0.plays ?? []})
         }
         .assign(to: &$plays)
     }
