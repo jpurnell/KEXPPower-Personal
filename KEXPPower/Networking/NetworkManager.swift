@@ -9,12 +9,12 @@
 import Foundation
 
 public struct NetworkManager {
+    public typealias PlayIdCompletion = (_ result: Result<Play?, Error>) -> Void
     public typealias PlayCompletion = (_ result: Result<PlayResult?, Error>) -> Void
     public typealias ShowCompletion = (_ result: Result<ShowResult?, Error>) -> Void
     public typealias ShowDetailsCompletion = (_ result: Result<Show?, Error>) -> Void
     public typealias ArchiveCompletion = (_ result: Result<ArchiveStreamResult?, Error>) -> Void
     public typealias AppleMusicCompletion = (_ result: Result<AppleMusicResult?, Error>) -> Void
-    public typealias ConfigurationCompletion = (_ result: Result<Configuration?, Error>) -> Void
     
     private let router = Router()
     private let reachability = Reachability()
@@ -41,13 +41,50 @@ public struct NetworkManager {
         parameters.append(URLQueryItem(name: "limit", value: "\(limit)"))
         parameters.append(URLQueryItem(name: "offset", value: "\(offset)"))
         
-        router.get(url: KEXPPower.playURL, parameters: parameters) { result in
+        router.get(url: KEXPPower.sharedInstance.playURL, parameters: parameters) { result in
             switch result {
             case .success(let data):
                 do {
                     let playResult = try JSONDecoder().decode(PlayResult.self, from: data)
 
                     queue.async { completion(.success(playResult)) }
+                } catch let error {
+                    let error = NSError(
+                        domain: "com.kexppower.error",
+                        code: 0,
+                        userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
+                    )
+                    
+                    queue.async { completion(.failure(error)) }
+                }
+                
+            case .failure(let error):
+                let error = NSError(
+                    domain: "com.kexppower.error",
+                    code: 0,
+                    userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
+                )
+                
+                queue.async { completion(.failure(error)) }
+            }
+        }
+    }
+    
+    public func getPlayWith(
+        playID: Int,
+        queue: DispatchQueue = .main,
+        completion: @escaping PlayIdCompletion)
+    {
+        var url = KEXPPower.sharedInstance.playURL
+        url.appendPathComponent(_: String(playID))
+      
+        router.get(url: url) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let play = try JSONDecoder().decode(Play.self, from: data)
+                    queue.async { completion(.success(play)) }
+                    
                 } catch let error {
                     let error = NSError(
                         domain: "com.kexppower.error",
@@ -96,7 +133,7 @@ public struct NetworkManager {
             parameters.append(URLQueryItem(name: "offset", value: "\(offset)"))
         }
 
-        router.get(url: KEXPPower.showURL, parameters: parameters) { result in
+        router.get(url: KEXPPower.sharedInstance.showURL, parameters: parameters) { result in
             switch result {
             case .success(let data):
                 do {
@@ -167,7 +204,7 @@ public struct NetworkManager {
         var parameters = [URLQueryItem]()
         parameters.append(URLQueryItem(name: "stream_time", value: streamTime))
 
-        router.get(url: KEXPPower.showStartURL, parameters: parameters) { result in
+        router.get(url: KEXPPower.sharedInstance.showStartURL, parameters: parameters) { result in
             switch result {
             case .success(let data):
                 do {
@@ -195,42 +232,12 @@ public struct NetworkManager {
             }
         }
     }
-
-    public func getConfiguration(queue: DispatchQueue = .main, completion: @escaping ConfigurationCompletion) {
-        guard
-            let configurationURL = KEXPPower.configurationURL,
-            let data = try? Data(contentsOf: configurationURL)
-        else {
-                let error = NSError(
-                domain: "com.kexppower.error",
-                code: 0,
-                userInfo: [NSLocalizedDescriptionKey: "Failure retrieving config"]
-            )
-            
-            queue.async { completion(.failure(error)) }
-            return
-        }
-        
-        do {
-            let configuration = try JSONDecoder().decode(Configuration.self, from: data)
-            queue.async {  completion(.success(configuration)) }
-        } catch let error {
-            let error = NSError(
-                domain: "com.kexppower.error",
-                code: 0,
-                userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
-            )
-            
-            queue.async { completion(.failure(error)) }
-        }
-    }
     
-    public func getArchiveStreamURL(bitrate: String, timestamp: String?, queue: DispatchQueue = .main, completion: @escaping ArchiveCompletion) {
+    public func getArchiveStreamURL(timestamp: String?, queue: DispatchQueue = .main, completion: @escaping ArchiveCompletion) {
         var parameters = [URLQueryItem]()
-        parameters.append(URLQueryItem(name: "bitrate", value: bitrate))
         parameters.append(URLQueryItem(name: "timestamp", value: timestamp))
         
-        router.get(url: KEXPPower.streamingURL, parameters: parameters) { result in
+        router.get(url: KEXPPower.sharedInstance.streamingURL, parameters: parameters) { result in
             switch result {
             case .success(let data):
                 do {
