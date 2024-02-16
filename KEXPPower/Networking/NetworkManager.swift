@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 
 public struct NetworkManager {
     public typealias PlayIdCompletion = (_ result: Result<Play?, Error>) -> Void
@@ -21,10 +22,21 @@ public struct NetworkManager {
     
     public init() {}
     
-    public var isReachability: Bool {
-        return reachability.isReachable()
-    }
+	public var isReachability: Bool {
+		return reachability.isReachable()
+	}
 
+//	extension Logger {
+//		init(func function: String, _ filePath: String = #file, _ depth: Int = 3, _ separator: String = " > ") {
+//			let fileName = filePath.components(separatedBy: "/").suffix(depth).joined(separator: separator)
+//			if let bundleIdentifier = Bundle.main.bundleIdentifier {
+//				self.init(subsystem: "\(bundleIdentifier)\(bundleIdentifier != "" ? separator : "")\(fileName)", category: "\(function)")
+//			} else {
+//				self.init(subsystem: "\(fileName)", category: "\(function)")
+//			}
+//		}
+//	}
+	
     public func getPlay(
         airdateBefore: String? = nil,
         limit: Int = 2000,
@@ -45,9 +57,13 @@ public struct NetworkManager {
             switch result {
             case .success(let data):
                 do {
-                    let playResult = try JSONDecoder().decode(PlayResult.self, from: data)
-
-                    queue.async { completion(.success(playResult)) }
+					let log = Logger(subsystem: "KEXP Power", category: "Networking > Network Manager > Get Play")
+					if let playResult = try? JSONDecoder().decode(PlayResult.self, from: data) {
+						log.debug("\(playResult.plays?.first!.description ?? "")")
+						queue.async { completion(.success(playResult)) }
+					} else {
+						log.error("🛑 Could not decode PlayResult from \(String(data: data, encoding: .utf8) ?? "")")
+					}
                 } catch let error {
                     let error = NSError(
                         domain: "com.kexppower.error",

@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import KEXPPower
+import OSLog
 
 class ShowStore: ObservableObject, Identifiable {
     private var timerSubscription: AnyCancellable?
@@ -32,15 +33,16 @@ class ShowStore: ObservableObject, Identifiable {
     }
     
     func next() {
+		let nextShowResultsStoreLogger = Logger(subsystem: "Shared > Show Information > Show Store", category: "Next")
         NetworkManager().getShow { result in
             switch result {
                 case .success(let showResult):
-                    guard let goodShowResult = showResult else { print("no results"); return }
+					guard let goodShowResult = showResult else { nextShowResultsStoreLogger.warning("No Results"); return }
                     self.results = [goodShowResult]
-                    guard let shows = goodShowResult.shows else { print("no shows"); return }
-                    print(shows[0])
+                    guard let shows = goodShowResult.shows else { nextShowResultsStoreLogger.warning("No Shows"); return }
+					nextShowResultsStoreLogger.log("\(shows[0].description)")
                 case .failure(let error):
-                    print("error: \(error.localizedDescription)")
+					nextShowResultsStoreLogger.error("\(error.localizedDescription, privacy: .public)")
             }
         }
         listShows()

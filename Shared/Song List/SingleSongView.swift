@@ -32,10 +32,12 @@ struct SingleSongView: View {
             Divider()
             ScrollView(.vertical, showsIndicators: false) {
                 Text(.init(stringLiteral: play.comment ?? ""))
-                            .font(.caption)
-            }.padding()
+//                            .font(.caption)
+            }
+			
             Spacer()
         }
+		.padding()
     }
 }
 

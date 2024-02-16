@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 
 /// Class used to configure KEXP networking
 public class KEXPPower {
@@ -27,7 +28,13 @@ public class KEXPPower {
     let listenerId: UUID = .init()
 
     var playURL: URL {
-        URL(string: KEXPPower.sharedInstance.kexpBaseURL + "/v2/plays")!
+		let playURLLogger = Logger(subsystem: "KEXPPower > Public API > KEXPPower", category: "play URL")
+		playURLLogger.info("Attempting \(KEXPPower.sharedInstance.kexpBaseURL)")
+		guard let returnURL = try URL(string: KEXPPower.sharedInstance.kexpBaseURL + "/v2/plays") else {
+			let defaultReturnURL = URL(string: "https://kexp.streamguys1.com/kexp160.aac?listenerId=\(UUID())")!
+			playURLLogger.log("opening  \(defaultReturnURL.absoluteString, privacy: .public)")
+			return defaultReturnURL }
+		return returnURL
     }
     var showURL: URL {
         URL(string: KEXPPower.sharedInstance.kexpBaseURL + "/v2/shows")!
@@ -41,7 +48,7 @@ public class KEXPPower {
         URL(string: KEXPPower.sharedInstance.kexpBaseURL + "/get_streaming_url")!
     }
 
-    private var kexpBaseURL: String!
+    private var kexpBaseURL: String
 
     /// Configure KEXPPower
     /// - Parameters:
@@ -60,16 +67,18 @@ public class KEXPPower {
     }
     
     static func getShowURL(with showId: String) -> URL {
-        return URL(string: KEXPPower.sharedInstance.kexpBaseURL + "/v2/shows/\(showId)")!
+		guard let returnURL = URL(string: KEXPPower.sharedInstance.kexpBaseURL + "/v2/shows/\(showId)") else { return URL(string: "")! }
+		return returnURL
     }
 
-    private init(){}
+    private init(){
+		self.kexpBaseURL = "https://api.kexp.org"
+		self.selectedBitRate = .oneSixty
+	}
     
-    public static func fixture(kexpBaseURL: String? = "https://api.kexp.org",
-                               availableStreams: [AvailableStream]  = [AvailableStream(streamName: "128 Kbps", streamURL: URL(string: "https://kexp-mp3-128.streamguys1.com/kexp128.mp3")!)],
-                               selectedArchiveBitRate: ArchiveBitRate = .oneTwentyEight) -> KEXPPower {
+	public static func fixture(kexpBaseURL: String? = "https://api.kexp.org", selectedBitRate: StreamingBitRate = .oneSixty) -> KEXPPower {
         let sharedInstance = KEXPPower()
-        sharedInstance.setup(kexpBaseURL: kexpBaseURL!, configurationURL: nil, availableStreams: availableStreams, archiveStreams: nil, selectedArchiveBitRate: selectedArchiveBitRate)
+        sharedInstance.setup(kexpBaseURL: kexpBaseURL ?? "", selectedBitRate: selectedBitRate)
         return sharedInstance
     }
 }

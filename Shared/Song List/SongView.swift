@@ -35,23 +35,29 @@ struct SongView: View {
                         ProgressView().progressViewStyle(.circular)
                     }
                 }
+				.clipShape(RoundedRectangle(cornerRadius: 36.0))
+				.shadow(color: .black.opacity(0.3), radius: 6, x: 1.0, y: 1.0)
                 .frame(minWidth: 20, idealWidth: 200, maxWidth: 200, minHeight: 20, idealHeight: 100, maxHeight: 200, alignment: .topLeading)
+				
                 VStack(alignment: .leading) {
-                    Text(DateFormatter.displayFormatter.string(from: playTime)).font(.caption)
+					Text(DateFormatter.displayFormatterWithDate.string(from: playTime))
+//						.font(.caption)
                     Text(songName).bold()
                     Text(artistName).fontWeight(.light)
                     Text(albumName).font(.caption)
                     HStack(alignment: .top) {
                         Text(year)
                         Text(recordLabel)
-                    }.font(.caption)
+                    }
+//					.font(.caption)
                 }
                 .frame(minWidth: 100, idealWidth: 200, maxWidth: 200, minHeight: 20, idealHeight: 100, maxHeight: 200, alignment: .topLeading)
             }.padding(.bottom, 5)
-            ScrollView(.vertical, showsIndicators: true) {
-                Text(.init(stringLiteral: comments))
-                    .font(.caption)
-            }.padding(.vertical)
+//            ScrollView(.vertical, showsIndicators: true) {
+//                Text(.init(stringLiteral: comments))
+////                    .font(.caption)
+//            }
+			.padding(.vertical)
         }
     }
 }

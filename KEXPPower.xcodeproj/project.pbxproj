@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7244DDE72B7E73E100375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
+		7244DDEA2B7E752700375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
+		7244DDEB2B7E752700375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
+		7244DDEC2B7E752800375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
+		7244DDED2B7E752800375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
+		7244DDEE2B7E752900375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
 		7272836727B2AE6900021CD4 /* ShowStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836527B2AE6900021CD4 /* ShowStore.swift */; };
 		7272836A27B2BF5E00021CD4 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836827B2BF5E00021CD4 /* ProgramView.swift */; };
 		7272836C27B2C4D100021CD4 /* ShowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836B27B2C4D100021CD4 /* ShowView.swift */; };
@@ -127,6 +133,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7244DDE32B7E73DB00375023 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		7272836427B1BBAC00021CD4 /* KEXPPowerExampleSwiftUI (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "KEXPPowerExampleSwiftUI (iOS).entitlements"; sourceTree = "<group>"; };
 		7272836527B2AE6900021CD4 /* ShowStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowStore.swift; sourceTree = "<group>"; };
 		7272836827B2BF5E00021CD4 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
@@ -278,6 +285,7 @@
 		72873BEF27A8D3C100132B62 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				7244DDE32B7E73DB00375023 /* Logger.swift */,
 				72873BF027A8D3C100132B62 /* KEXPPowerExampleSwiftUIApp.swift */,
 				72873BF127A8D3C100132B62 /* ContentView.swift */,
 				7272836D27B2C77900021CD4 /* Song List */,
@@ -356,7 +364,6 @@
 				8B451232240F5C1300EAFEFC /* ShowResult.swift */,
 				728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */,
 				7272837327B322C800021CD4 /* Show Fixture.swift */,
-				8B46C4B922DD9B03003E5277 /* Configuration.swift */,
 			);
 			path = KEXP;
 			sourceTree = "<group>";
@@ -759,6 +766,7 @@
 				72873C1927A8D3C200132B62 /* ContentView.swift in Sources */,
 				7272836727B2AE6900021CD4 /* ShowStore.swift in Sources */,
 				7272836A27B2BF5E00021CD4 /* ProgramView.swift in Sources */,
+				7244DDE72B7E73E100375023 /* Logger.swift in Sources */,
 				72873C3627A998E400132B62 /* PlayResultStore.swift in Sources */,
 				7272836C27B2C4D100021CD4 /* ShowView.swift in Sources */,
 				72873C3827A99C7000132B62 /* PlayView.swift in Sources */,
@@ -771,6 +779,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				72873C0A27A8D3C200132B62 /* Tests_iOSLaunchTests.swift in Sources */,
+				7244DDED2B7E752800375023 /* Logger.swift in Sources */,
 				72873C0827A8D3C200132B62 /* Tests_iOS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -780,6 +789,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				72873C1627A8D3C200132B62 /* Tests_macOSLaunchTests.swift in Sources */,
+				7244DDEE2B7E752900375023 /* Logger.swift in Sources */,
 				72873C1427A8D3C200132B62 /* Tests_macOS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -795,6 +805,7 @@
 				728DA59627B33D1700EE38A4 /* ShowResult Fixture.swift in Sources */,
 				8B46C4C022DEC811003E5277 /* UIImageView+Loading.swift in Sources */,
 				CFA34E5829BA309E00CF45B0 /* PlayFormatters.swift in Sources */,
+				7244DDEA2B7E752700375023 /* Logger.swift in Sources */,
 				8BFFED0822D43F3800E3378C /* KEXPPower.swift in Sources */,
 				8BB9AF642454E85E004DCD20 /* ShowNameShows.swift in Sources */,
 				8BEA9AD123555C0900C5F010 /* ArchiveShowStart.swift in Sources */,
@@ -808,7 +819,6 @@
 				8B1AE2EC27CC29EA000BFE1F /* AvailableStreams.swift in Sources */,
 				8B45123D240F6C7000EAFEFC /* PlayResult.swift in Sources */,
 				8BB9AF6624551133004DCD20 /* HostNameShows.swift in Sources */,
-				8B46C4BA22DD9B03003E5277 /* Configuration.swift in Sources */,
 				7272837227B3207D00021CD4 /* Play Fixture.swift in Sources */,
 				8B46C4C422DEE016003E5277 /* Reachability.swift in Sources */,
 				8BFFECFC22CB073100E3378C /* DateFormatter+StandardFormatters.swift in Sources */,
@@ -826,6 +836,7 @@
 				8B45123F2410A4D500EAFEFC /* PlayResultParseTests.swift in Sources */,
 				8BFFECF722C96F6000E3378C /* XCTestCase+Helpers.swift in Sources */,
 				8B437FB3234EE8F6002EDB91 /* ArchiveStreamParseTests.swift in Sources */,
+				7244DDEB2B7E752700375023 /* Logger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -834,6 +845,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8BFFECD822C95FB300E3378C /* ViewController.swift in Sources */,
+				7244DDEC2B7E752800375023 /* Logger.swift in Sources */,
 				8BFFECD622C95FB300E3378C /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -881,7 +893,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -890,10 +902,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.KEXPPowerExampleSwiftUI;
 				PRODUCT_NAME = KEXPPowerExampleSwiftUI;
 				SDKROOT = iphoneos;
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Debug;
 		};
@@ -914,7 +929,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -923,10 +938,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.KEXPPowerExampleSwiftUI;
 				PRODUCT_NAME = KEXPPowerExampleSwiftUI;
 				SDKROOT = iphoneos;
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -1066,6 +1084,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1075,6 +1094,7 @@
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+				XROS_DEPLOYMENT_TARGET = 1.0;
 			};
 			name = Debug;
 		};
@@ -1127,6 +1147,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				"MARKETING_VERSION[sdk=*]" = "";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -1137,6 +1158,7 @@
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+				XROS_DEPLOYMENT_TARGET = 1.0;
 			};
 			name = Release;
 		};
@@ -1147,13 +1169,13 @@
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 7F4LVTRHRM;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = KEXPPower/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1163,10 +1185,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPower;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Debug;
 		};
@@ -1177,13 +1202,13 @@
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 7F4LVTRHRM;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = KEXPPower/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1193,9 +1218,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPower;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
-				SUPPORTS_MACCATALYST = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Release;
 		};
@@ -1206,6 +1234,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7F4LVTRHRM;
 				INFOPLIST_FILE = KEXPPowerTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1226,6 +1255,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7F4LVTRHRM;
 				INFOPLIST_FILE = KEXPPowerTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1246,7 +1276,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				INFOPLIST_FILE = KEXPPowerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1254,8 +1284,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPowerExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Debug;
 		};
@@ -1266,7 +1300,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				INFOPLIST_FILE = KEXPPowerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1274,8 +1308,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPowerExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Release;
 		};

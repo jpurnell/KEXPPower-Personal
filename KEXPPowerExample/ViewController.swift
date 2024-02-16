@@ -8,10 +8,12 @@
 
 import KEXPPower
 import UIKit
+import OSLog
 
 class ViewController: UIViewController {
     let networkManager = NetworkManager()
     let archiveManager = ArchiveManager()
+	let viewControllerLogger = Logger(subsystem: "KEXP Power Example > View Controller", category: "View Controller")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,26 +21,26 @@ class ViewController: UIViewController {
         view.backgroundColor = .white
         
         networkManager.getPlay { result in
-            print("playResult: \(result)")
+			viewControllerLogger.log("playResult: \(result, privacy: .public)")
         }
 
         networkManager.getShow { result in
-            print("showResult: \(result)")
+			viewControllerLogger.log("showResult: \(result, privacy: .public)")
         }
 
         networkManager.getShowDetails(with: "47008") { result in
-            print("showDetailsResult: \(result)")
+			viewControllerLogger.log("showDetailsResult: \(result, privacy: .public)")
         }
    
         let now = Int(Date().timeIntervalSince1970)
         let oneWeekAgo = now - 604800
 
         networkManager.getShowStart(with: "\(oneWeekAgo)") { result in
-            print("showStartResult: \(result)")
+			viewControllerLogger.log("showStartResult: \(result, privacy: .public)")
         }
         
         archiveManager.retrieveArchiveShows { dateShows, hostShows, shows, genreShows in
-            print("retrieveArchiveShows: \(dateShows)")
+			viewControllerLogger.log("retrieveArchiveShows: \(dateShows, privacy: .public)")
         }
     }
 }

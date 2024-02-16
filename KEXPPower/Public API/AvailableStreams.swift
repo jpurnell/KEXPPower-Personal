@@ -8,8 +8,8 @@
 
 import Foundation
 
-class AvailableStreams {
-    let livePlayback: [KEXPPower.StreamingBitRate: URL]
+public class AvailableStreams {
+    public let livePlayback: [KEXPPower.StreamingBitRate: URL]
 
     init(with listenerId: UUID) {
         var livePlaybackDict = [KEXPPower.StreamingBitRate: URL]()

@@ -9,11 +9,13 @@
 import Foundation
 import Combine
 import KEXPPower
+import OSLog
 
 class PlayResultStore: ObservableObject, Identifiable {
     private var timerSubscription: AnyCancellable?
     @Published var results: [PlayResult] = []
     @Published var plays: [Play] = []
+	
     
     init() {
         next()
@@ -32,15 +34,18 @@ class PlayResultStore: ObservableObject, Identifiable {
     }
     
     func next() {
+		let nextPlayResultsStoreLogger = Logger(subsystem: "Shared > Song List > Play Results Store", category: "Next")
         NetworkManager().getPlay { result in
             switch result {
                 case .success(let playResult):
-                    guard let goodPlayResult = playResult else { print("no results"); return }
+					guard let goodPlayResult = playResult else { nextPlayResultsStoreLogger.warning("No Results"); return }
                     self.results = [goodPlayResult]
-                    guard let plays = goodPlayResult.plays else { print("no plays"); return}
-                    print(plays[0])
+                    guard let plays = goodPlayResult.plays else { nextPlayResultsStoreLogger.warning("No Plays"); return}
+					nextPlayResultsStoreLogger.log("\(plays[0].description, privacy: .public)")
                 case .failure(let error):
-                    print("error: \(error.localizedDescription)")
+					nextPlayResultsStoreLogger.error("\(error.localizedDescription, privacy: .public)")
+				default:
+					nextPlayResultsStoreLogger.error("unknown error")
             }
         }
         listPlays()

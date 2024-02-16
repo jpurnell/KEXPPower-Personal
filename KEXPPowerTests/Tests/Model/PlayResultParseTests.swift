@@ -10,8 +10,8 @@ import XCTest
 @testable import KEXPPower
 
 class PlayResultParseTests: XCTestCase {
-    var trackplay: Play?
-    var airbreak: Play?
+    var trackplay: Play_Original?
+    var airbreak: Play_Original?
     
     override func setUp() {
         super.setUp()

@@ -37,6 +37,7 @@ public struct Show: Decodable {
     public let tagline: String?
     public let imageURI: String?
     public let startTime: Date?
+	public var description: String { return "\(id ?? 0)\t\(uri ?? "")\n\(programName ?? "") with \((hostNames ?? [""]).joined(separator: ", "))" }
 
     enum CodingKeys: String, CodingKey {
         case id

@@ -13,8 +13,8 @@ struct PlayView: View {
     var play: Play
     
     var body: some View {
-        play.playType == .airbreak ? SongView(imageURL: "https://kexp.org/static/assets/img/kexp_logo.jpg", playTime: play.airdate ?? Date(), songName: "Airbreak", artistName: "", albumName: "", year: "", recordLabel: "", comments: "", small: true) : 
-        SongView(imageURL: play.thumbnailURI ?? "", playTime: play.airdate ?? Date(), songName: play.song ?? "", artistName: play.artist ?? "", albumName: play.album ?? "", year: play.releaseDate ?? "", recordLabel: play.labels?.map({$0}).joined(separator: "\n") ?? "", comments: play.comment ?? "")
+        play.playType == .airbreak ? SongView(imageURL: "https://kexp.org/static/assets/img/kexp_logo.jpg", playTime: /*play.airdate ??*/ Date(), songName: "Airbreak", artistName: "", albumName: "", year: "", recordLabel: "", comments: "", small: true) :
+        SongView(imageURL: play.thumbnailURI ?? "", playTime: /*play.airdate ??*/ Date(), songName: play.song ?? "", artistName: play.artist ?? "", albumName: play.album ?? "", year: play.releaseDate ?? "", recordLabel: play.labels?.map({$0}).joined(separator: "\n") ?? "", comments: play.comment ?? "")
     }
 }
 

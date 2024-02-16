@@ -20,19 +20,24 @@ struct ContentView: View {
         NavigationView {
             VStack(alignment: .center) {
                 ShowView(show: showResults.shows.first)
-//                List(playResults.results.first?.plays ?? []) { play in
                 List(playResults.results.flatMap({$0.plays ?? []})) { play in
                     NavigationLink(destination: {
                         SingleSongView(play: play) },
                                    label: {
                         PlayView(play: play)
                         .padding(.vertical)
-                    }).buttonStyle(PlainButtonStyle())
+                    })
+					.buttonStyle(PlainButtonStyle())
                 }.refreshable {
                     playResults.next()
                     showResults.next()
                 }
-            }.navigationBarHidden(true)
+			}
+			.background(.ultraThinMaterial)
+			.navigationBarHidden(true)
+			#if os(iOS)
+			.navigationSplitViewStyle(.balanced)
+			#endif
         }
     }
 }

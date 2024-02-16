@@ -29,9 +29,10 @@ struct ProgramView: View {
                 }
             }
             .frame(minWidth: 20, idealWidth: 120, maxWidth: 120, minHeight: 20, idealHeight: 120, maxHeight: 120, alignment: .center)
-            .clipShape(Circle())
+			.clipShape(RoundedRectangle(cornerRadius: 36.0))
             .shadow(radius: 10)
-            .overlay(Circle()
+			.overlay(RoundedRectangle(cornerRadius: 36.0)
+//            .overlay(Circle()
                         .stroke(Color.gray, lineWidth: 0.25)
             )
             VStack(alignment: .leading) {
