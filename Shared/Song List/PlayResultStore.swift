@@ -8,13 +8,14 @@
 
 import Foundation
 import Combine
-//import KEXPPower
+import SwiftUI
 import OSLog
 
 class PlayResultStore: ObservableObject, Identifiable {
     private var timerSubscription: AnyCancellable?
     @Published var results: [PlayResult] = []
     @Published var plays: [Play] = []
+//	@Published var visiblePlays: [VisiblePlay] = []
 	
     init() {
         next()
@@ -40,14 +41,13 @@ class PlayResultStore: ObservableObject, Identifiable {
 					guard let goodPlayResult = playResult else { nextPlayResultsStoreLogger.warning("No Results"); return }
                     self.results = [goodPlayResult]
                     guard let plays = goodPlayResult.plays else { nextPlayResultsStoreLogger.warning("No Plays"); return}
-					nextPlayResultsStoreLogger.log("\([plays[0]].map({$0.description}).joined(separator: "\n\n"), privacy: .public)")
+					nextPlayResultsStoreLogger.log("\([plays[(0...10)]].map({$0.description}).joined(separator: "\n\n"), privacy: .public)")
                 case .failure(let error):
 					nextPlayResultsStoreLogger.error("\(error.localizedDescription, privacy: .public)")
-				default:
-					nextPlayResultsStoreLogger.error("unknown error")
             }
         }
         listPlays()
+//		listVisiblePlays()
     }
     
     func listPlays() {

@@ -52,6 +52,9 @@
 		7219D8162BEA60F30079B78E /* HostNameShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF6524551133004DCD20 /* HostNameShows.swift */; };
 		7219D8172BEA60F30079B78E /* DateShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF612454C71C004DCD20 /* DateShows.swift */; };
 		7219D81A2BEA66C70079B78E /* CombinedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8192BEA66C70079B78E /* CombinedView.swift */; };
+		7219D81C2BEAA8710079B78E /* Extended View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81B2BEAA8710079B78E /* Extended View.swift */; };
+		7219D81E2BEAA8B80079B78E /* CompactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81D2BEAA8B80079B78E /* CompactView.swift */; };
+		7219D8202BEAAAD20079B78E /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81F2BEAAAD20079B78E /* ImageView.swift */; };
 		7244DDE72B7E73E100375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
 		7244DDEA2B7E752700375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
 		7244DDEB2B7E752700375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
@@ -107,7 +110,6 @@
 		8BFFECBF22C95E6100E3378C /* KEXPPower.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BFFECB522C95E6100E3378C /* KEXPPower.framework */; };
 		8BFFECC622C95E6200E3378C /* KEXPPower.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BFFECB822C95E6100E3378C /* KEXPPower.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8BFFECD622C95FB300E3378C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFECD522C95FB300E3378C /* AppDelegate.swift */; };
-		8BFFECD822C95FB300E3378C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFECD722C95FB300E3378C /* ViewController.swift */; };
 		8BFFECDD22C95FB900E3378C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BFFECDC22C95FB900E3378C /* Assets.xcassets */; };
 		8BFFECE622C9632500E3378C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8BFFECE522C9632500E3378C /* LaunchScreen.storyboard */; };
 		8BFFECF722C96F6000E3378C /* XCTestCase+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFECF622C96F6000E3378C /* XCTestCase+Helpers.swift */; };
@@ -159,6 +161,9 @@
 
 /* Begin PBXFileReference section */
 		7219D8192BEA66C70079B78E /* CombinedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedView.swift; sourceTree = "<group>"; };
+		7219D81B2BEAA8710079B78E /* Extended View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extended View.swift"; sourceTree = "<group>"; };
+		7219D81D2BEAA8B80079B78E /* CompactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactView.swift; sourceTree = "<group>"; };
+		7219D81F2BEAAAD20079B78E /* ImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 		7244DDE32B7E73DB00375023 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		7272836427B1BBAC00021CD4 /* KEXPPowerExampleSwiftUI (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "KEXPPowerExampleSwiftUI (iOS).entitlements"; sourceTree = "<group>"; };
 		7272836527B2AE6900021CD4 /* ShowStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowStore.swift; sourceTree = "<group>"; };
@@ -287,6 +292,9 @@
 				7272836F27B319AB00021CD4 /* SingleSongView.swift */,
 				72873C3527A998E400132B62 /* PlayResultStore.swift */,
 				7219D8192BEA66C70079B78E /* CombinedView.swift */,
+				7219D81F2BEAAAD20079B78E /* ImageView.swift */,
+				7219D81B2BEAA8710079B78E /* Extended View.swift */,
+				7219D81D2BEAA8B80079B78E /* CompactView.swift */,
 			);
 			path = "Song List";
 			sourceTree = "<group>";
@@ -685,7 +693,6 @@
 					};
 					72873C0227A8D3C200132B62 = {
 						CreatedOnToolsVersion = 13.2.1;
-						TestTargetID = 72873BF627A8D3C200132B62;
 					};
 					72873C0E27A8D3C200132B62 = {
 						CreatedOnToolsVersion = 13.2.1;
@@ -810,11 +817,14 @@
 				7219D7FE2BEA60E00079B78E /* PlayResult Fixture.swift in Sources */,
 				7219D7FF2BEA60E00079B78E /* ShowResult.swift in Sources */,
 				7219D8002BEA60E00079B78E /* ArchiveStreamResult.swift in Sources */,
+				7219D8202BEAAAD20079B78E /* ImageView.swift in Sources */,
+				7219D81C2BEAA8710079B78E /* Extended View.swift in Sources */,
 				7219D7F72BEA60DB0079B78E /* AppleMusicResult.swift in Sources */,
 				72873C3627A998E400132B62 /* PlayResultStore.swift in Sources */,
 				7272836C27B2C4D100021CD4 /* ShowView.swift in Sources */,
 				72873C3827A99C7000132B62 /* PlayView.swift in Sources */,
 				7219D7ED2BEA60D00079B78E /* NetworkManager.swift in Sources */,
+				7219D81E2BEAA8B80079B78E /* CompactView.swift in Sources */,
 				7219D7EE2BEA60D00079B78E /* Router.swift in Sources */,
 				7219D80F2BEA60EE0079B78E /* ArchiveManager.swift in Sources */,
 				7219D7EF2BEA60D00079B78E /* Reachability.swift in Sources */,
@@ -893,7 +903,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7219D80E2BEA60ED0079B78E /* ArchiveManager.swift in Sources */,
-				8BFFECD822C95FB300E3378C /* ViewController.swift in Sources */,
 				7219D8012BEA60E00079B78E /* ShowResult Fixture.swift in Sources */,
 				7219D8022BEA60E00079B78E /* Show Fixture.swift in Sources */,
 				7219D8142BEA60F30079B78E /* ShowNameShows.swift in Sources */,
@@ -969,7 +978,7 @@
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -1006,7 +1015,7 @@
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -1029,10 +1038,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "KEXPPowerExampleSwiftUI (iOS)";
 			};
 			name = Debug;
 		};
@@ -1049,10 +1058,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "KEXPPowerExampleSwiftUI (iOS)";
 			};
 			name = Release;
 		};

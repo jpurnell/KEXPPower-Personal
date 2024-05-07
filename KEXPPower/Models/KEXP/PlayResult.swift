@@ -9,6 +9,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import OSLog
 
 // MARK: - PlayResult
 public struct PlayResult: Decodable, Identifiable {
@@ -69,6 +70,31 @@ public struct Play: Codable, Identifiable {
 
 	public static func fixture(id: Int? = 3000448) -> Play {
 		return Play(id: id, imageURI: "no string", comment: "comment", song: "song", album: "album", artist: "Artist")
+	}
+}
+
+public class VisiblePlay: Identifiable, ObservableObject, Hashable {
+	var visiblePlayLogger = Logger(subsystem: "KEXP Power > Models >  KEXP > Play Result", category: "Visible Play")
+	public static func == (lhs: VisiblePlay, rhs: VisiblePlay) -> Bool {
+		return lhs.id == rhs.id
+	}
+	
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(id.hashValue)
+	}
+	
+	public var id = UUID()
+	public var play: Play
+	@Published public var isLarge: Bool
+	
+	func wiggle() -> Void {
+		isLarge.toggle()
+		visiblePlayLogger.log("Toggled isLarge for play \(self.play.song ?? "", privacy: .public) to \(self.isLarge, privacy: .public)")
+	}
+	
+	init(play: Play, isLarge: Bool = false) {
+		self.play = play
+		self.isLarge = isLarge
 	}
 }
 

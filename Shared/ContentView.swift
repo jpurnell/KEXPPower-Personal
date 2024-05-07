@@ -17,21 +17,12 @@ struct ContentView: View {
     @ObservedObject var showResults: ShowStore
     
     var body: some View {
-        NavigationView {
+//        NavigationView {
             VStack(alignment: .leading) {
 				ShowView(show: showResults.shows.first).padding(.horizontal)
-                List(playResults.results.flatMap({$0.plays ?? []})) { play in
-					var togglePlay = play
-					Button(action: {togglePlay.isRequest?.toggle()}, label: {
-						CombinedView(play: togglePlay)
-//						PlayView(play: play)
-					})
-//                    NavigationLink(destination: {
-//                        SingleSongView(play: play) },
-//                                   label: {
-//                        PlayView(play: play)
-//                    })
-					.buttonStyle(PlainButtonStyle())
+				List(playResults.results.flatMap({$0.plays ?? [] })) { play in
+						CombinedView(play: play)
+
                 }.refreshable {
                     playResults.next()
                     showResults.next()
@@ -42,7 +33,7 @@ struct ContentView: View {
 			#if os(iOS)
 			.navigationSplitViewStyle(.balanced)
 			#endif
-        }
+//        }
     }
 }
 
