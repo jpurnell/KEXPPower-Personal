@@ -59,7 +59,7 @@ public struct NetworkManager {
                 do {
 					let log = Logger(subsystem: "KEXP Power", category: "Networking > Network Manager > Get Play")
 					if let playResult = try? JSONDecoder().decode(PlayResult.self, from: data) {
-						log.debug("\(playResult.plays?.first!.description ?? "")")
+//						log.debug("\(playResult.plays?.first!.description ?? "")")
 						queue.async { completion(.success(playResult)) }
 					} else {
 						log.error("🛑 Could not decode PlayResult from \(String(data: data, encoding: .utf8) ?? "")")

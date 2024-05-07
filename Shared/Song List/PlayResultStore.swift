@@ -8,7 +8,7 @@
 
 import Foundation
 import Combine
-import KEXPPower
+//import KEXPPower
 import OSLog
 
 class PlayResultStore: ObservableObject, Identifiable {
@@ -16,7 +16,6 @@ class PlayResultStore: ObservableObject, Identifiable {
     @Published var results: [PlayResult] = []
     @Published var plays: [Play] = []
 	
-    
     init() {
         next()
         start()
@@ -41,7 +40,7 @@ class PlayResultStore: ObservableObject, Identifiable {
 					guard let goodPlayResult = playResult else { nextPlayResultsStoreLogger.warning("No Results"); return }
                     self.results = [goodPlayResult]
                     guard let plays = goodPlayResult.plays else { nextPlayResultsStoreLogger.warning("No Plays"); return}
-					nextPlayResultsStoreLogger.log("\(plays[0].description, privacy: .public)")
+					nextPlayResultsStoreLogger.log("\([plays[0]].map({$0.description}).joined(separator: "\n\n"), privacy: .public)")
                 case .failure(let error):
 					nextPlayResultsStoreLogger.error("\(error.localizedDescription, privacy: .public)")
 				default:

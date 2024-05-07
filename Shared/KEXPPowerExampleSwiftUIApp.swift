@@ -7,12 +7,12 @@
 //
 
 import SwiftUI
-import KEXPPower
+//import KEXPPower
 
 @main
 struct KEXPPowerExampleSwiftUIApp: App {
     
-    let kexp = KEXPPower.fixture()
+//    let kexp = KEXPPower.fixture()
     
     var body: some Scene {
         WindowGroup {

@@ -6,7 +6,7 @@
 //  Copyright © 2019 KEXP. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 public struct ArchiveStreamResult: Decodable {
     public var streamURL: URL?

@@ -6,7 +6,8 @@
 //  Copyright © 2019 KEXP. All rights reserved.
 //
 
-import UIKit
+//import UIKit
+import Foundation
 
 public struct ArchiveShowStart {
     public let startTimeDisplay: String

@@ -7,7 +7,7 @@
 //
 
 import SwiftUI
-import KEXPPower
+//import KEXPPower
 
 struct SingleSongView: View {
     var play: Play
@@ -32,7 +32,6 @@ struct SingleSongView: View {
             Divider()
             ScrollView(.vertical, showsIndicators: false) {
                 Text(.init(stringLiteral: play.comment ?? ""))
-//                            .font(.caption)
             }
 			
             Spacer()

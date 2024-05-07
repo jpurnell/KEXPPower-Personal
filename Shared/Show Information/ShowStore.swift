@@ -8,7 +8,7 @@
 
 import Foundation
 import Combine
-import KEXPPower
+//import KEXPPower
 import OSLog
 
 class ShowStore: ObservableObject, Identifiable {
@@ -43,6 +43,8 @@ class ShowStore: ObservableObject, Identifiable {
 					nextShowResultsStoreLogger.log("\(shows[0].description)")
                 case .failure(let error):
 					nextShowResultsStoreLogger.error("\(error.localizedDescription, privacy: .public)")
+				default:
+					nextShowResultsStoreLogger.error("\("Neither Error nor Result", privacy: .public)")
             }
         }
         listShows()

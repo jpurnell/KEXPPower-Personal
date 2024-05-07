@@ -6,7 +6,7 @@
 //  Copyright © 2019 KEXP. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 extension DateFormatter {
     
@@ -59,7 +59,7 @@ extension DateFormatter {
     public static let archiveShowStartTimeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .none
-        formatter.timeStyle = .short
+        formatter.timeStyle = .medium
         formatter.timeZone = NSTimeZone.local
         return formatter
     }()

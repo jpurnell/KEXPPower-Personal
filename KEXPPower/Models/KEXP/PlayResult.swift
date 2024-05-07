@@ -7,23 +7,31 @@
 //
 
 import Foundation
+import SwiftUI
+import Combine
 
 // MARK: - PlayResult
 public struct PlayResult: Decodable, Identifiable {
     public var id = UUID()
     public let next: String?
-    public let previous: String?
+//    public let previous: String?
 	public var plays: [Play]? = [Play.fixture()]
     
     enum CodingKeys: String, CodingKey {
         case plays = "results"
         case next
-        case previous
+//        case previous
     }
 }
 
 // MARK: - Result
 public struct Play: Codable, Identifiable {
+	func dateformatter() -> DateFormatter {
+		let df = DateFormatter()
+		df.dateStyle = .short
+		df.timeStyle = .short
+		return df
+	}
 	public var id: Int?
 	public var uri: String?
 	public var imageURI: String?
@@ -31,12 +39,14 @@ public struct Play: Codable, Identifiable {
 	public var song: String?
 	public var album: String?
 	public var artist: String? = "Artist"
-	public let playType: PlayType = .trackplay
-	public var airdate: String? = DateFormatter().string(from: Date())
-	public var thumbnailURI: String = ""
-	public var releaseDate: String? = DateFormatter().string(from: Date())
+	public let playType: PlayType? = .trackplay
+	public var airdate: String? = DateFormatter.airdateFormatter.string(from: Date())
+	public var thumbnailURI: String? = ""
+	public var releaseDate: String? = DateFormatter.releaseFormatter.string(from: Date())
 	public var labels: [String]? = ["label 1"]
 	public var isRequest: Bool? = false
+	public var airtime: String { let df = ISO8601DateFormatter(); let date = df.date(from: self.airdate!); let dateString = DateFormatter.archiveShowStartTimeFormatter.string(from: date ?? Date()); return dateString}
+//	public var isLarge: Bool = false
 	
 	enum CodingKeys: String, CodingKey {
 		case id
@@ -52,9 +62,10 @@ public struct Play: Codable, Identifiable {
 		case releaseDate = "release_date"
 		case labels
 		case isRequest = "is_request"
+//		case isLarge
 	}
 	
-	public var description: String { return "\(id ?? 0)\t\(uri ?? "")\n\(song ?? "")\n\(artist ?? "")\n\(album ?? "")\n\(releaseDate ?? "")\nRequest:\t\(isRequest ?? false)\n\(comment ?? "")" }
+	public var description: String { return "\(id ?? 0)\t\(uri ?? "")\n\(playType?.rawValue ?? "")\n\(song ?? "")\n\(artist ?? "")\n\(album ?? "")\n\(releaseDate ?? "")\nRequest:\t\(isRequest ?? false)\n\(comment ?? "")" }
 
 	public static func fixture(id: Int? = 3000448) -> Play {
 		return Play(id: id, imageURI: "no string", comment: "comment", song: "song", album: "album", artist: "Artist")
@@ -74,7 +85,7 @@ public struct Play_0: Decodable, Identifiable {
     public let song: String?
     public let trackID: String?
     public let recordingID: String?
-    public let artist: String? = ""
+    public var artist: String? = ""
     public let artistIDs: [String]?
     public let album: String?
     public let releaseID: String?

@@ -8,7 +8,7 @@
 
 import SwiftUI
 import Combine
-import KEXPPower
+//import KEXPPower
 
 struct ContentView: View {
     let networkManager = NetworkManager()
@@ -18,15 +18,19 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            VStack(alignment: .center) {
-                ShowView(show: showResults.shows.first)
+            VStack(alignment: .leading) {
+				ShowView(show: showResults.shows.first).padding(.horizontal)
                 List(playResults.results.flatMap({$0.plays ?? []})) { play in
-                    NavigationLink(destination: {
-                        SingleSongView(play: play) },
-                                   label: {
-                        PlayView(play: play)
-                        .padding(.vertical)
-                    })
+					var togglePlay = play
+					Button(action: {togglePlay.isRequest?.toggle()}, label: {
+						CombinedView(play: togglePlay)
+//						PlayView(play: play)
+					})
+//                    NavigationLink(destination: {
+//                        SingleSongView(play: play) },
+//                                   label: {
+//                        PlayView(play: play)
+//                    })
 					.buttonStyle(PlainButtonStyle())
                 }.refreshable {
                     playResults.next()
@@ -34,7 +38,7 @@ struct ContentView: View {
                 }
 			}
 			.background(.ultraThinMaterial)
-			.navigationBarHidden(true)
+//			.navigationBarHidden(true)
 			#if os(iOS)
 			.navigationSplitViewStyle(.balanced)
 			#endif

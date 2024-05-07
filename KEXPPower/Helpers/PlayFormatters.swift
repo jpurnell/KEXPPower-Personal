@@ -6,13 +6,14 @@
 //  Copyright © 2023 KEXP. All rights reserved.
 //
 
+import Foundation
 extension Play {
     
     /// Returns the release year followed by first album label (if any)
     /// Example: "2022 - Matador"
     /// If releaseDate is nil, returns nil
     var formattedReleaseYear: String? {
-        guard
+        guard 
             let releaseDateString = releaseDate,
             let releaseDate = DateFormatter.releaseFormatter.date(from: releaseDateString)
         else { return nil }

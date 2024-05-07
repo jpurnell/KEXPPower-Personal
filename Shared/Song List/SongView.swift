@@ -7,10 +7,12 @@
 //
 
 import SwiftUI
+//import KEXPPower
 
 struct SongView: View {
     var imageURL: String = "https://kexp.org/static/assets/img/kexp_logo.jpg"
-    var playTime: Date = Date()
+//	var playTime: String = ISO8601DateFormatter().string(from: Date())
+	var playTime: String = RelativeDateTimeFormatter().string(for: Date())!
     var songName: String = "Song"
     var artistName: String = "Artist"
     var albumName: String = "Album"
@@ -30,33 +32,41 @@ struct SongView: View {
                         .aspectRatio(contentMode: .fit)
                 } placeholder: {
                     if imageURL == "" {
-                        Image(systemName: "music.note.list").font(.system(size: 75)) }
+                        Image(systemName: "music.note.list").font(.system(size: 60)) }
                     else {
                         ProgressView().progressViewStyle(.circular)
                     }
                 }
-				.clipShape(RoundedRectangle(cornerRadius: 36.0))
-				.shadow(color: .black.opacity(0.3), radius: 6, x: 1.0, y: 1.0)
-                .frame(minWidth: 20, idealWidth: 200, maxWidth: 200, minHeight: 20, idealHeight: 100, maxHeight: 200, alignment: .topLeading)
+				.clipShape(RoundedRectangle(cornerRadius: 5.0))
+				.shadow(
+					color: .black.opacity(0.3),
+					radius: 6,
+					x: 1.0,
+					y: 1.0
+				)
+				.frame(
+					minWidth: 20,
+					idealWidth: 200,
+					maxWidth: 200,
+					minHeight: 20,
+					idealHeight: 100,
+					maxHeight: 200,
+					alignment: .topLeading
+				)
 				
                 VStack(alignment: .leading) {
-					Text(DateFormatter.displayFormatterWithDate.string(from: playTime))
-//						.font(.caption)
+					Text(playTime).multilineTextAlignment(/*@START_MENU_TOKEN@*/.leading/*@END_MENU_TOKEN@*/)
                     Text(songName).bold()
                     Text(artistName).fontWeight(.light)
                     Text(albumName).font(.caption)
                     HStack(alignment: .top) {
                         Text(year)
                         Text(recordLabel)
-                    }
-//					.font(.caption)
+					}.font(.caption)
                 }
-                .frame(minWidth: 100, idealWidth: 200, maxWidth: 200, minHeight: 20, idealHeight: 100, maxHeight: 200, alignment: .topLeading)
-            }.padding(.bottom, 5)
-//            ScrollView(.vertical, showsIndicators: true) {
-//                Text(.init(stringLiteral: comments))
-////                    .font(.caption)
-//            }
+                .frame(minWidth: 200, idealWidth: 200, minHeight: 20, idealHeight: 100, maxHeight: 300, alignment: .topLeading)
+            }
+			.padding(.bottom, 5)
 			.padding(.vertical)
         }
     }
