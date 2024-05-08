@@ -7,14 +7,12 @@
 //
 
 import SwiftUI
-//import KEXPPower
 
 struct ShowView: View {
     var show: Show?
     
     var body: some View {
         ProgramView(imageURL: show?.imageURI ?? "", programName: show?.programName ?? "", hostName: show?.hostNames ?? [""], tagline: show?.tagline ?? "", small: true)
-//			.padding()
     }
 }
 

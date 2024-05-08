@@ -10,7 +10,6 @@ import SwiftUI
 
 struct ImageView: View {
 	public var play: Play
-//	var imageURL: String = "https://www.kexp.org/static/assets/img/default.png"
 	func imageURL() -> String { return (play.song == nil || play.playType == .airbreak) ? "https://kexp.org/static/assets/img/kexp_logo.jpg" : "https://www.kexp.org/static/assets/img/default.png" }
     var body: some View {
 		AsyncImage(url: URL(string: play.imageURI ?? imageURL()), scale: 1) { image in
@@ -31,7 +30,7 @@ struct ImageView: View {
 		}
 		.clipShape(RoundedRectangle(cornerRadius: 5.0))
 		.shadow(
-			color: .black.opacity(0.3),
+			color: .primary.opacity(0.3),
 			radius: 5.0,
 			x: 1.0,
 			y: 1.0

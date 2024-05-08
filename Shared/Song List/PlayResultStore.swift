@@ -15,11 +15,11 @@ class PlayResultStore: ObservableObject, Identifiable {
     private var timerSubscription: AnyCancellable?
     @Published var results: [PlayResult] = []
     @Published var plays: [Play] = []
-//	@Published var visiblePlays: [VisiblePlay] = []
+	@Published var activePlay: Play = .fixture()
 	
     init() {
-        next()
-        start()
+		start()
+		next()
     }
     
     func start(every interval: TimeInterval = 10.0) {
@@ -34,14 +34,20 @@ class PlayResultStore: ObservableObject, Identifiable {
     }
     
     func next() {
-		let nextPlayResultsStoreLogger = Logger(subsystem: "Shared > Song List > Play Results Store", category: "Next")
+		let logger = Logger(#function)
+		let nextPlayResultsStoreLogger = Logger(#function)
+		listActivePlay()
         NetworkManager().getPlay { result in
             switch result {
                 case .success(let playResult):
 					guard let goodPlayResult = playResult else { nextPlayResultsStoreLogger.warning("No Results"); return }
                     self.results = [goodPlayResult]
                     guard let plays = goodPlayResult.plays else { nextPlayResultsStoreLogger.warning("No Plays"); return}
-					nextPlayResultsStoreLogger.log("\([plays[(0...10)]].map({$0.description}).joined(separator: "\n\n"), privacy: .public)")
+					let currentPlay = [plays[(0)]].first!
+					if self.activePlay.id != currentPlay.id {
+						self.activePlay = currentPlay
+						nextPlayResultsStoreLogger.log("\(self.activePlay.description), privacy: .public)")
+					}
                 case .failure(let error):
 					nextPlayResultsStoreLogger.error("\(error.localizedDescription, privacy: .public)")
             }
@@ -57,4 +63,12 @@ class PlayResultStore: ObservableObject, Identifiable {
         }
         .assign(to: &$plays)
     }
+	
+	func listActivePlay() {
+		self.$results
+			.map { results in
+				results.flatMap({$0.plays ?? []}).first ?? .fixture()
+			}
+			.assign(to: &$activePlay)
+	}
 }

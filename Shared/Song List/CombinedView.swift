@@ -9,15 +9,8 @@
 import SwiftUI
 
 struct CombinedView: View {
-	@State var play: Play
+	@State var play: Play?
 	var imageURL: String = "https://kexp.org/static/assets/img/kexp_logo.jpg"
-	var playTime: String = RelativeDateTimeFormatter().string(for: Date())!
-	var songName: String = "Song"
-	var artistName: String = "Artist"
-	var albumName: String = "Album"
-	var year: String = "Year"
-	var recordLabel: String = "Record Label"
-	var comments: String = "Comments"
 	@State var small: Bool = true
 	
 	var body: some View {
@@ -26,22 +19,25 @@ struct CombinedView: View {
 		},
 			   label: {
 			VStack{
-				HStack(alignment: .center) {
-					ImageView(play: play)
+				HStack {
+					ImageView(play: play ?? .fixture())
 					.frame(
-						minWidth: small ? 100 : 220,
-						idealWidth: small ? 100 : 400,
-						maxWidth: small ? 100 : 220,
-						minHeight: small ?  100 : 100,
-						idealHeight: small ? 100 : 400
+						minWidth: small ? 120 : 200,
+						idealWidth: small ? 120 : 500,
+						maxWidth: small ? 120 : 500,
+						minHeight: small ?  120 : 120,
+						idealHeight: small ? 120 : 500
 					)
-					.padding(small ? [.vertical] : [.all])
 					.animation(.easeInOut(duration: 1.0), value: 1.0)
-					small ? CompactView(play: play)
-						.padding(.leading, 5)
-						.padding(.vertical) : nil
+					.padding(small ? [.vertical] : [.all])
+					(small ? CompactView(play: play ?? .fixture())
+						.frame(minWidth: 200, maxWidth: .infinity)
+						.padding(.leading)
+						.padding(.vertical) : nil)
+						.animation(.easeInOut(duration: 1.0), value: 1.0)
 				}
-				small ? nil : ExtendedView(play: play)
+				(small ? nil : ExtendedView(play: play ?? .fixture()))
+					.animation(.easeInOut(duration: 1.0), value: 1.0)
 					.frame(
 						minWidth: 200,
 						idealWidth: 200,
@@ -53,7 +49,7 @@ struct CombinedView: View {
 					)
 					.padding(.bottom, 5).padding(.vertical)
 			}
-		}).foregroundStyle(.black)
+		}).foregroundStyle(.primary)
 		}
 	}
 			   

@@ -8,7 +8,6 @@
 
 import Foundation
 import Combine
-//import KEXPPower
 import OSLog
 
 class ShowStore: ObservableObject, Identifiable {
@@ -33,7 +32,8 @@ class ShowStore: ObservableObject, Identifiable {
     }
     
     func next() {
-		let nextShowResultsStoreLogger = Logger(subsystem: "Shared > Show Information > Show Store", category: "Next")
+//		let nextShowResultsStoreLogger = Logger(subsystem: "Shared > Show Information > Show Store", category: "Next")
+		let nextShowResultsStoreLogger = Logger(#function)
         NetworkManager().getShow { result in
             switch result {
                 case .success(let showResult):

@@ -16,7 +16,7 @@ struct ExtendedView: View {
 			Text(play.song ?? "Airbreak").fontWeight(.semibold)
 			Text(play.artist ?? "").font(.caption)
 			Text(play.album ?? "").font(.caption).foregroundColor(.gray)
-			ScrollView(.vertical, showsIndicators: false) {
+			ScrollView(.vertical, showsIndicators: true) {
 				Text(.init(stringLiteral: play.comment ?? ""))
 					.lineLimit(nil)
 					.multilineTextAlignment(.leading)
