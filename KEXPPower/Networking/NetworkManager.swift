@@ -59,7 +59,7 @@ public struct NetworkManager {
                 do {
 					let log = Logger(subsystem: "KEXP Power", category: "Networking > Network Manager > Get Play")
 					if let playResult = try? JSONDecoder().decode(PlayResult.self, from: data) {
-//						log.debug("\(playResult.plays?.first!.description ?? "")")
+						log.debug("\(playResult.plays?.first!.description ?? "")")
 						queue.async { completion(.success(playResult)) }
 					} else {
 						log.error("🛑 Could not decode PlayResult from \(String(data: data, encoding: .utf8) ?? "")")
@@ -70,7 +70,6 @@ public struct NetworkManager {
                         code: 0,
                         userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
                     )
-                    
                     queue.async { completion(.failure(error)) }
                 }
                 
@@ -80,7 +79,6 @@ public struct NetworkManager {
                     code: 0,
                     userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
                 )
-                
                 queue.async { completion(.failure(error)) }
             }
         }
@@ -100,14 +98,12 @@ public struct NetworkManager {
                 do {
                     let play = try JSONDecoder().decode(Play.self, from: data)
                     queue.async { completion(.success(play)) }
-                    
                 } catch let error {
                     let error = NSError(
                         domain: "com.kexppower.error",
                         code: 0,
                         userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
                     )
-                    
                     queue.async { completion(.failure(error)) }
                 }
                 
@@ -117,7 +113,6 @@ public struct NetworkManager {
                     code: 0,
                     userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
                 )
-                
                 queue.async { completion(.failure(error)) }
             }
         }
@@ -154,7 +149,6 @@ public struct NetworkManager {
             case .success(let data):
                 do {
                     let showResult = try JSONDecoder().decode(ShowResult.self, from: data)
-
                     queue.async { completion(.success(showResult)) }
                 } catch let error {
                     let error = NSError(
