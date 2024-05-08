@@ -8,7 +8,6 @@
 
 import SwiftUI
 import Combine
-//import KEXPPower
 
 struct ContentView: View {
     let networkManager = NetworkManager()
@@ -17,9 +16,8 @@ struct ContentView: View {
     @ObservedObject var showResults: ShowStore
     
     var body: some View {
-//        NavigationView {
             VStack(alignment: .leading) {
-				ShowView(show: showResults.shows.first).padding(.horizontal)
+				ShowView(show: showResults.shows.first).padding()
 				List(playResults.results.flatMap({$0.plays ?? [] })) { play in
 						CombinedView(play: play)
 
@@ -29,11 +27,12 @@ struct ContentView: View {
                 }
 			}
 			.background(.ultraThinMaterial)
-//			.navigationBarHidden(true)
+		#if os(iOS) || os(visionOS)
+			.navigationBarHidden(true)
+		#endif
 			#if os(iOS)
 			.navigationSplitViewStyle(.balanced)
 			#endif
-//        }
     }
 }
 

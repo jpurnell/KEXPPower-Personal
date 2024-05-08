@@ -13,12 +13,13 @@ struct ExtendedView: View {
 	
     var body: some View {
 		VStack {
-			Text(play.song ?? "").fontWeight(.semibold)
+			Text(play.song ?? "Airbreak").fontWeight(.semibold)
 			Text(play.artist ?? "").font(.caption)
 			Text(play.album ?? "").font(.caption).foregroundColor(.gray)
-//			Divider()
 			ScrollView(.vertical, showsIndicators: false) {
 				Text(.init(stringLiteral: play.comment ?? ""))
+					.lineLimit(nil)
+					.multilineTextAlignment(.leading)
 			}
 			Spacer()
 		}

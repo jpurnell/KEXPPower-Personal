@@ -47,7 +47,6 @@ class PlayResultStore: ObservableObject, Identifiable {
             }
         }
         listPlays()
-//		listVisiblePlays()
     }
     
     func listPlays() {

@@ -26,27 +26,37 @@ struct CombinedView: View {
 		},
 			   label: {
 			VStack{
-				HStack {
+				HStack(alignment: .center) {
 					ImageView(play: play)
 					.frame(
-						minWidth: small ? 20 : 100,
-						idealWidth: small ? 100 : 200,
-						maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
-						minHeight: small ?  20 : 100,
-						idealHeight: small ? 100 : 200,
-						maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/,
-						alignment: small ? .topLeading : .center
+						minWidth: small ? 100 : 220,
+						idealWidth: small ? 100 : 400,
+						maxWidth: small ? 100 : 220,
+						minHeight: small ?  100 : 100,
+						idealHeight: small ? 100 : 400
 					)
-					.padding(small ? [.top] : [.all])
+					.padding(small ? [.vertical] : [.all])
 					.animation(.easeInOut(duration: 1.0), value: 1.0)
-					small ? CompactView(play: play).frame(minWidth: 200, idealWidth: 200, minHeight: 20, idealHeight: 100, maxHeight: 300, alignment: .topLeading).padding(.bottom, 5).padding(.vertical) : nil
+					small ? CompactView(play: play)
+						.padding(.leading, 5)
+						.padding(.vertical) : nil
 				}
-				small ? nil : ExtendedView(play: play)				
+				small ? nil : ExtendedView(play: play)
+					.frame(
+						minWidth: 200,
+						idealWidth: 200,
+						maxWidth: .infinity,
+						minHeight: 100,
+						idealHeight: 200,
+						maxHeight: 500,
+						alignment: .center
+					)
+					.padding(.bottom, 5).padding(.vertical)
 			}
 		}).foregroundStyle(.black)
 		}
 	}
 			   
 #Preview {
-		CombinedView(play: .fixture())
+	CombinedView(play: .fixture()).previewLayout(.sizeThatFits).previewDevice(.none)
 }

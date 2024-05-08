@@ -12,18 +12,21 @@ struct CompactView: View {
 	public var play: Play
 	var body: some View {
 		VStack(alignment: .leading) {
-			Text(play.airtime).multilineTextAlignment(/*@START_MENU_TOKEN@*/.leading/*@END_MENU_TOKEN@*/)
-			Text(play.song ?? "").bold()
-			Text(play.artist ?? "").fontWeight(.light)
-			Text(play.album ?? "").font(.caption)
+			Text(play.airtime).font(.callout)
+			Text(play.song ?? "Airbreak").lineLimit(nil).fontWeight(.semibold)
+			Text(play.artist ?? "").fontWeight(.light).lineLimit(nil)
+			Text(play.album ?? "").font(.caption).lineLimit(nil)
 			HStack(alignment: .top) {
 				Text(play.releaseDate ?? "")
 				Text(play.labels?.map({$0}).joined(separator: "\n") ?? "")
-			}.font(.caption)
+			}
+			.font(.caption)
 		}
+		.multilineTextAlignment(/*@START_MENU_TOKEN@*/.leading/*@END_MENU_TOKEN@*/)
 	}
 }
 
 #Preview {
 	CompactView(play: .fixture())
+		.previewLayout(.sizeThatFits)
 }
