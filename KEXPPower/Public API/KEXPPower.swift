@@ -29,7 +29,7 @@ public class KEXPPower {
 
     var playURL: URL {
 		let playURLLogger = Logger(subsystem: "KEXPPower > Public API > KEXPPower", category: "play URL")
-//		playURLLogger.info("Attempting \(KEXPPower.sharedInstance.kexpBaseURL)")
+		playURLLogger.info("Attempting \(KEXPPower.sharedInstance.kexpBaseURL)")
 		guard let returnURL = URL(string: KEXPPower.sharedInstance.kexpBaseURL + "/v2/plays") else {
 			let defaultReturnURL = URL(string: "https://kexp.streamguys1.com/kexp160.aac?listenerId=\(UUID())")!
 			playURLLogger.log("opening \(defaultReturnURL.absoluteString, privacy: .public)")
