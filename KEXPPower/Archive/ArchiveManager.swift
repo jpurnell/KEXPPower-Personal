@@ -35,31 +35,33 @@ public class ArchiveManager {
         
         return requestDate
     } ()
-
+	//TODO: - ASYNC
     /// Retrieves currently available archive shows from `KEXP`
     /// - Parameter completion: Returns the all archived shows sorted by Date/Show Name/Host Name/Genre
-    public func retrieveArchiveShows(completion: @escaping ArchiveShowCompletion) {
-        networkManager.getShow(startTimeAfter: requestDate, limit: 200) { [weak self] result in
-            guard
-                case let .success(showResult) = result,
-                let strongSelf = self,
-                let shows = showResult?.shows
-            else {
-                completion([], [], [], [])
-                return
-            }
-            
-            let archiveShows = shows.map { ArchiveShow(show: $0) }
-            strongSelf.allArchiveShows = strongSelf.updateShowEndTimes(archiveShows: archiveShows)
-            
-            let showsByDate = strongSelf.getShowsByDate()
-            let showsByShowName = strongSelf.getShowsByShowName()
-            let showsByHostName = strongSelf.getShowsByHostName()
-            let showsByGenre = strongSelf.getShowsByGenre()
-
-            completion(showsByDate, showsByShowName, showsByHostName, showsByGenre)
-        }
-    }
+//    public func retrieveArchiveShows(completion: @escaping ArchiveShowCompletion) {
+//        networkManager.getShow(startTimeAfter: requestDate, limit: 200) { [weak self] result in
+//            guard
+//                case let .success(showResult) = result,
+//                let strongSelf = self,
+//                let shows = showResult?.shows
+//            else {
+//                completion([], [], [], [])
+//                return
+//            }
+//            
+//            let archiveShows = shows.map { ArchiveShow(show: $0) }
+//            strongSelf.allArchiveShows = strongSelf.updateShowEndTimes(archiveShows: archiveShows)
+//            
+//            let showsByDate = strongSelf.getShowsByDate()
+//            let showsByShowName = strongSelf.getShowsByShowName()
+//            let showsByHostName = strongSelf.getShowsByHostName()
+//            let showsByGenre = strongSelf.getShowsByGenre()
+//
+//            completion(showsByDate, showsByShowName, showsByHostName, showsByGenre)
+//        }
+//    }
+	
+	
 
     /// Generates the available starting times for a particular archived show.
     /// - Parameter
@@ -88,36 +90,36 @@ public class ArchiveManager {
         completion(archiveShowStartTimes)
     }
     
-    
+    //TODO: - ASYNC -
     /// Retrieves the URLs needed to play an archive show
     /// - Parameters:
     ///   - playbackTimeStamp: The show playback start timestamp
     ///   - completion: Playback mp3s and offset
-    public func getStreamURLs(for playbackTimeStamp: Date, completion: @escaping ArchivePlayBackCompletion) {
-        networkManager.getArchiveStreamURL(
-            timestamp: DateFormatter.archiveEndShowFormatter.string(from: playbackTimeStamp)) { [weak self] result in
-                guard
-                    let strongSelf = self,
-                    case let .success(archiveStreamResult) = result,
-                    let offset = archiveStreamResult?.offset,
-                    var streamURL = archiveStreamResult?.streamURL
-                else {
-                    completion([], 0)
-                    return
-                }
-                
-                var showPlaybackFiles = [URL]()
-                streamURL = strongSelf.appendListenerId(toURL: streamURL)
-                showPlaybackFiles.append(streamURL)
-            
-                if var nextStreamURL = archiveStreamResult?.nextStreamURL {
-                    nextStreamURL = strongSelf.appendListenerId(toURL: nextStreamURL)
-                    showPlaybackFiles.append(nextStreamURL)
-                }
-                
-                completion(showPlaybackFiles, offset)
-            }
-    }
+//    public func getStreamURLs(for playbackTimeStamp: Date, completion: @escaping ArchivePlayBackCompletion) {
+//        networkManager.getArchiveStreamURL(
+//            timestamp: DateFormatter.archiveEndShowFormatter.string(from: playbackTimeStamp)) { [weak self] result in
+//                guard
+//                    let strongSelf = self,
+//                    case let .success(archiveStreamResult) = result,
+//                    let offset = archiveStreamResult?.offset,
+//                    var streamURL = archiveStreamResult?.streamURL
+//                else {
+//                    completion([], 0)
+//                    return
+//                }
+//                
+//                var showPlaybackFiles = [URL]()
+//                streamURL = strongSelf.appendListenerId(toURL: streamURL)
+//                showPlaybackFiles.append(streamURL)
+//            
+//                if var nextStreamURL = archiveStreamResult?.nextStreamURL {
+//                    nextStreamURL = strongSelf.appendListenerId(toURL: nextStreamURL)
+//                    showPlaybackFiles.append(nextStreamURL)
+//                }
+//                
+//                completion(showPlaybackFiles, offset)
+//            }
+//    }
     
     private func appendListenerId(toURL url: URL) -> URL {
         var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false)

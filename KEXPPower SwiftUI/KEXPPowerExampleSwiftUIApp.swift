@@ -13,16 +13,18 @@ import OSLog
 @main
 struct KEXPPowerExampleSwiftUIApp: App {
 	
+	#if os(iOS)
 	//INFO: - https://www.hackingwithswift.com/quick-start/swiftui/how-to-add-an-appdelegate-to-a-swiftui-app
 	@UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-	
+	#endif
     var body: some Scene {
         WindowGroup {
-            ContentView(playResults: PlayResultStore(), showResults: ShowStore())
+			ContentView()
         }
     }
 }
 
+#if os(iOS)
 // Custom AppDelegate to handle application lifecycle events
 // INFO: - https://medium.com/@afridi.khondakar/implementing-background-play-picture-in-picture-in-swiftui-building-a-video-streaming-app-with-141304b84728
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -33,14 +35,15 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		// Configure the audio session for background audio and video services
 		
 		let audioSession = AVAudioSession.sharedInstance()
-		
+		application.beginReceivingRemoteControlEvents()
 		do {
 			// Set the audio session category to playback
-			try audioSession.setCategory(.playback)
-			logger.info("set audioSession category to playback")
+			let audioSessionCategory: AVAudioSession.Category = .playAndRecord
+			try audioSession.setCategory(audioSessionCategory, mode: .default, options: [.mixWithOthers, .defaultToSpeaker, .allowAirPlay])
+			logger.info("set audioSession category to \(audioSessionCategory.rawValue, privacy: .public)")
 			
 			// Activate the audio session
-			try audioSession.setActive(true, options: [])
+			try audioSession.setActive(true, options: [.notifyOthersOnDeactivation])
 			logger.info("set audioSession setactive to true")
 		} catch {
 			// Handle errors related to audio session setup
@@ -50,3 +53,4 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		return true
 	}
 }
+#endif

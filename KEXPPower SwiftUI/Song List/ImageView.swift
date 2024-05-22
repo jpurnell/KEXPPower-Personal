@@ -9,15 +9,15 @@
 import SwiftUI
 
 struct ImageView: View {
-	public var play: Play
-	func imageURL() -> String { return (play.song == nil || play.playType == .airbreak) ? "https://kexp.org/static/assets/img/kexp_logo.jpg" : "https://www.kexp.org/static/assets/img/default.png" }
+	var play: Play?
+	func imageURL() -> String { return (play?.song == nil || play?.playType == .airbreak) ? "https://kexp.org/static/assets/img/kexp_logo.jpg" : "https://www.kexp.org/static/assets/img/default.png" }
     var body: some View {
-		AsyncImage(url: URL(string: play.imageURI ?? imageURL()), scale: 1) { image in
+		AsyncImage(url: URL(string: play?.imageURI ?? imageURL()), scale: 1) { image in
 			image
 				.resizable()
 				.aspectRatio(contentMode: .fit)
 		} placeholder: {
-			if play.imageURI == "" {
+			if play?.imageURI == "" {
 				AsyncImage(url: URL(string: imageURL()), scale: 1) {
 					image in
 					image.image?.resizable()

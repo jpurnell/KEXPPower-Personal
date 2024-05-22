@@ -77,6 +77,7 @@
 		72873C3627A998E400132B62 /* PlayResultStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873C3527A998E400132B62 /* PlayResultStore.swift */; };
 		728DA59427B33C8E00EE38A4 /* PlayResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */; };
 		728DA59627B33D1700EE38A4 /* ShowResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */; };
+		72F4993B2BFD2E7100A8B8B6 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F4993A2BFD2E7100A8B8B6 /* TestView.swift */; };
 		8B159DC1233C66E500BCB7AB /* ArchiveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B159DC0233C66E500BCB7AB /* ArchiveManager.swift */; };
 		8B1AE2EC27CC29EA000BFE1F /* AvailableStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1AE2EB27CC29EA000BFE1F /* AvailableStreams.swift */; };
 		8B3C37AD234021E800413329 /* ArchiveShow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3C37AC234021E800413329 /* ArchiveShow.swift */; };
@@ -184,6 +185,8 @@
 		72873C3D27AB7CDC00132B62 /* To Add.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "To Add.md"; sourceTree = "<group>"; };
 		728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayResult Fixture.swift"; sourceTree = "<group>"; };
 		728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShowResult Fixture.swift"; sourceTree = "<group>"; };
+		72952B572BEC2FE500C2A0DA /* KEXPPowerExampleSwiftUI--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "KEXPPowerExampleSwiftUI--iOS--Info.plist"; sourceTree = "<group>"; };
+		72F4993A2BFD2E7100A8B8B6 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		8B159DC0233C66E500BCB7AB /* ArchiveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveManager.swift; sourceTree = "<group>"; };
 		8B1AE2EB27CC29EA000BFE1F /* AvailableStreams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableStreams.swift; sourceTree = "<group>"; };
 		8B3C37AC234021E800413329 /* ArchiveShow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveShow.swift; sourceTree = "<group>"; };
@@ -284,7 +287,6 @@
 				7219D8242BEBBD860079B78E /* AudioPlayerView.swift */,
 				7219D8262BEBCA200079B78E /* AVPlayer.swift */,
 				7219D8282BEBD1270079B78E /* VideoPlayer.swift */,
-				7219D82A2BEBD1FF0079B78E /* PlayerView UI.swift */,
 			);
 			path = "Audio Player";
 			sourceTree = "<group>";
@@ -292,7 +294,9 @@
 		7272836D27B2C77900021CD4 /* Song List */ = {
 			isa = PBXGroup;
 			children = (
+				7219D82A2BEBD1FF0079B78E /* PlayerView UI.swift */,
 				72873C3527A998E400132B62 /* PlayResultStore.swift */,
+				72F4993A2BFD2E7100A8B8B6 /* TestView.swift */,
 				7219D8192BEA66C70079B78E /* CombinedView.swift */,
 				7219D81F2BEAAAD20079B78E /* ImageView.swift */,
 				7219D81B2BEAA8710079B78E /* Extended View.swift */,
@@ -318,7 +322,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		72873BEF27A8D3C100132B62 /* Shared */ = {
+		72873BEF27A8D3C100132B62 /* KEXPPower SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
 				7244DDE32B7E73DB00375023 /* Logger.swift */,
@@ -330,7 +334,7 @@
 				72873BF227A8D3C200132B62 /* Assets.xcassets */,
 				72873C3D27AB7CDC00132B62 /* To Add.md */,
 			);
-			path = Shared;
+			path = "KEXPPower SwiftUI";
 			sourceTree = "<group>";
 		};
 		72873BFD27A8D3C200132B62 /* macOS */ = {
@@ -427,11 +431,12 @@
 		8BFFECAB22C95E6100E3378C = {
 			isa = PBXGroup;
 			children = (
+				72952B572BEC2FE500C2A0DA /* KEXPPowerExampleSwiftUI--iOS--Info.plist */,
 				7272836427B1BBAC00021CD4 /* KEXPPowerExampleSwiftUI (iOS).entitlements */,
 				8BFFECB722C95E6100E3378C /* KEXPPower */,
 				8BFFECC222C95E6100E3378C /* KEXPPowerTests */,
 				8BFFECD422C95FB300E3378C /* KEXPPowerExample */,
-				72873BEF27A8D3C100132B62 /* Shared */,
+				72873BEF27A8D3C100132B62 /* KEXPPower SwiftUI */,
 				72873BFD27A8D3C200132B62 /* macOS */,
 				72873C0627A8D3C200132B62 /* Tests iOS */,
 				72873C1227A8D3C200132B62 /* Tests macOS */,
@@ -820,6 +825,7 @@
 				7219D7FE2BEA60E00079B78E /* PlayResult Fixture.swift in Sources */,
 				7219D7FF2BEA60E00079B78E /* ShowResult.swift in Sources */,
 				7219D8002BEA60E00079B78E /* ArchiveStreamResult.swift in Sources */,
+				72F4993B2BFD2E7100A8B8B6 /* TestView.swift in Sources */,
 				7219D8202BEAAAD20079B78E /* ImageView.swift in Sources */,
 				7219D81C2BEAA8710079B78E /* Extended View.swift in Sources */,
 				7219D7F72BEA60DB0079B78E /* AppleMusicResult.swift in Sources */,
@@ -962,6 +968,7 @@
 				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "KEXPPowerExampleSwiftUI--iOS--Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -999,6 +1006,7 @@
 				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "KEXPPowerExampleSwiftUI--iOS--Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

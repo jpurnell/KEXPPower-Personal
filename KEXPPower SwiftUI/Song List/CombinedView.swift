@@ -7,9 +7,10 @@
 	//
 
 import SwiftUI
+import OSLog
 
 struct CombinedView: View {
-	@State var play: Play?
+	var play: Play?
 	var imageURL: String = "https://kexp.org/static/assets/img/kexp_logo.jpg"
 	@State var small: Bool = true
 	
@@ -49,8 +50,13 @@ struct CombinedView: View {
 					)
 					.padding(.bottom, 5).padding(.vertical)
 			}
-		}).foregroundStyle(.primary)
-		}
+		})
+		.foregroundStyle(.primary)
+		.onAppear(perform: {
+//			let logger = Logger(#function)
+//			logger.debug("Displaying Combined view for \(play?.description ?? "Default Play", privacy: .public)")
+		})
+	}
 	}
 			   
 #Preview {

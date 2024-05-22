@@ -28,7 +28,7 @@ struct ProgramView: View {
                     ProgressView().progressViewStyle(.circular)
                 }
             }
-            .frame(minWidth: 20, idealWidth: 120, maxWidth: 120, minHeight: 20, idealHeight: 120, maxHeight: 120, alignment: .center)
+            .frame(minWidth: 20, idealWidth: 120, maxWidth: 120, minHeight: 120, idealHeight: 120, maxHeight: 120, alignment: .center)
 			.clipShape(RoundedRectangle(cornerRadius: 5.0))
             .shadow(radius: 10)
 			.overlay(RoundedRectangle(cornerRadius: 5.0)

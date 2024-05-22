@@ -8,8 +8,10 @@
 
 import Foundation
 import AVKit
+import MediaPlayer
 import OSLog
 
+#if os(iOS)
 class PlayerController: ObservableObject {
 	//MARK: – Published Properties
 	
@@ -36,6 +38,7 @@ class PlayerController: ObservableObject {
 		
 		setupPlayer(link)
 		setupAVPlayerViewController()
+		setupRemoteTransportControls()
 	}
 	
 	private func setupPlayer(_ url: URL = URL(string: "")!) {
@@ -62,6 +65,7 @@ class PlayerController: ObservableObject {
 		player?.currentItem?.externalMetadata = [title, artist, artwork]
 	}
 	
+	
 	private func setupArtworkMetadata(_ artwork: AVMutableMetadataItem) {
 		if let url = URL(string: artwork.stringValue ?? "https://kexp.org/static/assets/img/kexp_logo.jpg") {
 			let task = URLSession.shared.dataTask(with: url) { data, response, error in
@@ -86,7 +90,36 @@ class PlayerController: ObservableObject {
 		avPlayerViewController.player = player
 		avPlayerViewController.allowsPictureInPicturePlayback = true
 		avPlayerViewController.canStartPictureInPictureAutomaticallyFromInline = true
+		avPlayerViewController.allowsVideoFrameAnalysis = true
+		avPlayerViewController.showsPlaybackControls = true
+		avPlayerViewController.showsTimecodes = true
+		avPlayerViewController.updatesNowPlayingInfoCenter = true
+
 	}
+	
+	func setupRemoteTransportControls() {
+		let commandCenter = MPRemoteCommandCenter.shared()
+		
+		commandCenter.playCommand.isEnabled = true
+		commandCenter.playCommand.addTarget { [unowned self] event in
+			if !self.isPlaying {
+				player?.play()
+				return .success
+			}
+			return .commandFailed
+		}
+		
+		commandCenter.pauseCommand.isEnabled = true
+		commandCenter.pauseCommand.addTarget { [unowned self] event in
+			if self.isPlaying {
+				player?.pause()
+				return .success
+			}
+			return .commandFailed
+		}
+		
+	}
+
 	
 	// MARK: - Playback Control
 	
@@ -105,3 +138,4 @@ class PlayerController: ObservableObject {
 	
 	// Set up metadata for the current AVPlayerItem
 }
+#endif

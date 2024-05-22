@@ -24,7 +24,15 @@ public struct PlayResult: Decodable, Identifiable {
 }
 
 // MARK: - Result
-public struct Play: Codable, Identifiable {
+public class Play: Codable, Identifiable, ObservableObject, Hashable {
+	public static func == (lhs: Play, rhs: Play) -> Bool {
+		return lhs.id == rhs.id
+	}
+	
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(id.hashValue)
+	}
+	
 	func dateformatter() -> DateFormatter {
 		let df = DateFormatter()
 		df.dateStyle = .short
@@ -65,7 +73,8 @@ public struct Play: Codable, Identifiable {
 	public var description: String { return "\(id ?? 0)\t\(uri ?? "")\n\(playType?.rawValue ?? "")\n\(song ?? "")\n\(artist ?? "")\n\(album ?? "")\n\(releaseDate ?? "")\nRequest:\t\(isRequest ?? false)\n\(comment ?? "")" }
 
 	public static func fixture(id: Int? = 3000448) -> Play {
-		return Play(id: id, imageURI: "https://ia600201.us.archive.org/3/items/mbid-62a66ab7-769f-455f-b520-263fb73b2e8e/mbid-62a66ab7-769f-455f-b520-263fb73b2e8e-38213669108_thumb500.jpg", comment: "Teezo Touchdown will be at Neumos on Saturday, May 18th, and then at San Francisco\'s The Independent on  Monday and Tuesday, May 20th and 21st.\n--\nThe rapper covered Talking Heads\' 1983 song for A24‘s Talking Heads tribute album.  The album is expected to ship in July.: https://www.stereogum.com/2253489/teezo-touchdown-making-flippy-floppy-talking-heads-cover/music/", song: "I Was Riding My Bike To Work When I Realized I Have No Job", album: "Making Flippy Floppy", artist: "Teezo Touchdown", airdate: "2024-05-07T11:23:27-07:00", thumbnailURI: "https://ia600201.us.archive.org/3/items/mbid-62a66ab7-769f-455f-b520-263fb73b2e8e/mbid-62a66ab7-769f-455f-b520-263fb73b2e8e-38213669108_thumb250.jpg", releaseDate: "2024-02-29", labels: ["A24 Music"], isRequest: true)
+//		return Play(id: id, imageURI: "https://ia600201.us.archive.org/3/items/mbid-62a66ab7-769f-455f-b520-263fb73b2e8e/mbid-62a66ab7-769f-455f-b520-263fb73b2e8e-38213669108_thumb500.jpg", comment: "Teezo Touchdown will be at Neumos on Saturday, May 18th, and then at San Francisco\'s The Independent on  Monday and Tuesday, May 20th and 21st.\n--\nThe rapper covered Talking Heads\' 1983 song for A24‘s Talking Heads tribute album.  The album is expected to ship in July.: https://www.stereogum.com/2253489/teezo-touchdown-making-flippy-floppy-talking-heads-cover/music/", song: "I Was Riding My Bike To Work When I Realized I Have No Job", album: "Making Flippy Floppy", artist: "Teezo Touchdown", airdate: "2024-05-07T11:23:27-07:00", thumbnailURI: "https://ia600201.us.archive.org/3/items/mbid-62a66ab7-769f-455f-b520-263fb73b2e8e/mbid-62a66ab7-769f-455f-b520-263fb73b2e8e-38213669108_thumb250.jpg", releaseDate: "2024-02-29", labels: ["A24 Music"], isRequest: true)
+		return Play()
 	}
 }
 

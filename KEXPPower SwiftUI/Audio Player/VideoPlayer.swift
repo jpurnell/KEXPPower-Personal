@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 import AVKit
 
+#if os(iOS)
 // A SwiftUI view wrapper for an AVPlayerViewController
 struct VideoPlayer: UIViewControllerRepresentable {
 	// MARK: - Observed Object
@@ -30,3 +31,4 @@ struct VideoPlayer: UIViewControllerRepresentable {
 		return playerController.avPlayerViewController
 	}
 }
+#endif
