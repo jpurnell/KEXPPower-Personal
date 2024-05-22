@@ -29,3 +29,15 @@ public struct SearchTrack: Decodable {
 //        case trackViewUrl
 //    }
 }
+
+extension SearchTrack {
+	public static func fixture(trackViewUrl: URL = URL(string: "https://music.apple.com/us/album/this-year/1445589195?i=1445589202&uo=4")!) -> SearchTrack {
+		return SearchTrack(trackViewUrl: trackViewUrl)
+	}
+}
+
+extension AppleMusicResult {
+	public static func fixture(resultCount: Int = 1, results: [SearchTrack] = [.fixture()]) -> AppleMusicResult {
+		return AppleMusicResult(resultCount: resultCount, results: results)
+	}
+}
