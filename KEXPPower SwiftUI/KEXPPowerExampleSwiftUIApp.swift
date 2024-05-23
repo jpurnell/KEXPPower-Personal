@@ -38,7 +38,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		application.beginReceivingRemoteControlEvents()
 		do {
 			// Set the audio session category to playback
-			let audioSessionCategory: AVAudioSession.Category = .playAndRecord
+			let audioSessionCategory: AVAudioSession.Category = .playback
 			try audioSession.setCategory(audioSessionCategory, mode: .default, options: [.mixWithOthers, .defaultToSpeaker, .allowAirPlay])
 			logger.info("set audioSession category to \(audioSessionCategory.rawValue, privacy: .public)")
 			

@@ -36,7 +36,7 @@ struct ContentView: View {
 				VStack(alignment: .leading){
 					Text("Now Playing").fontWeight(.semibold)
 					HStack(alignment: .center) {
-						PlayerView(play: resultsRetriever.play)
+						PlayerView(resultsRetriever: resultsRetriever)
 					}
 				}.padding(.horizontal)
 				#endif

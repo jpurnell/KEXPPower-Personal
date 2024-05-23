@@ -12,39 +12,47 @@ import MediaPlayer
 import OSLog
 
 #if os(iOS)
+
+@MainActor
 class PlayerController: ObservableObject {
+	
 	//MARK: – Published Properties
 	
 	// Published properties to trigger UI Updates when changed
 	@Published var playbackVideoLink: String = ""
 	@Published var playbackTitle: String = ""
+	@Published var playbackAlbum: String = ""
 	@Published var playbackArtist: String = ""
 	@Published var playbackArtwork: String = ""
 	@Published var isPlaying: Bool = false
 	let logger = Logger(#function)
+	var nowPlayingInfo: [String: Any] = [:]
 	
 	// MARK: - AVPlayer and AVPlayerViewController Properties
 	
 	var player: AVPlayer?
 	var avPlayerViewController: AVPlayerViewController = AVPlayerViewController()
-	
 	// MARK: - Initialization and Setup
 	
-	@MainActor func initPlayer(link: URL = URL(string: "")!, title: String = "", artist: String = "", artwork: String = "") {
+	@MainActor func initPlayer(link: URL = URL(string: "")!, title: String = "", album: String = "", artist: String = "", artwork: String = "") {
+		logger.debug("Initiating PlayerController for \(title, privacy: .public)")
 		self.playbackVideoLink = link.absoluteString
 		self.playbackTitle = title
+		self.playbackAlbum = album
 		self.playbackArtist = artist
 		self.playbackArtwork = artwork
 		
 		setupPlayer(link)
 		setupAVPlayerViewController()
 		setupRemoteTransportControls()
+		setupNotificationView()
 	}
+	
 	
 	private func setupPlayer(_ url: URL = URL(string: "")!) {
 		// Initialize AVPlayer with the provided link
 		player = AVPlayer(url: url)
-		
+		player?.allowsExternalPlayback = true
 		// Set up metadata for the current item
 		setupMetadata()
 	}
@@ -54,35 +62,42 @@ class PlayerController: ObservableObject {
 		title.identifier = .commonIdentifierTitle
 		title.value = playbackTitle as NSString
 		
+		let album = AVMutableMetadataItem()
+		album.identifier = .commonIdentifierAlbumName
+		album.value = playbackAlbum as NSString
+		
 		let artist = AVMutableMetadataItem()
 		artist.identifier = .commonIdentifierArtist
 		artist.value = playbackArtist as NSString
 		
-		let artwork = AVMutableMetadataItem()
-		setupArtworkMetadata(artwork)
+		var artwork = AVMutableMetadataItem()
+		Task {
+			artwork = await setupArtworkMetadata(playbackArtwork).0
+		}
 		
 		// Set external Metadata for the current AVPlayerItem
-		player?.currentItem?.externalMetadata = [title, artist, artwork]
+		player?.currentItem?.externalMetadata = [title, album, artist, artwork]
 	}
 	
-	
-	private func setupArtworkMetadata(_ artwork: AVMutableMetadataItem) {
-		if let url = URL(string: artwork.stringValue ?? "https://kexp.org/static/assets/img/kexp_logo.jpg") {
-			let task = URLSession.shared.dataTask(with: url) { data, response, error in
-				if let error = error { self.logger.error("Could not retrieve url.\(error.localizedDescription)") }
-				else if let data = data {
-					if let image = UIImage(data: data) {
-						if let imageData = image.jpegData(compressionQuality: 1.0) {
-							artwork.identifier = .commonIdentifierArtwork
-							artwork.value = imageData as NSData
-							artwork.dataType = kCMMetadataBaseDataType_JPEG as String
-						}
-					}
-				}
-			}
+	private func setupArtworkMetadata(_ artwork: String = "https://kexp.org/static/assets/img/kexp_logo.jpg") async -> (AVMutableMetadataItem, UIImage) {
+		let artworkMetadata = AVMutableMetadataItem()
+		artworkMetadata.identifier = .commonIdentifierArtwork
+		artworkMetadata.value = artwork as NSString
+		
+		guard let url = URL(string: artwork) else { return (artworkMetadata, UIImage(systemName: "music.note")!) }
+		
+		let (data, _) = try! await URLSession.shared.data(from: url)
+				
+		guard let image = UIImage(data: data) else { return (artworkMetadata, UIImage(systemName: "music.note")!) }
+		
+		if let imageData = image.jpegData(compressionQuality: 1.0) {
+			artworkMetadata.identifier = .commonIdentifierArtwork
+			artworkMetadata.value = imageData as NSData
+			artworkMetadata.dataType = kCMMetadataBaseDataType_JPEG as String
 		}
+		return (artworkMetadata, image)
 	}
-	
+		
 	// MARK: - AVPlayerViewController Setup
 	
 	@MainActor private func setupAVPlayerViewController() {
@@ -120,7 +135,50 @@ class PlayerController: ObservableObject {
 		
 	}
 
+	func setupNotificationView() {
+		guard var nowPlayingInfo = player?.currentItem?.nowPlayingInfo else { logger.warning("Could not set up Now Playing info"); return }
+		
+		nowPlayingInfo[MPMediaItemPropertyTitle] = playbackTitle
+		nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = playbackAlbum
+		nowPlayingInfo[MPMediaItemPropertyArtist] = playbackArtist
+		Task {
+			let artwork = await setupArtworkMetadata(playbackArtwork).1
+			nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artwork.size, requestHandler: { (size) -> UIImage in
+			return artwork })
+		}
+		logger.debug("Now Playing:\n\(nowPlayingInfo.map({"\($0.key)\t\($0.value)"}).joined(separator: "\n"))")
+	}
 	
+	func updateNotificationView(_ song: String, artist: String, album: String, artwork: String) async -> Bool {
+		let updatedTitle = AVMutableMetadataItem()
+		updatedTitle.identifier = .commonIdentifierTitle
+		updatedTitle.value = song as NSString
+		
+		let updatedAlbum = AVMutableMetadataItem()
+		updatedAlbum.identifier = .commonIdentifierAlbumName
+		updatedAlbum.value = album as NSString
+		
+		let updatedArtist = AVMutableMetadataItem()
+		updatedArtist.identifier = .commonIdentifierArtist
+		updatedArtist.value = artist as NSString
+		
+		let updatedArtwork = await setupArtworkMetadata(artwork)
+		
+		player?.currentItem?.externalMetadata = [updatedTitle, updatedAlbum, updatedArtist, updatedArtwork.0]
+		nowPlayingInfo.updateValue(song, forKey: MPMediaItemPropertyTitle)
+		nowPlayingInfo.updateValue(artist, forKey: MPMediaItemPropertyArtist)
+		nowPlayingInfo.updateValue(album, forKey: MPMediaItemPropertyAlbumTitle)
+		Task {
+			let artwork = await setupArtworkMetadata(artwork).1
+			nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artwork.size, requestHandler: { (size) -> UIImage in
+			return artwork })
+		}
+		player?.currentItem?.nowPlayingInfo = nowPlayingInfo
+		let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
+		nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
+		
+		return true
+	}
 	// MARK: - Playback Control
 	
 	func pausePlayer() {

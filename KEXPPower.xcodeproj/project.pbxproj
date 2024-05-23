@@ -59,7 +59,7 @@
 		7219D8252BEBBD860079B78E /* AudioPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8242BEBBD860079B78E /* AudioPlayerView.swift */; };
 		7219D8272BEBCA200079B78E /* AVPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8262BEBCA200079B78E /* AVPlayer.swift */; };
 		7219D8292BEBD1270079B78E /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8282BEBD1270079B78E /* VideoPlayer.swift */; };
-		7219D82B2BEBD1FF0079B78E /* PlayerView UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D82A2BEBD1FF0079B78E /* PlayerView UI.swift */; };
+		7219D82B2BEBD1FF0079B78E /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D82A2BEBD1FF0079B78E /* PlayerView.swift */; };
 		7244DDE72B7E73E100375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
 		7244DDEA2B7E752700375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
 		7244DDEB2B7E752700375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
@@ -164,7 +164,7 @@
 		7219D8242BEBBD860079B78E /* AudioPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerView.swift; sourceTree = "<group>"; };
 		7219D8262BEBCA200079B78E /* AVPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayer.swift; sourceTree = "<group>"; };
 		7219D8282BEBD1270079B78E /* VideoPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayer.swift; sourceTree = "<group>"; };
-		7219D82A2BEBD1FF0079B78E /* PlayerView UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerView UI.swift"; sourceTree = "<group>"; };
+		7219D82A2BEBD1FF0079B78E /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
 		7244DDE32B7E73DB00375023 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		7272836427B1BBAC00021CD4 /* KEXPPowerExampleSwiftUI (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "KEXPPowerExampleSwiftUI (iOS).entitlements"; sourceTree = "<group>"; };
 		7272836527B2AE6900021CD4 /* ShowStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowStore.swift; sourceTree = "<group>"; };
@@ -298,10 +298,8 @@
 		7272836D27B2C77900021CD4 /* Song List */ = {
 			isa = PBXGroup;
 			children = (
-				7219D82A2BEBD1FF0079B78E /* PlayerView UI.swift */,
+				7219D82A2BEBD1FF0079B78E /* PlayerView.swift */,
 				72873C3527A998E400132B62 /* PlayResultStore.swift */,
-				72F4993C2BFE6B0700A8B8B6 /* ResultRetriever.swift */,
-				72F4993E2BFE767B00A8B8B6 /* AppleMusicRetriever.swift */,
 				72F4993A2BFD2E7100A8B8B6 /* TestView.swift */,
 				7219D8192BEA66C70079B78E /* CombinedView.swift */,
 				7219D81F2BEAAAD20079B78E /* ImageView.swift */,
@@ -336,6 +334,7 @@
 				72873BF127A8D3C100132B62 /* ContentView.swift */,
 				7272836E27B2C78D00021CD4 /* Show Information */,
 				7219D8212BEBBBE30079B78E /* Audio Player */,
+				72F499402BFE990000A8B8B6 /* Retrievers */,
 				7272836D27B2C77900021CD4 /* Song List */,
 				72873BF227A8D3C200132B62 /* Assets.xcassets */,
 				72873C3D27AB7CDC00132B62 /* To Add.md */,
@@ -367,6 +366,15 @@
 				72873C1527A8D3C200132B62 /* Tests_macOSLaunchTests.swift */,
 			);
 			path = "Tests macOS";
+			sourceTree = "<group>";
+		};
+		72F499402BFE990000A8B8B6 /* Retrievers */ = {
+			isa = PBXGroup;
+			children = (
+				72F4993C2BFE6B0700A8B8B6 /* ResultRetriever.swift */,
+				72F4993E2BFE767B00A8B8B6 /* AppleMusicRetriever.swift */,
+			);
+			path = Retrievers;
 			sourceTree = "<group>";
 		};
 		8B159DBF233C665200BCB7AB /* Archive */ = {
@@ -845,7 +853,7 @@
 				7219D7EE2BEA60D00079B78E /* Router.swift in Sources */,
 				7219D80F2BEA60EE0079B78E /* ArchiveManager.swift in Sources */,
 				7219D7EF2BEA60D00079B78E /* Reachability.swift in Sources */,
-				7219D82B2BEBD1FF0079B78E /* PlayerView UI.swift in Sources */,
+				7219D82B2BEBD1FF0079B78E /* PlayerView.swift in Sources */,
 				72873C1727A8D3C200132B62 /* KEXPPowerExampleSwiftUIApp.swift in Sources */,
 				72F4993D2BFE6B0700A8B8B6 /* ResultRetriever.swift in Sources */,
 			);

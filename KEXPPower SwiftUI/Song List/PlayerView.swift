@@ -13,14 +13,14 @@ import AVFAudio
 #if os(iOS)
 struct PlayerView: View {
 	// StateObject that manages the player controller and its state
-	@StateObject var playerController = PlayerController()
-	var play: Play?
+//	@StateObject var playerController = PlayerController()
+	var resultsRetriever: ResultRetriever
 	@State var small: Bool = true
 	let logger = Logger(#function)
 	
     var body: some View {
 		HStack(alignment: .center) {
-			Button(action: {playerController.playOrPause()}) {
+			Button(action: {resultsRetriever.playerController.playOrPause()}) {
 				VStack {
 					Button(action: {
 						small.toggle()
@@ -29,9 +29,9 @@ struct PlayerView: View {
 						VStack{
 							HStack {
 								ZStack {
-									ImageView(play: play ?? .fixture()).frame( width: small ? 120 : 300, height: small ? 120 : 300 )
-									Button(action: playerController.playOrPause) {
-										Image(systemName: playerController.isPlaying ? "pause.circle" : "play.circle")
+									ImageView(play: resultsRetriever.play ?? .fixture()).frame( width: small ? 120 : 300, height: small ? 120 : 300 )
+									Button(action: resultsRetriever.playerController.playOrPause) {
+										Image(systemName: resultsRetriever.playerController.isPlaying ? "pause.circle" : "play.circle")
 											.resizable()
 											.foregroundStyle(.primary)
 											.opacity(small ? 0.9 : 0).animation(.easeInOut(duration: 1.0), value: 1.0)
@@ -40,13 +40,13 @@ struct PlayerView: View {
 								}
 								.animation(.easeInOut(duration: 1.0), value: 1.0)
 								.padding(small ? [.vertical] : [.all])
-								(small ? CompactView(play: play ?? .fixture())
+								(small ? CompactView(play: resultsRetriever.play ?? .fixture())
 									.frame(minWidth: 200, maxWidth: .infinity)
 									.padding(.leading)
 									.padding(.vertical) : nil)
 									.animation(.easeInOut(duration: 1.0), value: 1.0)
 							}
-							(small ? nil : ExtendedView(play: play ?? .fixture()))
+							(small ? nil : ExtendedView(play: resultsRetriever.play ?? .fixture()))
 								.animation(.easeInOut(duration: 1.0), value: 1.0)
 								.frame(
 									minWidth: 200,
@@ -61,32 +61,22 @@ struct PlayerView: View {
 					})
 					.foregroundStyle(.primary)
 					.onAppear(perform: {
-//						let logger = Logger(#function)
-//						logger.debug("Displaying Combined view for \(play?.description ?? "Default Play", privacy: .public)")
+
 					})
 				}
 			}
 		}
 		.task {
+			
 		}
 		.onAppear {
-//			logger.debug("Displaying Player view for \(play?.description ?? "Default Play", privacy: .public)")
-			let streamURL = KEXPPower().streamURL
 			
-			
-			playerController.initPlayer(
-				link: streamURL,
-				title: play?.song ?? "",
-				artist: play?.artist ?? "",
-				artwork: play?.imageURI ?? ""
-			)
-//			logger.debug("Set up Player with Stream \(streamURL.absoluteString, privacy: .public) with play \(play?.description ?? "No Song")")
 		}
     }
 }
 
 #Preview {
-	PlayerView(play: .fixture())
+	PlayerView(resultsRetriever: ResultRetriever())
 //	PlayerView(playResultsStore: PlayResultStore())
 }
 #endif
