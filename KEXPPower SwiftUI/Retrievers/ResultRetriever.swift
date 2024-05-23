@@ -25,17 +25,18 @@ public class ResultRetriever {
 	func getResults() async {
 		Task {
 			let streamURL = KEXPPower().streamURL
-			playerController.initPlayer(link: streamURL, title: play.song ?? "Airbreak", album: play.album ?? "", artist: play.artist ?? "KEXP", artwork: play.imageURI ?? "https://kexp.org/static/assets/img/kexp_logo.jpg")
+			let kexpLogo = "https://kexp.org/static/assets/img/kexp_logo.jpg"
+			playerController.initPlayer(link: streamURL, title: play.song ?? "Airbreak", album: play.album ?? "", artist: play.artist ?? "KEXP", artwork: play.imageURI ?? kexpLogo)
 			repeat {
 				let playResult = try await networkManager.getPlay()
 				plays = playResult.plays ?? []
 				play = playResult.plays?.first ?? .fixture()
 				let showResult = try await networkManager.getShow()
 				show = showResult.shows?.first ?? Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"])
-				playerController.playbackTitle = play.song ?? ""
-				playerController.playbackArtist = play.artist ?? ""
+				playerController.playbackTitle = play.song ?? "Airbreak"
+				playerController.playbackArtist = play.artist ?? "KEXP"
 				playerController.playbackAlbum = play.album ?? ""
-				playerController.playbackArtwork = play.imageURI ?? ""
+				playerController.playbackArtwork = play.imageURI ?? kexpLogo
 				let updatedNotifications = await playerController.updateNotificationView(playerController.playbackTitle , artist: playerController.playbackArtist, album: playerController.playbackAlbum, artwork: playerController.playbackArtwork)
 				logger.debug("Updated Player Controller for \(self.playerController.playbackTitle).\rNotifications Updated: \(updatedNotifications)")
 								try await Task.sleep(until: .now + .seconds(5))

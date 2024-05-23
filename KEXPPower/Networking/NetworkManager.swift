@@ -89,9 +89,9 @@ public struct NetworkManager {
 		return archiveStreamResult
 	}
 	
-	public func getAppleMusicLink(artist: String?, track: String?, queue: DispatchQueue = .main) async throws -> AppleMusicResult {
+	public func getAppleMusicLink(artist: String?, track: String?, album: String?, queue: DispatchQueue = .main) async throws -> AppleMusicResult {
 		let iTunesURL = "https://itunes.apple.com/search"
-		let searchTerm = " \(artist ?? "") \(track ?? "")"
+		let searchTerm = " \(artist ?? "") \(track ?? "") \(album ?? "")"
 		var parameters = [URLQueryItem]()
 			parameters.append(URLQueryItem(name: "term", value: searchTerm))
 			parameters.append(URLQueryItem(name: "entity", value: "song"))

@@ -45,9 +45,9 @@ struct ExtendedView: View {
 			do {
 				if play?.artist != nil && play?.song != nil {
 					logger.debug("Looking up \(play?.song ?? "", privacy: .public)")
-					let track = try await appleMusicRetriever.getAppleMusicResult(artist: play!.artist!, track: play!.song!)
+					let track = try await appleMusicRetriever.getAppleMusicResult(artist: play!.artist!, track: play!.song!, album: play?.album ?? "")
 					appleMusicURL = track
-					logger.debug("Got track \(play?.song ?? "", privacy: .public) at \(appleMusicURL?.absoluteString ?? "", privacy: .public)")
+					logger.debug("Got track \(play?.song ?? "", privacy: .public) from \(play?.album ?? "") at \(appleMusicURL?.absoluteString ?? "", privacy: .public)")
 				} else { return }
 			} catch {
 				let logger = Logger(#function)

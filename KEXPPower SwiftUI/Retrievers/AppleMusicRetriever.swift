@@ -16,9 +16,9 @@ public class AppleMusicRetriever {
 	let networkManager = NetworkManager()
 	var appleMusicURL: URL?
 	
-	func getAppleMusicResult(artist: String, track: String) async throws -> URL? {
+	func getAppleMusicResult(artist: String, track: String, album: String) async throws -> URL? {
 		do {
-			let appleMusicResult = try await NetworkManager().getAppleMusicLink(artist: artist, track: track)
+			let appleMusicResult = try await NetworkManager().getAppleMusicLink(artist: artist, track: track, album: album)
 			if let appleMusicURL = (appleMusicResult.results?.first?.trackViewUrl) {
 				logger.debug("Got URL: \(appleMusicURL)")
 				return appleMusicURL
