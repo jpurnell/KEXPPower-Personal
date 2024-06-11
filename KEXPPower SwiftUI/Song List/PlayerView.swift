@@ -10,7 +10,7 @@ import SwiftUI
 import OSLog
 import AVFAudio
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 struct PlayerView: View {
 	// StateObject that manages the player controller and its state
 //	@StateObject var playerController = PlayerController()
@@ -29,24 +29,25 @@ struct PlayerView: View {
 						VStack{
 							HStack {
 								ZStack {
-									ImageView(play: resultsRetriever.play ?? .fixture()).frame( width: small ? 120 : 300, height: small ? 120 : 300 )
-									Button(action: resultsRetriever.playerController.playOrPause) {
-										Image(systemName: resultsRetriever.playerController.isPlaying ? "pause.circle" : "play.circle")
-											.resizable()
-											.foregroundStyle(.primary)
-											.opacity(small ? 0.9 : 0).animation(.easeInOut(duration: 1.0), value: 1.0)
-											.frame(minWidth: 64, idealWidth: 64, maxWidth: 64, minHeight: 64, idealHeight: 64, maxHeight: 64, alignment: .center)
-									}
+									ImageView(play: resultsRetriever.play).frame( width: small ? 100 : 300, height: small ? 100 : 300 )
 								}
 								.animation(.easeInOut(duration: 1.0), value: 1.0)
-								.padding(small ? [.vertical] : [.all])
-								(small ? CompactView(play: resultsRetriever.play ?? .fixture())
-									.frame(minWidth: 200, maxWidth: .infinity)
+								.padding(small ? [.vertical] : [])
+								(small ? CompactView(play: resultsRetriever.play)
+									.frame(minWidth: 150, maxWidth: .infinity)
 									.padding(.leading)
 									.padding(.vertical) : nil)
 									.animation(.easeInOut(duration: 1.0), value: 1.0)
+								small ?
+								Button(action: resultsRetriever.playerController.playOrPause) {
+									Image(systemName: resultsRetriever.playerController.isPlaying ? "pause.circle" : "play.circle")
+										.resizable()
+										.foregroundStyle(.primary)
+										.opacity(small ? 0.9 : 0).animation(.easeInOut(duration: 1.0), value: 1.0)
+										.frame(minWidth: 64, idealWidth: 64, maxWidth: 64, minHeight: 64, idealHeight: 64, maxHeight: 64, alignment: .center)
+								} : nil
 							}
-							(small ? nil : ExtendedView(play: resultsRetriever.play ?? .fixture()))
+							(small ? nil : ExtendedView(play: resultsRetriever.play))
 								.animation(.easeInOut(duration: 1.0), value: 1.0)
 								.frame(
 									minWidth: 200,
@@ -77,6 +78,5 @@ struct PlayerView: View {
 
 #Preview {
 	PlayerView(resultsRetriever: ResultRetriever())
-//	PlayerView(playResultsStore: PlayResultStore())
 }
 #endif

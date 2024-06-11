@@ -10,7 +10,7 @@ import Foundation
 import SwiftUI
 import AVKit
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 // A SwiftUI view wrapper for an AVPlayerViewController
 struct VideoPlayer: UIViewControllerRepresentable {
 	// MARK: - Observed Object

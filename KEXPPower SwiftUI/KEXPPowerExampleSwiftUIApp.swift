@@ -13,7 +13,7 @@ import OSLog
 @main
 struct KEXPPowerExampleSwiftUIApp: App {
 	
-	#if os(iOS)
+	#if os(iOS) || os(visionOS)
 	//INFO: - https://www.hackingwithswift.com/quick-start/swiftui/how-to-add-an-appdelegate-to-a-swiftui-app
 	@UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 	#endif
@@ -24,7 +24,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
     }
 }
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 // Custom AppDelegate to handle application lifecycle events
 // INFO: - https://medium.com/@afridi.khondakar/implementing-background-play-picture-in-picture-in-swiftui-building-a-video-streaming-app-with-141304b84728
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -32,14 +32,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 	// This method is called when the application finishes launching
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
 		
+		#if os(iOS) || os(visionOS)
 		// Configure the audio session for background audio and video services
-		
 		let audioSession = AVAudioSession.sharedInstance()
 		application.beginReceivingRemoteControlEvents()
 		do {
 			// Set the audio session category to playback
 			let audioSessionCategory: AVAudioSession.Category = .playback
-			try audioSession.setCategory(audioSessionCategory, mode: .default, options: [.mixWithOthers, .defaultToSpeaker, .allowAirPlay])
+			try audioSession.setCategory(audioSessionCategory, mode: .default, options: [.allowAirPlay])
 			logger.info("set audioSession category to \(audioSessionCategory.rawValue, privacy: .public)")
 			
 			// Activate the audio session
@@ -49,7 +49,13 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 			// Handle errors related to audio session setup
 			logger.error("Setting category to AVAudioSessionCategoryPlayback failed.")
 		}
+		#endif
 		
+		#if os(macOS)
+		let macViewController = MPMusicPlayerController()
+		macViewController
+		MPNowPlayingInfoCenter.default().playbackState = .stopped
+		#endif
 		return true
 	}
 }

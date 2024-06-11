@@ -9,6 +9,7 @@
 import Foundation
 
 /// Class that manages the retrieving of archive shows
+@MainActor
 public class ArchiveManager {
     public typealias ArchiveCompletion = (_ archiveShows: [ArchiveShow]?) -> Void
     public typealias ArchivePlayBackCompletion = (_ showURLS: [URL], _ offset: Double) -> Void

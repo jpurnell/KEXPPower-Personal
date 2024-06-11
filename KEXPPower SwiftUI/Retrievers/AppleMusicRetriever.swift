@@ -20,7 +20,7 @@ public class AppleMusicRetriever {
 		do {
 			let appleMusicResult = try await NetworkManager().getAppleMusicLink(artist: artist, track: track, album: album)
 			if let appleMusicURL = (appleMusicResult.results?.first?.trackViewUrl) {
-				logger.debug("Got URL: \(appleMusicURL)")
+//				logger.debug("Got URL: \(appleMusicURL)")
 				return appleMusicURL
 			}
 		} catch {

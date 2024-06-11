@@ -181,59 +181,59 @@ public struct NetworkManager {
 //        }
 //    }
 //    
-    public func getShow(
-        startTimeBefore: String? = nil,
-        startTimeAfter: String? = nil,
-        limit: Int? = nil,
-        offset: Int? = nil,
-        queue: DispatchQueue = .main,
-        completion: @escaping ShowCompletion)
-    {
-        var parameters = [URLQueryItem]()
-        
-        if let startTimeBefore = startTimeBefore {
-            parameters.append(URLQueryItem(name: "start_time_before", value: startTimeBefore))
-        }
-        
-        if let startTimeAfter = startTimeAfter {
-            parameters.append(URLQueryItem(name: "start_time_after", value: startTimeAfter))
-        }
-        
-        if let limit = limit {
-            parameters.append(URLQueryItem(name: "limit", value: "\(limit)"))
-        }
-        
-        if let offset = offset {
-            parameters.append(URLQueryItem(name: "offset", value: "\(offset)"))
-        }
-
-        router.get(url: KEXPPower.sharedInstance.showURL, parameters: parameters) { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let showResult = try JSONDecoder().decode(ShowResult.self, from: data)
-                    queue.async { completion(.success(showResult)) }
-                } catch let error {
-                    let error = NSError(
-                        domain: "com.kexppower.error",
-                        code: 0,
-                        userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
-                    )
-                    
-                    queue.async { completion(.failure(error)) }
-                }
-                
-            case .failure(let error):
-                let error = NSError(
-                    domain: "com.kexppower.error",
-                    code: 0,
-                    userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
-                )
-                
-                queue.async { completion(.failure(error)) }
-            }
-        }
-    }
+//    public func getShow(
+//        startTimeBefore: String? = nil,
+//        startTimeAfter: String? = nil,
+//        limit: Int? = nil,
+//        offset: Int? = nil,
+//        queue: DispatchQueue = .main,
+//        completion: @escaping ShowCompletion)
+//    {
+//        var parameters = [URLQueryItem]()
+//        
+//        if let startTimeBefore = startTimeBefore {
+//            parameters.append(URLQueryItem(name: "start_time_before", value: startTimeBefore))
+//        }
+//        
+//        if let startTimeAfter = startTimeAfter {
+//            parameters.append(URLQueryItem(name: "start_time_after", value: startTimeAfter))
+//        }
+//        
+//        if let limit = limit {
+//            parameters.append(URLQueryItem(name: "limit", value: "\(limit)"))
+//        }
+//        
+//        if let offset = offset {
+//            parameters.append(URLQueryItem(name: "offset", value: "\(offset)"))
+//        }
+//
+//        router.get(url: KEXPPower.sharedInstance.showURL, parameters: parameters) { result in
+//            switch result {
+//            case .success(let data):
+//                do {
+//                    let showResult = try JSONDecoder().decode(ShowResult.self, from: data)
+//                    queue.async { completion(.success(showResult)) }
+//                } catch let error {
+//                    let error = NSError(
+//                        domain: "com.kexppower.error",
+//                        code: 0,
+//                        userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
+//                    )
+//                    
+//                    queue.async { completion(.failure(error)) }
+//                }
+//                
+//            case .failure(let error):
+//                let error = NSError(
+//                    domain: "com.kexppower.error",
+//                    code: 0,
+//                    userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]
+//                )
+//                
+//                queue.async { completion(.failure(error)) }
+//            }
+//        }
+//    }
 //    
 //    public func getShowDetails(
 //        with showId: String,

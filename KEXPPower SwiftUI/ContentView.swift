@@ -29,10 +29,17 @@ struct ContentView: View {
 					Text("Now Playing").fontWeight(.semibold)
 					HStack(alignment: .center) {
 						CombinedView(play: resultsRetriever.play)
+//						Button(action: resultsRetriever.playerController.playOrPause) {
+//							Image(systemName: resultsRetriever.playerController.isPlaying ? "pause.circle" : "play.circle")
+//								.resizable()
+//								.foregroundStyle(.primary)
+////								.opacity(small ? 0.9 : 0).animation(.easeInOut(duration: 1.0), value: 1.0)
+//								.frame(minWidth: 64, idealWidth: 64, maxWidth: 64, minHeight: 64, idealHeight: 64, maxHeight: 64, alignment: .center)
+//						}
 					}
 				}.padding(.horizontal)
 				#endif
-				#if os(iOS)
+				#if os(iOS) || os(visionOS)
 				VStack(alignment: .leading){
 					Text("Now Playing").fontWeight(.semibold)
 					HStack(alignment: .center) {
@@ -49,7 +56,7 @@ struct ContentView: View {
 					.refreshable {
 						press.toggle()
 						let _ = await resultsRetriever.getResults()
-						logger.debug("Manual Refresh\rActive Play:\r\((resultsRetriever.play ?? .fixture()).description, privacy: .public)")
+						logger.debug("Manual Refresh\rActive Play:\r\((resultsRetriever.play).description, privacy: .public)")
 				}
 			}
 			.task {
@@ -59,7 +66,7 @@ struct ContentView: View {
 		#if os(iOS) || os(visionOS)
 			.navigationBarHidden(true)
 		#endif
-			#if os(iOS)
+			#if os(iOS) || os(visionOS)
 			.navigationSplitViewStyle(.balanced)
 			#endif
     }

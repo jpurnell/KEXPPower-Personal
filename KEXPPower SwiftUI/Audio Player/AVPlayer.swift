@@ -11,7 +11,7 @@ import AVKit
 import MediaPlayer
 import OSLog
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 @MainActor
 class PlayerController: ObservableObject {
@@ -52,7 +52,9 @@ class PlayerController: ObservableObject {
 	private func setupPlayer(_ url: URL = URL(string: "")!) {
 		// Initialize AVPlayer with the provided link
 		player = AVPlayer(url: url)
+		#if os(iOS)
 		player?.allowsExternalPlayback = true
+		#endif
 		// Set up metadata for the current item
 		setupMetadata()
 	}
@@ -103,13 +105,8 @@ class PlayerController: ObservableObject {
 	@MainActor private func setupAVPlayerViewController() {
 		// Assign AVPlayer to AVPlayerViewController
 		avPlayerViewController.player = player
-		avPlayerViewController.allowsPictureInPicturePlayback = true
-		avPlayerViewController.canStartPictureInPictureAutomaticallyFromInline = true
-		avPlayerViewController.allowsVideoFrameAnalysis = true
 		avPlayerViewController.showsPlaybackControls = true
-		avPlayerViewController.showsTimecodes = true
 		avPlayerViewController.updatesNowPlayingInfoCenter = true
-
 	}
 	
 	func setupRemoteTransportControls() {
@@ -119,6 +116,7 @@ class PlayerController: ObservableObject {
 		commandCenter.playCommand.addTarget { [unowned self] event in
 			if !self.isPlaying {
 				player?.play()
+				isPlaying.toggle()
 				return .success
 			}
 			return .commandFailed
@@ -128,13 +126,14 @@ class PlayerController: ObservableObject {
 		commandCenter.pauseCommand.addTarget { [unowned self] event in
 			if self.isPlaying {
 				player?.pause()
+				isPlaying.toggle()
 				return .success
 			}
 			return .commandFailed
 		}
 		
 	}
-
+	
 	func setupNotificationView() {
 		guard var nowPlayingInfo = player?.currentItem?.nowPlayingInfo else { logger.warning("Could not set up Now Playing info"); return }
 		
@@ -146,7 +145,15 @@ class PlayerController: ObservableObject {
 			nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: artwork.size, requestHandler: { (size) -> UIImage in
 			return artwork })
 		}
-		logger.debug("Now Playing:\n\(nowPlayingInfo.map({"\($0.key)\t\($0.value)"}).joined(separator: "\n"))")
+		let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
+		var info: [String: Any] = [:]
+		info.updateValue(playbackTitle, forKey: MPMediaItemPropertyTitle)
+		info.updateValue(playbackAlbum, forKey: MPMediaItemPropertyAlbumTitle)
+		info.updateValue(playbackArtist, forKey: MPMediaItemPropertyArtist)
+		info.updateValue(playbackArtwork, forKey: MPMediaItemPropertyArtwork)
+		
+		nowPlayingInfoCenter.nowPlayingInfo = info
+//		logger.debug("Now Playing:\n\(nowPlayingInfoCenter.nowPlayingInfo.map({"\($0.key)\t\($0.value)"}).joined(separator: "\n"))")
 	}
 	
 	func updateNotificationView(_ song: String, artist: String, album: String, artwork: String) async -> Bool {
@@ -177,6 +184,23 @@ class PlayerController: ObservableObject {
 		let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
 		nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
 		
+		return true
+	}
+	
+	func setNowPlayingMetadata(_ song: String, artist: String, album: String, artwork: String) async -> Bool {
+	   
+		let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
+		var nowPlayingInfo = [String: Any]()
+		
+		logger.log(level: .info, "**** Set track metadata: title \(song)")
+		nowPlayingInfo[MPNowPlayingInfoPropertyIsLiveStream] = true
+		nowPlayingInfo[MPMediaItemPropertyTitle] = song
+		nowPlayingInfo[MPMediaItemPropertyArtist] = artist
+		nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
+		nowPlayingInfo[MPMediaItemPropertyAlbumArtist] = artist
+		nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = album
+		
+		nowPlayingInfoCenter.nowPlayingInfo = nowPlayingInfo
 		return true
 	}
 	// MARK: - Playback Control

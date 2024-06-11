@@ -10,6 +10,7 @@ import Foundation
 import OSLog
 
 /// Class used to configure KEXP networking
+@MainActor
 public class KEXPPower {
     /// Available archive bit rates
     public enum StreamingBitRate: Int {

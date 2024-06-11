@@ -22,7 +22,7 @@ struct ExtendedView: View {
 			HStack{
 				VStack{
 					Button {
-						if let url = appleMusicURL {
+						if let _ = appleMusicURL {
 							logger.debug("Opening \(appleMusicURL?.absoluteString ?? "")")
 							openURL(appleMusicURL!)
 							logger.debug("Think we opened \(appleMusicURL?.absoluteString ?? "")")
@@ -37,26 +37,27 @@ struct ExtendedView: View {
 			}
 			ScrollView(.vertical, showsIndicators: true) {
 				Text(.init(stringLiteral: play?.comment ?? ""))
-					.lineLimit(5)
+					.lineLimit(nil)
 					.multilineTextAlignment(.leading)
 			}
 		}
 		.task {
-			do {
-				if play?.artist != nil && play?.song != nil {
-					logger.debug("Looking up \(play?.song ?? "", privacy: .public)")
-					let track = try await appleMusicRetriever.getAppleMusicResult(artist: play!.artist!, track: play!.song!, album: play?.album ?? "")
-					appleMusicURL = track
-					logger.debug("Got track \(play?.song ?? "", privacy: .public) from \(play?.album ?? "") at \(appleMusicURL?.absoluteString ?? "", privacy: .public)")
-				} else { return }
-			} catch {
-				let logger = Logger(#function)
-				logger.error("No track found")
-			}
+			
 		}
-		.onAppear {		
-//			let logger = Logger(#function)
-//			logger.debug("Displaying Extended view for \(play?.description ?? "Default Play", privacy: .public)")
+		.onAppear {
+			Task {
+				do {
+					if play?.artist != nil && play?.song != nil {
+						logger.debug("Looking up \(play?.song ?? "", privacy: .public)")
+						let track = try await appleMusicRetriever.getAppleMusicResult(artist: play!.artist!, track: play!.song!, album: play?.album ?? "")
+						appleMusicURL = track
+						logger.debug("Got track \(play?.song ?? "", privacy: .public) by \(play?.artist ?? "", privacy: .public) from \(play?.album ?? "N/A") (\(play?.formattedReleaseYear ?? "")) at \(appleMusicURL?.absoluteString ?? "", privacy: .public)")
+					} else { return }
+				} catch {
+					let logger = Logger(#function)
+					logger.error("No track found")
+				}
+			}
 		}
     }
 }
