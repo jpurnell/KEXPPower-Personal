@@ -5,11 +5,10 @@ G1 (artwork `try!` crash), G2/G3 (artwork never reached the system; String store
 writer), G5/G6 (`isPlaying` now mirrors `timeControlStatus`), G7 (no longer deactivates the session on every pause),
 G8/G9 (dead macOS block and `beginReceivingRemoteControlEvents` removed). Also found and fixed during the work: the
 refresh loop requested 2,000 plays every 5 seconds, and could run as overlapping loops.
-**Still open:** G10 (resume after an audio interruption), G12 (app is still Swift 5 language mode), the
-`AudioSessionCoordinator` extraction (session setup remains in the app delegate), and an ADR for the single-publisher
-decision. `NowPlayingPublishing` is the seam Proposal 2 will use for iOS 27.
-**Date:** 2026-11-02
-**Sequence:** Proposal 1 of 2. Must land before [NowPlayingFramework.md](../proposals/NowPlayingFramework.md).
+**Closed afterwards (same day):** G10 (resume after an interruption, and pause when headphones are unplugged, in
+`AudioSessionCoordinator`), G12 (the app and its test target build in Swift 6 language mode, verified with
+`-swift-version 6`), the session-coordinator extraction (the app delegate is gone), and ADR-003.
+`NowPlayingPublishing` is the seam Proposal 2 will use for iOS 27 (deferred by the owner).
 
 ---
 

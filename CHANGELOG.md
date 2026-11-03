@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Changed
-- The app consumes the KEXPPower library as a package (`jpurnell/KEXPPowerKit`, local path) instead of
+- The app consumes the KEXPPower library as a package (`jpurnell/KEXPPowerKit`, local path; `Play` is now a `Sendable` struct) instead of
   compiling a fork's sources into the app target. See `project/decisions/ADR-002-library-in-its-own-repo.md`.
 - Now Playing: a single publisher (`LegacyNowPlayingPublisher`) writes system state; the player no longer
   does. `PlayerController.isPlaying` mirrors the player's own `timeControlStatus`, so remote commands and
@@ -13,6 +13,7 @@
 - Controls honor Reduce Transparency; icons carry accessibility labels.
 
 ### Fixed
+- Playback resumes after an interruption (a phone call) when the system says it may, and pauses when headphones are unplugged.
 - Artwork loading no longer crashes on an unreachable or malformed URL (`try!`), and only contacts
   kexp.org and archive.org over https. Loaded artwork now actually reaches the lock screen.
 - Removed `.animation(_, value: 1.0)` modifiers that keyed off a constant and never animated.
@@ -23,6 +24,9 @@
 - `beginReceivingRemoteControlEvents()` and a dead macOS block in the app delegate.
 
 ### Added
+- `AudioSessionCoordinator` owns the audio session; the app delegate is removed.
+- The app and its tests build in Swift 6 language mode.
+- Stream quality setting (160 kbps standard, 64 kbps data saver), in Settings on macOS.
 - `ArtworkLoader`, `NowPlayingSnapshot`, `NowPlayingPublishing`, and a hosted unit-test target
   (`KEXPPowerAppTests`, Swift Testing).
 - Privacy manifest (`PrivacyInfo.xcprivacy`; no tracking, no collected data).

@@ -35,6 +35,7 @@ import UIKit
 
         private let artworkLoader: ArtworkLoader
         private let publisher: any NowPlayingPublishing
+        private let sessionCoordinator = AudioSessionCoordinator()
         private let logger = Logger(#function)
 
         init(
@@ -52,6 +53,7 @@ import UIKit
         func initPlayer(link: URL) {
             logger.debug("Initiating PlayerController")
 
+            sessionCoordinator.configure()
             let player = AVPlayer(url: link)
             player.allowsExternalPlayback = true
             player.currentItem?.preferredForwardBufferDuration = 300
@@ -67,6 +69,14 @@ import UIKit
                 .sink { [weak self] status in
                     MainActor.assumeIsolated { self?.timeControlStatusChanged(status) }
                 }
+
+            sessionCoordinator.observe { [weak self] action in
+                switch action {
+                case .resume: self?.playPlayer()
+                case .pause: self?.pausePlayer()
+                case .none: break
+                }
+            }
 
             publisher.installCommands(
                 play: { [weak self] in self?.playPlayer() },
@@ -129,7 +139,7 @@ import UIKit
         // MARK: - Playback Control
 
         func playPlayer() {
-            try? AVAudioSession.sharedInstance().setActive(true)
+            sessionCoordinator.activate()
             player?.play()
         }
 

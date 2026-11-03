@@ -32,7 +32,10 @@ public class ResultRetriever {
 	func getResults() async {
 		polling.task?.cancel()
 		#if os(iOS) || os(visionOS)
-		playerController.initPlayer(link: KEXPPower().streamURL)
+		let kexp = KEXPPower()
+		let quality = StreamQuality.resolve(stored: UserDefaults.standard.string(forKey: StreamQuality.storageKey))
+		kexp.setup(kexpBaseURL: "https://api.kexp.org", selectedBitRate: quality.bitrate)
+		playerController.initPlayer(link: kexp.streamURL)
 		#endif
 		polling.task = Task { [weak self] in
 			while !Task.isCancelled {

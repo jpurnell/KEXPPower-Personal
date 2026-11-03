@@ -9,7 +9,9 @@
 /* Begin PBXBuildFile section */
 		3BA956736E6DE724B118062C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */; };
 		3BD8D5DD14914B8F3A2721F3 /* KEXPPower in Frameworks */ = {isa = PBXBuildFile; productRef = 389B2E62968225912A149478 /* KEXPPower */; };
+		3E6D1A6E931937E93135528E /* AudioSessionCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC28CE91608589838D9B94EB /* AudioSessionCoordinatorTests.swift */; };
 		53344C98D88110970F815A6E /* ArtworkLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194EA0B2BC30640BD0198702 /* ArtworkLoaderTests.swift */; };
+		55BA219965B9320FA7A7DFD2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */; };
 		5C8856D425FA331DD91B6BE8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F478354AB15736CA0D325E03 /* Foundation.framework */; };
 		63957A89CFEAE6A0655D9DFB /* NowPlayingPublishing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8164F358A4D6B820413FE9 /* NowPlayingPublishing.swift */; };
 		7219D81A2BEA66C70079B78E /* CombinedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8192BEA66C70079B78E /* CombinedView.swift */; };
@@ -31,9 +33,12 @@
 		72F4993B2BFD2E7100A8B8B6 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F4993A2BFD2E7100A8B8B6 /* TestView.swift */; };
 		72F4993D2BFE6B0700A8B8B6 /* ResultRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F4993C2BFE6B0700A8B8B6 /* ResultRetriever.swift */; };
 		72F4993F2BFE767B00A8B8B6 /* AppleMusicRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F4993E2BFE767B00A8B8B6 /* AppleMusicRetriever.swift */; };
+		8F8468319F4A1DFE2E8C875E /* StreamQualityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */; };
 		90154A7C06635F45181ABEFA /* ArtworkLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887D2DD0B4466BDE3608BEDC /* ArtworkLoader.swift */; };
 		B52A0E6BD1CB1EFBFEEBAEA3 /* NowPlayingSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAACEDCB09A8C0408183AE4E /* NowPlayingSnapshot.swift */; };
 		F45A15232BCDD30EDA0A62F7 /* NowPlayingSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B31F30C218CB6953AAC0790 /* NowPlayingSnapshotTests.swift */; };
+		F662F0BB86EF034D6A462B6B /* StreamQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA518B0C7861569CC6A87A7E /* StreamQuality.swift */; };
+		F727520C3ED6F4D58DD7F0DC /* AudioSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B738F575BF653577589359 /* AudioSessionCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +53,7 @@
 
 /* Begin PBXFileReference section */
 		194EA0B2BC30640BD0198702 /* ArtworkLoaderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ArtworkLoaderTests.swift; sourceTree = "<group>"; };
+		51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		5B31F30C218CB6953AAC0790 /* NowPlayingSnapshotTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NowPlayingSnapshotTests.swift; sourceTree = "<group>"; };
 		6D8164F358A4D6B820413FE9 /* NowPlayingPublishing.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NowPlayingPublishing.swift; sourceTree = "<group>"; };
@@ -82,7 +88,11 @@
 		8BFFECBE22C95E6100E3378C /* KEXPPowerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KEXPPowerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BFFECD322C95FB300E3378C /* KEXPPowerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KEXPPowerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AB02E9335D79398B148ACE1 /* KEXPPowerAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KEXPPowerAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC28CE91608589838D9B94EB /* AudioSessionCoordinatorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AudioSessionCoordinatorTests.swift; sourceTree = "<group>"; };
+		BA518B0C7861569CC6A87A7E /* StreamQuality.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQuality.swift; sourceTree = "<group>"; };
 		BAACEDCB09A8C0408183AE4E /* NowPlayingSnapshot.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NowPlayingSnapshot.swift; sourceTree = "<group>"; };
+		C2B738F575BF653577589359 /* AudioSessionCoordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AudioSessionCoordinator.swift; sourceTree = "<group>"; };
+		E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQualityTests.swift; sourceTree = "<group>"; };
 		F478354AB15736CA0D325E03 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
@@ -117,6 +127,7 @@
 				887D2DD0B4466BDE3608BEDC /* ArtworkLoader.swift */,
 				BAACEDCB09A8C0408183AE4E /* NowPlayingSnapshot.swift */,
 				6D8164F358A4D6B820413FE9 /* NowPlayingPublishing.swift */,
+				C2B738F575BF653577589359 /* AudioSessionCoordinator.swift */,
 			);
 			path = "Audio Player";
 			sourceTree = "<group>";
@@ -165,6 +176,8 @@
 				72873BF227A8D3C200132B62 /* Assets.xcassets */,
 				72873C3D27AB7CDC00132B62 /* To Add.md */,
 				55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */,
+				BA518B0C7861569CC6A87A7E /* StreamQuality.swift */,
+				51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */,
 			);
 			path = "KEXPPower SwiftUI";
 			sourceTree = "<group>";
@@ -225,6 +238,8 @@
 			children = (
 				194EA0B2BC30640BD0198702 /* ArtworkLoaderTests.swift */,
 				5B31F30C218CB6953AAC0790 /* NowPlayingSnapshotTests.swift */,
+				AC28CE91608589838D9B94EB /* AudioSessionCoordinatorTests.swift */,
+				E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */,
 			);
 			name = KEXPPowerAppTests;
 			path = KEXPPowerAppTests;
@@ -379,6 +394,9 @@
 				90154A7C06635F45181ABEFA /* ArtworkLoader.swift in Sources */,
 				B52A0E6BD1CB1EFBFEEBAEA3 /* NowPlayingSnapshot.swift in Sources */,
 				63957A89CFEAE6A0655D9DFB /* NowPlayingPublishing.swift in Sources */,
+				F727520C3ED6F4D58DD7F0DC /* AudioSessionCoordinator.swift in Sources */,
+				F662F0BB86EF034D6A462B6B /* StreamQuality.swift in Sources */,
+				55BA219965B9320FA7A7DFD2 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -388,6 +406,8 @@
 			files = (
 				53344C98D88110970F815A6E /* ArtworkLoaderTests.swift in Sources */,
 				F45A15232BCDD30EDA0A62F7 /* NowPlayingSnapshotTests.swift in Sources */,
+				3E6D1A6E931937E93135528E /* AudioSessionCoordinatorTests.swift in Sources */,
+				8F8468319F4A1DFE2E8C875E /* StreamQualityTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,7 +491,7 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Debug;
@@ -509,7 +529,7 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -581,7 +601,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_GLOBAL_CONCURRENCY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 				XROS_DEPLOYMENT_TARGET = 1.0;
@@ -648,7 +668,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_GLOBAL_CONCURRENCY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
