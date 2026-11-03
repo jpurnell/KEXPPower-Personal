@@ -17,7 +17,15 @@ import StationKitAdapterKEXP
 @MainActor
 @Observable
 final class WatchPlayer {
+    /// How far the stream is from being playable. A fresh launch can take a while on a cold watch network.
+    enum Connection: Equatable {
+        case connecting
+        case ready
+        case failed
+    }
+
     private(set) var isPlaying = false
+    private(set) var connection = Connection.connecting
     /// True from the tap until audio is actually playing, which takes a few seconds on a live stream.
     private(set) var isBuffering = false
     private(set) var artwork: CGImage?
@@ -50,28 +58,7 @@ final class WatchPlayer {
     func start() {
         guard player == nil else { return }
         sessionCoordinator.configure()
-
-        let streams = station.streams
-        guard let stream = streams.first(where: { $0.id == "64" }) ?? streams.first else {
-            notice = "No stream available"
-            return
-        }
-        let player = AVPlayer(url: stream.url)
-        self.player = player
-        let streamMessage = "Stream \(stream.id) kbps option, \(stream.kind)"
-        logger.info("\(streamMessage, privacy: .public)")
-
-        itemObservation = player.currentItem?.publisher(for: \.status)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                MainActor.assumeIsolated { self?.itemStatusChanged(status) }
-            }
-
-        statusObservation = player.publisher(for: \.timeControlStatus)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] status in
-                MainActor.assumeIsolated { self?.timeControlStatusChanged(status) }
-            }
+        makePlayer()
 
         let session = AVAudioSession.sharedInstance()
         volume = session.outputVolume
@@ -95,15 +82,57 @@ final class WatchPlayer {
 
         polling.task?.cancel()
         polling.task = Task { [weak self] in
+            var failures = 0
             while !Task.isCancelled {
-                await self?.refresh()
-                try? await Task.sleep(for: .seconds(15))
+                let succeeded = await self?.refresh() ?? false
+                failures = succeeded ? 0 : failures + 1
+                // Refresh every 15 s; after a failure retry sooner (3 s, 6 s, 9 s, …) so a cold network recovers quickly.
+                try? await Task.sleep(for: .seconds(succeeded ? 15 : min(3 * failures, 15)))
             }
         }
     }
 
+    /// Creates the player for the stream; also used to start over after a failed connection.
+    private func makePlayer() {
+        let streams = station.streams
+        guard let stream = streams.first(where: { $0.id == "64" }) ?? streams.first else {
+            notice = "No stream available"
+            connection = .failed
+            return
+        }
+        let player = AVPlayer(url: stream.url)
+        self.player = player
+        connection = .connecting
+        let streamMessage = "Stream \(stream.id) kbps option, \(stream.kind)"
+        logger.info("\(streamMessage, privacy: .public)")
+
+        itemObservation = player.currentItem?.publisher(for: \.status)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                MainActor.assumeIsolated { self?.itemStatusChanged(status) }
+            }
+
+        statusObservation = player.publisher(for: \.timeControlStatus)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                MainActor.assumeIsolated { self?.timeControlStatusChanged(status) }
+            }
+    }
+
+    /// What to tell the listener about the connection, or `nil` when the stream is ready.
+    var connectionText: String? {
+        switch connection {
+        case .connecting: "Connecting…"
+        case .ready: nil
+        case .failed: "Can't reach KEXP. Tap to retry."
+        }
+    }
+
     /// Starts playback, asking the system for a route first when one is needed.
+    ///
+    /// A tap while the stream is still connecting means "play as soon as it is ready".
     func play() {
+        if connection == .failed { makePlayer() }
         Task { [weak self] in await self?.startPlayback() }
     }
 
@@ -127,6 +156,17 @@ final class WatchPlayer {
         let error = player?.currentItem?.error
         let message = "Item status \(status.rawValue); error \(error?.localizedDescription ?? "none")"
         logger.info("\(message, privacy: .public)")
+        switch status {
+        case .readyToPlay:
+            connection = .ready
+        case .failed:
+            connection = .failed
+            isBuffering = false
+        case .unknown:
+            connection = .connecting
+        @unknown default:
+            connection = .connecting
+        }
     }
 
     /// Pauses playback.
@@ -150,7 +190,9 @@ final class WatchPlayer {
         publisher.publish(snapshot, artwork: currentArtwork)
     }
 
-    private func refresh() async {
+    /// Refreshes what is on the air.
+    /// - Returns: Whether the station answered.
+    private func refresh() async -> Bool {
         do {
             let nowPlaying = try await station.nowPlaying()
             let next = NowPlayingSnapshot(
@@ -162,13 +204,15 @@ final class WatchPlayer {
 
             var artwork: CGImage?
             if let url = next.artworkURL { artwork = await artworkLoader.image(for: url) }
-            guard snapshot.artworkURL == next.artworkURL, snapshot.title == next.title else { return }
+            guard snapshot.artworkURL == next.artworkURL, snapshot.title == next.title else { return true }
             currentArtwork = artwork
             self.artwork = artwork
             publisher.publish(snapshot, artwork: artwork)
+            return true
         } catch {
             let message = "Refresh failed: \(error.localizedDescription)"
             logger.error("\(message, privacy: .public)")
+            return false
         }
     }
 }

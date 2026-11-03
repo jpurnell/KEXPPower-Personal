@@ -44,6 +44,11 @@ struct WatchContentView: View {
             }
             .buttonStyle(.borderedProminent)
             .accessibilityLabel(player.isPlaying ? "Pause" : (player.isBuffering ? "Loading" : "Play"))
+            if let connectionText = player.connectionText {
+                Text(connectionText)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
             if let notice = player.notice {
                 Text(notice)
                     .font(.caption2)
