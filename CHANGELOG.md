@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Added
-- A standalone watchOS app, `Spinner Watch` (`com.JPEnterprises.Spinner.watchkitapp`, watchOS 10): live KEXP stream on the 64 kbps option, now-playing and play/pause, lock-screen and remote-command integration through `StationKit`, long-form audio session. Not yet embedded in the iOS app. The button shows a spinner while the stream buffers and a tap then cancels; album art is shown.
+- A standalone watchOS app, `Spinner Watch` (`com.JPEnterprises.Spinner.watchkitapp`, watchOS 10): live KEXP stream on the 64 kbps option, now-playing and play/pause, lock-screen and remote-command integration through `StationKit`, long-form audio session. Not yet embedded in the iOS app. The button shows a spinner while the stream buffers and a tap then cancels; album art is shown. Background audio is declared with `WKBackgroundModes` (the iOS key is silently ignored on watchOS, which made audio fade out when the app left the foreground).
 
 ### Changed
 - Player glue (Now Playing snapshot and publisher, audio session coordinator, artwork loader) now comes from `StationKit` 0.2.0, and the KEXP stream and now-playing mapping from `StationKitAdapterKEXP` 0.2.0; the app's copies and their tests (moved to StationKit) are removed. `KEXPPowerKit` is 4.0.1.

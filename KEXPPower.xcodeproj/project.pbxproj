@@ -88,6 +88,7 @@
 		72F4993A2BFD2E7100A8B8B6 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		72F4993C2BFE6B0700A8B8B6 /* ResultRetriever.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRetriever.swift; sourceTree = "<group>"; };
 		72F4993E2BFE767B00A8B8B6 /* AppleMusicRetriever.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicRetriever.swift; sourceTree = "<group>"; };
+		80F0329F70FA2305C5C4A218 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		820CD5465D780A78350BCECB /* WatchPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchPlayer.swift; sourceTree = "<group>"; };
 		8BFFECB522C95E6100E3378C /* KEXPPower.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KEXPPower.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BFFECBE22C95E6100E3378C /* KEXPPowerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KEXPPowerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -148,6 +149,7 @@
 				820CD5465D780A78350BCECB /* WatchPlayer.swift */,
 				C895B019C2EAD90B83BC21BB /* WatchContentView.swift */,
 				6CA6C4099197D2A7731C6508 /* Assets.xcassets */,
+				80F0329F70FA2305C5C4A218 /* Info.plist */,
 			);
 			name = "Spinner Watch";
 			path = "Spinner Watch";
@@ -525,8 +527,8 @@
 				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Spinner Watch/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
-				INFOPLIST_KEY_UIBackgroundModes = audio;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.JPEnterprises.Spinner;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				MARKETING_VERSION = 1.0;
@@ -786,8 +788,8 @@
 				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Spinner Watch/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
-				INFOPLIST_KEY_UIBackgroundModes = audio;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.JPEnterprises.Spinner;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				MARKETING_VERSION = 1.0;
