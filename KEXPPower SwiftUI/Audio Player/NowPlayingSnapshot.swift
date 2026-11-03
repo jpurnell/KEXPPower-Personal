@@ -3,6 +3,8 @@
 //  KEXPPowerExampleSwiftUI
 //
 
+#if os(iOS) || os(visionOS)
+
 import MediaPlayer
 import UIKit
 
@@ -57,3 +59,5 @@ struct NowPlayingSnapshot: Equatable, Sendable {
         return string
     }
 }
+
+#endif

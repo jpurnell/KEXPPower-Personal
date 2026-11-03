@@ -36,7 +36,7 @@ struct CompactView: View {
 	}
 }
 
-#Preview {
+#Preview(traits: .sizeThatFitsLayout) {
 	CompactView(play: .fixture())
-		.previewLayout(.sizeThatFits)
+
 }

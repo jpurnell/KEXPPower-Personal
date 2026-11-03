@@ -3,6 +3,8 @@
 //  KEXPPowerExampleSwiftUI
 //
 
+#if os(iOS) || os(visionOS)
+
 import UIKit
 
 /// Loads artwork images for the player, never trapping and never contacting an unexpected host.
@@ -58,3 +60,5 @@ actor ArtworkLoader {
         return image
     }
 }
+
+#endif

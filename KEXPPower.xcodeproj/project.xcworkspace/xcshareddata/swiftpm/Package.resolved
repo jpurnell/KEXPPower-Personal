@@ -1,0 +1,15 @@
+{
+  "originHash" : "d2e10d319984fe69d96a0651ae05f326399c097e975822b3f75869dc8de86bac",
+  "pins" : [
+    {
+      "identity" : "kexppowerkit",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:jpurnell/KEXPPowerKit.git",
+      "state" : {
+        "revision" : "b7061eeddbc2ab91e65471802dc406eaac8f444e",
+        "version" : "4.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}

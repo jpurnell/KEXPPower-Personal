@@ -2,13 +2,13 @@
 
 **Date:** 2026-11-02
 **Category:** architecture
-**Status:** Accepted. Extraction done and the app builds against it (local path dependency); the app builds against it; committed in 53f58e6.
+**Status:** Accepted and complete. Library released as 4.0.0; the app depends on it by URL, was verified running on a physical iPhone (iOS 27.2), and `Package.resolved` pins it.
 **Amends:** ADR-001 (the fork is kept, but outside this repo).
 
 ## Decision
 The KEXPPower fork was extracted, with its git history, into `jpurnell/KEXPPowerKit` (private GitHub repo,
-sibling directory `../KEXPPowerKit`). The module is still named `KEXPPower`. This app repo will consume it as a
-package dependency and delete its in-repo framework target.
+sibling directory `../KEXPPowerKit`). The module is still named `KEXPPower`. This app repo consumes it as a
+package dependency (`from: 4.0.0`, by SSH URL) and its in-repo framework target is deleted.
 
 ## State at extraction
 - Swift 6 language mode, tools 6.2; iOS 17, macOS 14, visionOS 1.

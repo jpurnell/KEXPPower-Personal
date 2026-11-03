@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Changed
-- The app consumes the KEXPPower library as a package (`jpurnell/KEXPPowerKit`, local path; `Play` is now a `Sendable` struct) instead of
+- The app consumes the KEXPPower library as a package (`jpurnell/KEXPPowerKit` 4.0.0, by URL; `Play` is now a `Sendable` struct) instead of
   compiling a fork's sources into the app target. See `project/decisions/ADR-002-library-in-its-own-repo.md`.
 - Now Playing: a single publisher (`LegacyNowPlayingPublisher`) writes system state; the player no longer
   does. `PlayerController.isPlaying` mirrors the player's own `timeControlStatus`, so remote commands and

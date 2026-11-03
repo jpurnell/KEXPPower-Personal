@@ -6,14 +6,14 @@
 //  Copyright © 2024 KEXP. All rights reserved.
 //
 
+
+#if os(iOS) || os(visionOS)
 import AVFoundation
 import AVKit
 import Combine
 import Foundation
 import OSLog
 import UIKit
-
-#if os(iOS) || os(visionOS)
 
     /// Owns the live-stream `AVPlayer` and reports it to the system through a single publisher.
     ///

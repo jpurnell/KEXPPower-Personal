@@ -3,6 +3,8 @@
 //  KEXPPowerExampleSwiftUI
 //
 
+#if os(iOS) || os(visionOS)
+
 import MediaPlayer
 import UIKit
 
@@ -62,3 +64,5 @@ final class LegacyNowPlayingPublisher: NowPlayingPublishing {
         return (command, token)
     }
 }
+
+#endif

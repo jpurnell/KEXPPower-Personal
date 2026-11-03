@@ -80,6 +80,6 @@ struct CombinedView: View {
     }
 }
 
-#Preview {
-    CombinedView(play: .fixture()).previewLayout(.sizeThatFits).previewDevice(.none)
+#Preview(traits: .sizeThatFitsLayout) {
+    CombinedView(play: .fixture())
 }

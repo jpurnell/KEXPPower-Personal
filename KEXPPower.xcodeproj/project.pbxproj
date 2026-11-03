@@ -337,7 +337,7 @@
 			);
 			mainGroup = 8BFFECAB22C95E6100E3378C;
 			packageReferences = (
-				E0677C3B28D3E95134F60740 /* XCLocalSwiftPackageReference "KEXPPowerKit" */,
+				15838809A2B3C0A208FE8634 /* XCRemoteSwiftPackageReference "KEXPPowerKit" */,
 			);
 			productRefGroup = 8BFFECB622C95E6100E3378C /* Products */;
 			projectDirPath = "";
@@ -708,16 +708,21 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		E0677C3B28D3E95134F60740 /* XCLocalSwiftPackageReference "KEXPPowerKit" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../KEXPPowerKit;
+/* Begin XCRemoteSwiftPackageReference section */
+		15838809A2B3C0A208FE8634 /* XCRemoteSwiftPackageReference "KEXPPowerKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:jpurnell/KEXPPowerKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		389B2E62968225912A149478 /* KEXPPower */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 15838809A2B3C0A208FE8634 /* XCRemoteSwiftPackageReference "KEXPPowerKit" */;
 			productName = KEXPPower;
 		};
 /* End XCSwiftPackageProductDependency section */

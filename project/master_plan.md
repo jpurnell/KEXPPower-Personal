@@ -30,7 +30,7 @@ quicker and more pleasant to use than the existing KEXP app.
 ### Technology Stack
 - **Language:** Swift 6.x, strict concurrency, Swift 6 language mode
 - **UI:** SwiftUI
-- **Build System:** Xcode project (app); the library is this repo's in-repo fork of KEXPPower (framework target); see ADR-001
+- **Build System:** Xcode project (app); the library is the `jpurnell/KEXPPowerKit` package (a fork of KEXPPower), pinned `from: 4.0.0`; see ADR-001/002
 - **Testing:** Swift Testing for new tests; the existing XCTest suite stays until migrated
 - **Concurrency:** Swift 6 strict concurrency throughout
 - **Platforms:** iOS (primary, deployment target 17), macOS, visionOS, CarPlay. tvOS and watchOS are out of scope.
@@ -106,7 +106,7 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 ### What's Next
 - [x] Playback hardening: `project/plans/completed/PlaybackHardening.md` (complete: interruption/route handling, session coordinator, Swift 6, ADR-003)
 - [x] Library extracted to `jpurnell/KEXPPowerKit` (ADR-002): Swift 6, `programImageURI`, 14-day lookback, UIKit removed, 34 tests
-- [x] App switched to the package (local path `../KEXPPowerKit`); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Committed in 53f58e6.
+- [x] App switched to the package (`jpurnell/KEXPPowerKit` 4.0.0, by URL; verified running on a physical iPhone); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Committed in 53f58e6.
 - [x] Library: `Play.playType` decoding fixed, placeholder defaults removed, `Sendable` structs (no app `PlayItem` needed: the app only uses `Play` as a value), KEXPPowerKit `f1c7fc0`
 - [ ] Finish async `ArchiveManager` (iOS 27.2 follow-up)
 - [ ] iOS 27 `NowPlaying` adoption: `project/plans/proposals/NowPlayingFramework.md`
