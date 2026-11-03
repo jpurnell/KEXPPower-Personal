@@ -101,6 +101,9 @@ import UIKit
         }
 
         private func timeControlStatusChanged(_ status: AVPlayer.TimeControlStatus) {
+            let waitingReason = player?.reasonForWaitingToPlay?.rawValue ?? "none"
+            let message = "timeControlStatus \(status.rawValue); waiting reason \(waitingReason)"
+            logger.info("\(message, privacy: .public)")
             isPlaying = status == .playing
             snapshot.state = isPlaying ? .playing : .paused
             publisher.publish(snapshot, artwork: currentArtwork)

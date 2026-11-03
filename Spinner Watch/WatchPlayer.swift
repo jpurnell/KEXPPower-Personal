@@ -36,6 +36,7 @@ final class WatchPlayer {
     @ObservationIgnored private var snapshot: NowPlayingSnapshot
     @ObservationIgnored private var currentArtwork: CGImage?
     @ObservationIgnored private var statusObservation: AnyCancellable?
+    @ObservationIgnored private var itemObservation: AnyCancellable?
     @ObservationIgnored private let polling = PollingTask()
 
     init() {
@@ -54,6 +55,14 @@ final class WatchPlayer {
         }
         let player = AVPlayer(url: stream.url)
         self.player = player
+        let streamMessage = "Stream \(stream.id) kbps option, \(stream.kind)"
+        logger.info("\(streamMessage, privacy: .public)")
+
+        itemObservation = player.currentItem?.publisher(for: \.status)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                MainActor.assumeIsolated { self?.itemStatusChanged(status) }
+            }
 
         statusObservation = player.publisher(for: \.timeControlStatus)
             .receive(on: DispatchQueue.main)
@@ -89,13 +98,24 @@ final class WatchPlayer {
 
     private func startPlayback() async {
         isBuffering = true
-        guard await sessionCoordinator.activateForPlayback() else {
+        let activated = await sessionCoordinator.activateForPlayback()
+        let session = AVAudioSession.sharedInstance()
+        let outputs = session.currentRoute.outputs.map { $0.portType.rawValue }.joined(separator: ",")
+        let sessionMessage = "Activation \(activated ? "succeeded" : "failed"); policy \(session.routeSharingPolicy.rawValue); outputs \(outputs)"
+        logger.info("\(sessionMessage, privacy: .public)")
+        guard activated else {
             isBuffering = false
             notice = "Choose an audio output to listen"
             return
         }
         notice = nil
         player?.play()
+    }
+
+    private func itemStatusChanged(_ status: AVPlayerItem.Status) {
+        let error = player?.currentItem?.error
+        let message = "Item status \(status.rawValue); error \(error?.localizedDescription ?? "none")"
+        logger.info("\(message, privacy: .public)")
     }
 
     /// Pauses playback.
@@ -112,6 +132,9 @@ final class WatchPlayer {
     private func timeControlStatusChanged(_ status: AVPlayer.TimeControlStatus) {
         isPlaying = status == .playing
         if isPlaying { isBuffering = false }
+        let waitingReason = player?.reasonForWaitingToPlay?.rawValue ?? "none"
+        let message = "timeControlStatus \(status.rawValue); waiting reason \(waitingReason)"
+        logger.info("\(message, privacy: .public)")
         snapshot.state = isPlaying ? .playing : .paused
         publisher.publish(snapshot, artwork: currentArtwork)
     }

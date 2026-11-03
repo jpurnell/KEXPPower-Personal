@@ -40,6 +40,9 @@ struct WatchContentView: View {
             }
             .buttonStyle(.borderedProminent)
             .accessibilityLabel(player.isPlaying ? "Pause" : (player.isBuffering ? "Loading" : "Play"))
+            VolumeControlView()
+                .frame(height: 24)
+                .accessibilityLabel("Volume")
             if let notice = player.notice {
                 Text(notice)
                     .font(.caption2)
