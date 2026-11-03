@@ -109,6 +109,7 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 - [x] App switched to the package (`jpurnell/KEXPPowerKit` 4.0.0, by URL; verified running on a physical iPhone); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Committed in 53f58e6.
 - [x] Library: `Play.playType` decoding fixed, placeholder defaults removed, `Sendable` structs (no app `PlayItem` needed: the app only uses `Play` as a value), KEXPPowerKit `f1c7fc0`
 - [ ] Finish async `ArchiveManager` (iOS 27.2 follow-up)
+- [x] Phase 0 (in progress): `StationKit` 0.1.0 (core types, `MusicLinks`; 25 tests; builds for iOS/macOS/visionOS/tvOS/watchOS) and `StationKitAdapterKEXP` 0.1.0 (KEXP as a Station; 9 offline + 2 live tests), both private. Next: move player glue into StationKit; app consumes both.
 - [ ] Navigation shell, Mac playback/layout, Apple Music playlists, widget + App Intents, archive UI: `project/plans/upcoming/PlatformExperience.md` (proposed; revised 2026-11-03: separate iOS/visionOS/macOS targets, generic `StationKit` repo + `StationKitAdapterKEXP` adapter repo, ISRC-based song matching)
 - [ ] iOS 27 `NowPlaying` adoption: `project/plans/proposals/NowPlayingFramework.md` (on hold)
 
@@ -169,4 +170,4 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 
 ---
 
-**Last Updated:** 2026-11-02 (filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)
+**Last Updated:** 2026-11-03 (filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)
