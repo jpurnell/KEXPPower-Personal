@@ -17,6 +17,7 @@
 		4C511420FAF041C41D91F90E /* VolumeBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499A6F19108336D3581B180E /* VolumeBar.swift */; };
 		55BA219965B9320FA7A7DFD2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */; };
 		5C8856D425FA331DD91B6BE8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F478354AB15736CA0D325E03 /* Foundation.framework */; };
+		62BB7D5584DCDCC4AAB0FEB0 /* Spinner Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F91060B80CB56756A0E46BFC /* Spinner Watch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6637D63621745475499BEA32 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C895B019C2EAD90B83BC21BB /* WatchContentView.swift */; };
 		7219D81A2BEA66C70079B78E /* CombinedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8192BEA66C70079B78E /* CombinedView.swift */; };
 		7219D81C2BEAA8710079B78E /* Extended View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81B2BEAA8710079B78E /* Extended View.swift */; };
@@ -55,7 +56,28 @@
 			remoteGlobalIDString = 72873BF627A8D3C200132B62;
 			remoteInfo = "KEXPPowerExampleSwiftUI (iOS)";
 		};
+		E50145E54EACA98334404513 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 277CF9D58DFAE7DD5EF566A7;
+			remoteInfo = "Spinner Watch";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A637FCAF2C2DD1513610DB33 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				62BB7D5584DCDCC4AAB0FEB0 /* Spinner Watch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		12E1B8A2E3028D5783D9ACCE /* VolumeControlView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VolumeControlView.swift; sourceTree = "<group>"; };
@@ -345,10 +367,12 @@
 				72873BF327A8D3C200132B62 /* Sources */,
 				72873BF427A8D3C200132B62 /* Frameworks */,
 				72873BF527A8D3C200132B62 /* Resources */,
+				A637FCAF2C2DD1513610DB33 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F55B72257AD727E6D60B8211 /* PBXTargetDependency */,
 			);
 			name = "KEXPPowerExampleSwiftUI (iOS)";
 			packageProductDependencies = (
@@ -503,6 +527,13 @@
 			name = "KEXPPowerExampleSwiftUI (iOS)";
 			target = 72873BF627A8D3C200132B62 /* KEXPPowerExampleSwiftUI (iOS) */;
 			targetProxy = D5290FEE84E9DAFE9696730B /* PBXContainerItemProxy */;
+		};
+		F55B72257AD727E6D60B8211 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Spinner Watch";
+			platformFilter = ios;
+			target = 277CF9D58DFAE7DD5EF566A7 /* Spinner Watch */;
+			targetProxy = E50145E54EACA98334404513 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
