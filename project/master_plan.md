@@ -109,7 +109,8 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 - [x] App switched to the package (`jpurnell/KEXPPowerKit` 4.0.0, by URL; verified running on a physical iPhone); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Committed in 53f58e6.
 - [x] Library: `Play.playType` decoding fixed, placeholder defaults removed, `Sendable` structs (no app `PlayItem` needed: the app only uses `Play` as a value), KEXPPowerKit `f1c7fc0`
 - [ ] Finish async `ArchiveManager` (iOS 27.2 follow-up)
-- [ ] iOS 27 `NowPlaying` adoption: `project/plans/proposals/NowPlayingFramework.md`
+- [ ] Navigation shell, Mac playback/layout, Apple Music playlists, widget + App Intents, archive UI: `project/plans/proposals/PlatformExperience.md` (proposed)
+- [ ] iOS 27 `NowPlaying` adoption: `project/plans/proposals/NowPlayingFramework.md` (on hold)
 
 ---
 
@@ -150,6 +151,7 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 - [ ] Fork upkeep (ADR-001): program image field, 14-day lookback, Swift 6 mode for the framework
 
 ### Phase 2: The features this app exists for
+- [x] Spotify and Bandcamp search links; tappable links in DJ comments (`MusicLinks`)
 - [ ] Apple Music: add to a dedicated KEXP playlist; open the song in Apple Music (finish)
 - [ ] Archive playback from an arbitrary point (needs the async `ArchiveManager` finished)
 - [ ] Other links: Spotify, Bandcamp, links parsed from DJ comments
