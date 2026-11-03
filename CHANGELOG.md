@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### Changed
+- Player glue (Now Playing snapshot and publisher, audio session coordinator, artwork loader) now comes from `StationKit` 0.2.0, and the KEXP stream and now-playing mapping from `StationKitAdapterKEXP` 0.2.0; the app's copies and their tests (moved to StationKit) are removed. `KEXPPowerKit` is 4.0.1.
+- visionOS: the app icon's last layer is opaque and the logo is its own transparent layer; the App Store icon has no alpha; the macOS icon fills the standard icon grid. `allowsExternalPlayback` is not used on visionOS, where it does not exist.
 - The app consumes the KEXPPower library as a package (`jpurnell/KEXPPowerKit` 4.0.0, by URL; `Play` is now a `Sendable` struct) instead of
   compiling a fork's sources into the app target. See `project/decisions/ADR-002-library-in-its-own-repo.md`.
 - Now Playing: a single publisher (`LegacyNowPlayingPublisher`) writes system state; the player no longer

@@ -13,6 +13,7 @@ import AVKit
 import Combine
 import Foundation
 import OSLog
+import StationKit
 import UIKit
 
     /// Owns the live-stream `AVPlayer` and reports it to the system through a single publisher.
@@ -29,8 +30,10 @@ import UIKit
         private(set) var player: AVPlayer?
         let avPlayerViewController = AVPlayerViewController()
 
-        private var snapshot = NowPlayingSnapshot(song: nil, artist: nil, album: nil, imageURI: nil, state: .paused)
-        private var currentArtwork: UIImage?
+        private let stationName: String
+        private let fallbackArtworkURL: URL?
+        private var snapshot: NowPlayingSnapshot
+        private var currentArtwork: CGImage?
         private var statusObservation: AnyCancellable?
 
         private let artworkLoader: ArtworkLoader
@@ -38,12 +41,23 @@ import UIKit
         private let sessionCoordinator = AudioSessionCoordinator()
         private let logger = Logger(#function)
 
+        /// - Parameters:
+        ///   - stationName: Shown as the artist when the broadcast names none.
+        ///   - fallbackArtworkURL: Artwork used when a broadcast has none, usually the station's logo.
+        ///   - artworkLoader: Loads artwork; its allowed domains decide where images may come from.
+        ///   - publisher: The single writer of system Now Playing state.
         init(
-            artworkLoader: ArtworkLoader = ArtworkLoader(),
+            stationName: String = "KEXP",
+            fallbackArtworkURL: URL? = URL(string: "https://kexp.org/static/assets/img/kexp_logo.jpg"),
+            artworkLoader: ArtworkLoader = ArtworkLoader(allowedDomains: ["kexp.org", "archive.org"]),
             publisher: any NowPlayingPublishing = LegacyNowPlayingPublisher()
         ) {
+            self.stationName = stationName
+            self.fallbackArtworkURL = fallbackArtworkURL
             self.artworkLoader = artworkLoader
             self.publisher = publisher
+            self.snapshot = NowPlayingSnapshot(
+                .nothing, stationName: stationName, fallbackArtworkURL: fallbackArtworkURL, state: .paused)
         }
 
         // MARK: - Setup
@@ -55,7 +69,9 @@ import UIKit
 
             sessionCoordinator.configure()
             let player = AVPlayer(url: link)
+            #if !os(visionOS)
             player.allowsExternalPlayback = true
+            #endif
             player.currentItem?.preferredForwardBufferDuration = 300
             self.player = player
 
@@ -93,27 +109,24 @@ import UIKit
         // MARK: - Now Playing
 
         /// Tells the system, and the on-screen player, what is on the air.
-        /// - Parameters:
-        ///   - song: The track title, or `nil` during an airbreak.
-        ///   - artist: The artist.
-        ///   - album: The album.
-        ///   - imageURI: Artwork URL.
-        func updateNowPlaying(song: String?, artist: String?, album: String?, imageURI: String?) async {
+        /// - Parameter nowPlaying: What the station is broadcasting.
+        func updateNowPlaying(_ nowPlaying: NowPlaying) async {
             let next = NowPlayingSnapshot(
-                song: song, artist: artist, album: album, imageURI: imageURI,
+                nowPlaying, stationName: stationName, fallbackArtworkURL: fallbackArtworkURL,
                 state: isPlaying ? .playing : .paused)
             snapshot = next
 
-            let artwork = await artworkLoader.image(for: next.artworkURLString)
+            var artwork: CGImage?
+            if let url = next.artworkURL { artwork = await artworkLoader.image(for: url) }
             // A newer track arrived while the artwork was loading; leave it to publish.
-            guard snapshot.artworkURLString == next.artworkURLString, snapshot.title == next.title else { return }
+            guard snapshot.artworkURL == next.artworkURL, snapshot.title == next.title else { return }
 
             currentArtwork = artwork
             player?.currentItem?.externalMetadata = externalMetadata(for: snapshot, artwork: artwork)
             publisher.publish(snapshot, artwork: artwork)
         }
 
-        private func externalMetadata(for snapshot: NowPlayingSnapshot, artwork: UIImage?) -> [AVMetadataItem] {
+        private func externalMetadata(for snapshot: NowPlayingSnapshot, artwork: CGImage?) -> [AVMetadataItem] {
             func item(_ identifier: AVMetadataIdentifier, _ value: NSCopying & NSObjectProtocol) -> AVMetadataItem {
                 let item = AVMutableMetadataItem()
                 item.identifier = identifier
@@ -126,7 +139,7 @@ import UIKit
                 item(.commonIdentifierAlbumName, snapshot.album as NSString),
                 item(.commonIdentifierArtist, snapshot.artist as NSString),
             ]
-            if let data = artwork?.jpegData(compressionQuality: 0.8) {
+            if let artwork, let data = UIImage(cgImage: artwork).jpegData(compressionQuality: 0.8) {
                 let artworkItem = AVMutableMetadataItem()
                 artworkItem.identifier = .commonIdentifierArtwork
                 artworkItem.value = data as NSData

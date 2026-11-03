@@ -7,6 +7,8 @@ import AVKit
 import Foundation
 import KEXPPower
 import OSLog
+import StationKit
+import StationKitAdapterKEXP
 
 @MainActor
 @Observable
@@ -32,10 +34,11 @@ public class ResultRetriever {
 	func getResults() async {
 		polling.task?.cancel()
 		#if os(iOS) || os(visionOS)
-		let kexp = KEXPPower()
 		let quality = StreamQuality.resolve(stored: UserDefaults.standard.string(forKey: StreamQuality.storageKey))
-		kexp.setup(kexpBaseURL: "https://api.kexp.org", selectedBitRate: quality.bitrate)
-		playerController.initPlayer(link: kexp.streamURL)
+		let streams = KEXPStation().streams
+		if let stream = streams.first(where: { $0.id == quality.rawValue }) ?? streams.first {
+			playerController.initPlayer(link: stream.url)
+		}
 		#endif
 		polling.task = Task { [weak self] in
 			while !Task.isCancelled {
@@ -55,7 +58,7 @@ public class ResultRetriever {
 			show = showResult.shows?.first ?? Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"])
 
 			#if os(iOS) || os(visionOS)
-			await playerController.updateNowPlaying(song: play.song, artist: play.artist, album: play.album, imageURI: play.imageURI)
+			await playerController.updateNowPlaying(KEXPMapping.nowPlaying(from: plays.first))
 			#endif
 		} catch {
 			logger.error("Refresh failed: \(error.localizedDescription, privacy: .public)")

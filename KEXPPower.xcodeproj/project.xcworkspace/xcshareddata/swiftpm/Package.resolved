@@ -1,13 +1,31 @@
 {
-  "originHash" : "d2e10d319984fe69d96a0651ae05f326399c097e975822b3f75869dc8de86bac",
+  "originHash" : "cd43d41ee430ef65746fb528b1d5669a164b456d61c43ac9df4877f2d7dac46c",
   "pins" : [
     {
       "identity" : "kexppowerkit",
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:jpurnell/KEXPPowerKit.git",
       "state" : {
-        "revision" : "b7061eeddbc2ab91e65471802dc406eaac8f444e",
-        "version" : "4.0.0"
+        "revision" : "2929ffcb1c1d017019ba0b4d9cc2a9034056c6c5",
+        "version" : "4.0.1"
+      }
+    },
+    {
+      "identity" : "stationkit",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:jpurnell/StationKit.git",
+      "state" : {
+        "revision" : "c75a64b5be745523eeeb225c6f40e9564a17a09c",
+        "version" : "0.2.0"
+      }
+    },
+    {
+      "identity" : "stationkitadapterkexp",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:jpurnell/StationKitAdapterKEXP.git",
+      "state" : {
+        "revision" : "732ea4e31e510cfa2b1b5237933b6be78314c98f",
+        "version" : "0.2.0"
       }
     }
   ],
