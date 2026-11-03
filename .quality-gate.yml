@@ -1,0 +1,29 @@
+# `excludedCheckers` and `enabledCheckers`, not `exclude` and `checkers`.
+#
+# The gate ignores keys it does not recognise, so the superseded names produced a file
+# that described a checker selection which never ran — the defaults ran instead, and the
+# mismatch surfaced only as an advisory note. A survey on 2026-08-25 found 11 of 73
+# repositories carrying the old names, every one of them scaffolded from here.
+#
+# Not `excludePatterns`, which is what the gate's own "did you mean" suggests: that key
+# holds file globs, so taking the suggestion turns a checker name into a pattern that
+# matches nothing and excludes nothing.
+#
+# No exclusions by default. `disk-clean` used to be listed here; it is no longer a
+# checker (it became `quality-gate clean`), so excluding it hid nothing and only made
+# the report announce an exclusion in force.
+
+enabledCheckers:
+  - all
+  - logging
+
+# Without this the status auditor looks for a master plan inside the framework's own
+# directory, finds none, and skips. A checker that skips is not a checker that passed.
+status:
+  guidelinesPath: "."
+  masterPlanPath: project/master_plan.md
+
+# No org-judgement-corpus clone was found, so the consistency and ijs sections are
+# omitted rather than pointed at a path that does not exist. Clone it next to this
+# project (or anywhere, with ORG_JUDGEMENT_CORPUS) and re-run setup, or add
+# `consistency:` and `ijs:` here with its `corpusPath`.

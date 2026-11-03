@@ -31,24 +31,22 @@ struct PlayerView: View {
 								ZStack {
 									ImageView(play: resultsRetriever.play).frame( width: small ? 100 : 300, height: small ? 100 : 300 )
 								}
-								.animation(.easeInOut(duration: 1.0), value: 1.0)
 								.padding(small ? [.vertical] : [])
 								(small ? CompactView(play: resultsRetriever.play)
 									.frame(minWidth: 150, maxWidth: .infinity)
 									.padding(.leading)
 									.padding(.vertical) : nil)
-									.animation(.easeInOut(duration: 1.0), value: 1.0)
 								small ?
 								Button(action: resultsRetriever.playerController.playOrPause) {
 									Image(systemName: resultsRetriever.playerController.isPlaying ? "pause.circle" : "play.circle")
 										.resizable()
 										.foregroundStyle(.primary)
-										.opacity(small ? 0.9 : 0).animation(.easeInOut(duration: 1.0), value: 1.0)
+										.opacity(small ? 0.9 : 0)
 										.frame(minWidth: 64, idealWidth: 64, maxWidth: 64, minHeight: 64, idealHeight: 64, maxHeight: 64, alignment: .center)
+										.accessibilityLabel(resultsRetriever.playerController.isPlaying ? "Pause" : "Play")
 								} : nil
 							}
 							(small ? nil : ExtendedView(play: resultsRetriever.play))
-								.animation(.easeInOut(duration: 1.0), value: 1.0)
 								.frame(
 									minWidth: 200,
 									idealWidth: 200,

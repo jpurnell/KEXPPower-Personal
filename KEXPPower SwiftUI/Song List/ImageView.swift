@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import KEXPPower
 
 struct ImageView: View {
 	var play: Play?

@@ -7,50 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7219D7EA2BEA60CB0079B78E /* DateFormatter+StandardFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFECFB22CB073100E3378C /* DateFormatter+StandardFormatters.swift */; };
-		7219D7EB2BEA60CB0079B78E /* PlayFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA34E5729BA309E00CF45B0 /* PlayFormatters.swift */; };
-		7219D7ED2BEA60D00079B78E /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFED0422D43EE700E3378C /* NetworkManager.swift */; };
-		7219D7EE2BEA60D00079B78E /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFED0222D43EA100E3378C /* Router.swift */; };
-		7219D7EF2BEA60D00079B78E /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B46C4C322DEE016003E5277 /* Reachability.swift */; };
-		7219D7F02BEA60D00079B78E /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFED0422D43EE700E3378C /* NetworkManager.swift */; };
-		7219D7F12BEA60D00079B78E /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFED0222D43EA100E3378C /* Router.swift */; };
-		7219D7F22BEA60D00079B78E /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B46C4C322DEE016003E5277 /* Reachability.swift */; };
-		7219D7F32BEA60D60079B78E /* DateFormatter+StandardFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFECFB22CB073100E3378C /* DateFormatter+StandardFormatters.swift */; };
-		7219D7F42BEA60D60079B78E /* PlayFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA34E5729BA309E00CF45B0 /* PlayFormatters.swift */; };
-		7219D7F62BEA60DB0079B78E /* AppleMusicResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B81465923628A1B008EDF50 /* AppleMusicResult.swift */; };
-		7219D7F72BEA60DB0079B78E /* AppleMusicResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B81465923628A1B008EDF50 /* AppleMusicResult.swift */; };
-		7219D7F82BEA60E00079B78E /* ShowResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */; };
-		7219D7F92BEA60E00079B78E /* Show Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272837327B322C800021CD4 /* Show Fixture.swift */; };
-		7219D7FA2BEA60E00079B78E /* ArchiveShowStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA9AD023555C0900C5F010 /* ArchiveShowStart.swift */; };
-		7219D7FB2BEA60E00079B78E /* PlayResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B45123C240F6C7000EAFEFC /* PlayResult.swift */; };
-		7219D7FC2BEA60E00079B78E /* ArchiveShow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3C37AC234021E800413329 /* ArchiveShow.swift */; };
-		7219D7FD2BEA60E00079B78E /* Play Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272837127B3207D00021CD4 /* Play Fixture.swift */; };
-		7219D7FE2BEA60E00079B78E /* PlayResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */; };
-		7219D7FF2BEA60E00079B78E /* ShowResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B451232240F5C1300EAFEFC /* ShowResult.swift */; };
-		7219D8002BEA60E00079B78E /* ArchiveStreamResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B437FB0234EE45B002EDB91 /* ArchiveStreamResult.swift */; };
-		7219D8012BEA60E00079B78E /* ShowResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */; };
-		7219D8022BEA60E00079B78E /* Show Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272837327B322C800021CD4 /* Show Fixture.swift */; };
-		7219D8032BEA60E00079B78E /* ArchiveShowStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA9AD023555C0900C5F010 /* ArchiveShowStart.swift */; };
-		7219D8042BEA60E00079B78E /* PlayResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B45123C240F6C7000EAFEFC /* PlayResult.swift */; };
-		7219D8052BEA60E00079B78E /* ArchiveShow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3C37AC234021E800413329 /* ArchiveShow.swift */; };
-		7219D8062BEA60E00079B78E /* Play Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272837127B3207D00021CD4 /* Play Fixture.swift */; };
-		7219D8072BEA60E00079B78E /* PlayResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */; };
-		7219D8082BEA60E00079B78E /* ShowResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B451232240F5C1300EAFEFC /* ShowResult.swift */; };
-		7219D8092BEA60E00079B78E /* ArchiveStreamResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B437FB0234EE45B002EDB91 /* ArchiveStreamResult.swift */; };
-		7219D80A2BEA60E90079B78E /* AvailableStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1AE2EB27CC29EA000BFE1F /* AvailableStreams.swift */; };
-		7219D80B2BEA60E90079B78E /* KEXPPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFED0722D43F3800E3378C /* KEXPPower.swift */; };
-		7219D80C2BEA60E90079B78E /* AvailableStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1AE2EB27CC29EA000BFE1F /* AvailableStreams.swift */; };
-		7219D80D2BEA60E90079B78E /* KEXPPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFED0722D43F3800E3378C /* KEXPPower.swift */; };
-		7219D80E2BEA60ED0079B78E /* ArchiveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B159DC0233C66E500BCB7AB /* ArchiveManager.swift */; };
-		7219D80F2BEA60EE0079B78E /* ArchiveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B159DC0233C66E500BCB7AB /* ArchiveManager.swift */; };
-		7219D8102BEA60F20079B78E /* ShowNameShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF632454E85E004DCD20 /* ShowNameShows.swift */; };
-		7219D8112BEA60F20079B78E /* GenreShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD1638124551394006BF61F /* GenreShows.swift */; };
-		7219D8122BEA60F20079B78E /* HostNameShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF6524551133004DCD20 /* HostNameShows.swift */; };
-		7219D8132BEA60F20079B78E /* DateShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF612454C71C004DCD20 /* DateShows.swift */; };
-		7219D8142BEA60F30079B78E /* ShowNameShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF632454E85E004DCD20 /* ShowNameShows.swift */; };
-		7219D8152BEA60F30079B78E /* GenreShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD1638124551394006BF61F /* GenreShows.swift */; };
-		7219D8162BEA60F30079B78E /* HostNameShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF6524551133004DCD20 /* HostNameShows.swift */; };
-		7219D8172BEA60F30079B78E /* DateShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF612454C71C004DCD20 /* DateShows.swift */; };
+		3BA956736E6DE724B118062C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */; };
+		3BD8D5DD14914B8F3A2721F3 /* KEXPPower in Frameworks */ = {isa = PBXBuildFile; productRef = 389B2E62968225912A149478 /* KEXPPower */; };
+		53344C98D88110970F815A6E /* ArtworkLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194EA0B2BC30640BD0198702 /* ArtworkLoaderTests.swift */; };
+		5C8856D425FA331DD91B6BE8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F478354AB15736CA0D325E03 /* Foundation.framework */; };
+		63957A89CFEAE6A0655D9DFB /* NowPlayingPublishing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D8164F358A4D6B820413FE9 /* NowPlayingPublishing.swift */; };
 		7219D81A2BEA66C70079B78E /* CombinedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8192BEA66C70079B78E /* CombinedView.swift */; };
 		7219D81C2BEAA8710079B78E /* Extended View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81B2BEAA8710079B78E /* Extended View.swift */; };
 		7219D81E2BEAA8B80079B78E /* CompactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81D2BEAA8B80079B78E /* CompactView.swift */; };
@@ -61,102 +22,35 @@
 		7219D8292BEBD1270079B78E /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8282BEBD1270079B78E /* VideoPlayer.swift */; };
 		7219D82B2BEBD1FF0079B78E /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D82A2BEBD1FF0079B78E /* PlayerView.swift */; };
 		7244DDE72B7E73E100375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
-		7244DDEA2B7E752700375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
-		7244DDEB2B7E752700375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
-		7244DDEC2B7E752800375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
-		7244DDED2B7E752800375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
-		7244DDEE2B7E752900375023 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
 		7272836727B2AE6900021CD4 /* ShowStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836527B2AE6900021CD4 /* ShowStore.swift */; };
 		7272836A27B2BF5E00021CD4 /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836827B2BF5E00021CD4 /* ProgramView.swift */; };
 		7272836C27B2C4D100021CD4 /* ShowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836B27B2C4D100021CD4 /* ShowView.swift */; };
-		7272837227B3207D00021CD4 /* Play Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272837127B3207D00021CD4 /* Play Fixture.swift */; };
-		7272837427B322C800021CD4 /* Show Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272837327B322C800021CD4 /* Show Fixture.swift */; };
 		72873C1727A8D3C200132B62 /* KEXPPowerExampleSwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873BF027A8D3C100132B62 /* KEXPPowerExampleSwiftUIApp.swift */; };
 		72873C1927A8D3C200132B62 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873BF127A8D3C100132B62 /* ContentView.swift */; };
 		72873C1B27A8D3C200132B62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72873BF227A8D3C200132B62 /* Assets.xcassets */; };
-		72873C3627A998E400132B62 /* PlayResultStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873C3527A998E400132B62 /* PlayResultStore.swift */; };
-		728DA59427B33C8E00EE38A4 /* PlayResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */; };
-		728DA59627B33D1700EE38A4 /* ShowResult Fixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */; };
 		72F4993B2BFD2E7100A8B8B6 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F4993A2BFD2E7100A8B8B6 /* TestView.swift */; };
 		72F4993D2BFE6B0700A8B8B6 /* ResultRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F4993C2BFE6B0700A8B8B6 /* ResultRetriever.swift */; };
 		72F4993F2BFE767B00A8B8B6 /* AppleMusicRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F4993E2BFE767B00A8B8B6 /* AppleMusicRetriever.swift */; };
-		72F499432BFF64ED00A8B8B6 /* updateNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F499422BFF64ED00A8B8B6 /* updateNotificationView.swift */; };
-		8B159DC1233C66E500BCB7AB /* ArchiveManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B159DC0233C66E500BCB7AB /* ArchiveManager.swift */; };
-		8B1AE2EC27CC29EA000BFE1F /* AvailableStreams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B1AE2EB27CC29EA000BFE1F /* AvailableStreams.swift */; };
-		8B3C37AD234021E800413329 /* ArchiveShow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3C37AC234021E800413329 /* ArchiveShow.swift */; };
-		8B437FAF234EE3CE002EDB91 /* ArchiveStreamSample.json in Resources */ = {isa = PBXBuildFile; fileRef = 8B437FAE234EE3CE002EDB91 /* ArchiveStreamSample.json */; };
-		8B437FB1234EE45B002EDB91 /* ArchiveStreamResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B437FB0234EE45B002EDB91 /* ArchiveStreamResult.swift */; };
-		8B437FB3234EE8F6002EDB91 /* ArchiveStreamParseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B437FB2234EE8F6002EDB91 /* ArchiveStreamParseTests.swift */; };
-		8B451233240F5C1300EAFEFC /* ShowResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B451232240F5C1300EAFEFC /* ShowResult.swift */; };
-		8B451236240F603D00EAFEFC /* ShowResultParseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B451235240F603D00EAFEFC /* ShowResultParseTests.swift */; };
-		8B451239240F606E00EAFEFC /* ShowSample.json in Resources */ = {isa = PBXBuildFile; fileRef = 8B451238240F606E00EAFEFC /* ShowSample.json */; };
-		8B45123B240F6C4C00EAFEFC /* PlaySample.json in Resources */ = {isa = PBXBuildFile; fileRef = 8B45123A240F6C4C00EAFEFC /* PlaySample.json */; };
-		8B45123D240F6C7000EAFEFC /* PlayResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B45123C240F6C7000EAFEFC /* PlayResult.swift */; };
-		8B45123F2410A4D500EAFEFC /* PlayResultParseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B45123E2410A4D500EAFEFC /* PlayResultParseTests.swift */; };
-		8B46C4C022DEC811003E5277 /* UIImageView+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B46C4BF22DEC811003E5277 /* UIImageView+Loading.swift */; };
-		8B46C4C422DEE016003E5277 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B46C4C322DEE016003E5277 /* Reachability.swift */; };
-		8B5EB7112992184700AD9588 /* Publishing KEXPPower in Resources */ = {isa = PBXBuildFile; fileRef = 8B5EB7102992184700AD9588 /* Publishing KEXPPower */; };
-		8B7D0C9F22F27452007875A3 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8B7D0C9E22F27452007875A3 /* README.md */; };
-		8B81465823617389008EDF50 /* AppleMusicSample.json in Resources */ = {isa = PBXBuildFile; fileRef = 8B81465723617389008EDF50 /* AppleMusicSample.json */; };
-		8B81465A23628A1B008EDF50 /* AppleMusicResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B81465923628A1B008EDF50 /* AppleMusicResult.swift */; };
-		8B81465C23628BD0008EDF50 /* AppleMusicResultParseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B81465B23628BD0008EDF50 /* AppleMusicResultParseTests.swift */; };
-		8BA96519250D4BF300A9244B /* ShowStartSample.json in Resources */ = {isa = PBXBuildFile; fileRef = 8BA96518250D4BF300A9244B /* ShowStartSample.json */; };
-		8BA9651B250D4C6D00A9244B /* ShowStartResultParseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA9651A250D4C6D00A9244B /* ShowStartResultParseTests.swift */; };
-		8BB9AF622454C71C004DCD20 /* DateShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF612454C71C004DCD20 /* DateShows.swift */; };
-		8BB9AF642454E85E004DCD20 /* ShowNameShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF632454E85E004DCD20 /* ShowNameShows.swift */; };
-		8BB9AF6624551133004DCD20 /* HostNameShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB9AF6524551133004DCD20 /* HostNameShows.swift */; };
-		8BD1638224551394006BF61F /* GenreShows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BD1638124551394006BF61F /* GenreShows.swift */; };
-		8BEA9AD123555C0900C5F010 /* ArchiveShowStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA9AD023555C0900C5F010 /* ArchiveShowStart.swift */; };
-		8BFFECC622C95E6200E3378C /* KEXPPower.h in Headers */ = {isa = PBXBuildFile; fileRef = 8BFFECB822C95E6100E3378C /* KEXPPower.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8BFFECDD22C95FB900E3378C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8BFFECDC22C95FB900E3378C /* Assets.xcassets */; };
-		8BFFECE622C9632500E3378C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8BFFECE522C9632500E3378C /* LaunchScreen.storyboard */; };
-		8BFFECF722C96F6000E3378C /* XCTestCase+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFECF622C96F6000E3378C /* XCTestCase+Helpers.swift */; };
-		8BFFECFC22CB073100E3378C /* DateFormatter+StandardFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFECFB22CB073100E3378C /* DateFormatter+StandardFormatters.swift */; };
-		8BFFED0322D43EA100E3378C /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFED0222D43EA100E3378C /* Router.swift */; };
-		8BFFED0522D43EE700E3378C /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFED0422D43EE700E3378C /* NetworkManager.swift */; };
-		8BFFED0822D43F3800E3378C /* KEXPPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BFFED0722D43F3800E3378C /* KEXPPower.swift */; };
-		CFA34E5829BA309E00CF45B0 /* PlayFormatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA34E5729BA309E00CF45B0 /* PlayFormatters.swift */; };
-		CFA34E5E29BA314C00CF45B0 /* PlayFormattersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA34E5D29BA314C00CF45B0 /* PlayFormattersTests.swift */; };
+		90154A7C06635F45181ABEFA /* ArtworkLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887D2DD0B4466BDE3608BEDC /* ArtworkLoader.swift */; };
+		B52A0E6BD1CB1EFBFEEBAEA3 /* NowPlayingSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAACEDCB09A8C0408183AE4E /* NowPlayingSnapshot.swift */; };
+		F45A15232BCDD30EDA0A62F7 /* NowPlayingSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B31F30C218CB6953AAC0790 /* NowPlayingSnapshotTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		72873BEC27A8D21500132B62 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BFFECB422C95E6100E3378C;
-			remoteInfo = KEXPPower;
-		};
-		72873C0427A8D3C200132B62 /* PBXContainerItemProxy */ = {
+		D5290FEE84E9DAFE9696730B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 72873BF627A8D3C200132B62;
 			remoteInfo = "KEXPPowerExampleSwiftUI (iOS)";
 		};
-		8BFFECC022C95E6100E3378C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8BFFECB422C95E6100E3378C;
-			remoteInfo = KEXPPower;
-		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		72873BEE27A8D21500132B62 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
+		194EA0B2BC30640BD0198702 /* ArtworkLoaderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ArtworkLoaderTests.swift; sourceTree = "<group>"; };
+		55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		5B31F30C218CB6953AAC0790 /* NowPlayingSnapshotTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NowPlayingSnapshotTests.swift; sourceTree = "<group>"; };
+		6D8164F358A4D6B820413FE9 /* NowPlayingPublishing.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NowPlayingPublishing.swift; sourceTree = "<group>"; };
 		7219D8192BEA66C70079B78E /* CombinedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedView.swift; sourceTree = "<group>"; };
 		7219D81B2BEAA8710079B78E /* Extended View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extended View.swift"; sourceTree = "<group>"; };
 		7219D81D2BEAA8B80079B78E /* CompactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactView.swift; sourceTree = "<group>"; };
@@ -171,73 +65,25 @@
 		7272836527B2AE6900021CD4 /* ShowStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowStore.swift; sourceTree = "<group>"; };
 		7272836827B2BF5E00021CD4 /* ProgramView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgramView.swift; sourceTree = "<group>"; };
 		7272836B27B2C4D100021CD4 /* ShowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowView.swift; sourceTree = "<group>"; };
-		7272837127B3207D00021CD4 /* Play Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Play Fixture.swift"; sourceTree = "<group>"; };
-		7272837327B322C800021CD4 /* Show Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Show Fixture.swift"; sourceTree = "<group>"; };
 		72873BF027A8D3C100132B62 /* KEXPPowerExampleSwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KEXPPowerExampleSwiftUIApp.swift; sourceTree = "<group>"; };
 		72873BF127A8D3C100132B62 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		72873BF227A8D3C200132B62 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		72873BF727A8D3C200132B62 /* KEXPPowerExampleSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KEXPPowerExampleSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		72873BFE27A8D3C200132B62 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
 		72873C0327A8D3C200132B62 /* Tests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		72873C0727A8D3C200132B62 /* Tests_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOS.swift; sourceTree = "<group>"; };
-		72873C0927A8D3C200132B62 /* Tests_iOSLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOSLaunchTests.swift; sourceTree = "<group>"; };
 		72873C0F27A8D3C200132B62 /* Tests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		72873C1327A8D3C200132B62 /* Tests_macOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOS.swift; sourceTree = "<group>"; };
-		72873C1527A8D3C200132B62 /* Tests_macOSLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_macOSLaunchTests.swift; sourceTree = "<group>"; };
-		72873C3527A998E400132B62 /* PlayResultStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayResultStore.swift; sourceTree = "<group>"; };
 		72873C3D27AB7CDC00132B62 /* To Add.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "To Add.md"; sourceTree = "<group>"; };
-		728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayResult Fixture.swift"; sourceTree = "<group>"; };
-		728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ShowResult Fixture.swift"; sourceTree = "<group>"; };
 		72952B572BEC2FE500C2A0DA /* KEXPPowerExampleSwiftUI--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "KEXPPowerExampleSwiftUI--iOS--Info.plist"; sourceTree = "<group>"; };
 		72F4993A2BFD2E7100A8B8B6 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		72F4993C2BFE6B0700A8B8B6 /* ResultRetriever.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRetriever.swift; sourceTree = "<group>"; };
 		72F4993E2BFE767B00A8B8B6 /* AppleMusicRetriever.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicRetriever.swift; sourceTree = "<group>"; };
-		72F499422BFF64ED00A8B8B6 /* updateNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = updateNotificationView.swift; sourceTree = "<group>"; };
-		8B159DC0233C66E500BCB7AB /* ArchiveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveManager.swift; sourceTree = "<group>"; };
-		8B1AE2EB27CC29EA000BFE1F /* AvailableStreams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableStreams.swift; sourceTree = "<group>"; };
-		8B3C37AC234021E800413329 /* ArchiveShow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveShow.swift; sourceTree = "<group>"; };
-		8B437FAE234EE3CE002EDB91 /* ArchiveStreamSample.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ArchiveStreamSample.json; sourceTree = "<group>"; };
-		8B437FB0234EE45B002EDB91 /* ArchiveStreamResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveStreamResult.swift; sourceTree = "<group>"; };
-		8B437FB2234EE8F6002EDB91 /* ArchiveStreamParseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveStreamParseTests.swift; sourceTree = "<group>"; };
-		8B451232240F5C1300EAFEFC /* ShowResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowResult.swift; sourceTree = "<group>"; };
-		8B451235240F603D00EAFEFC /* ShowResultParseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowResultParseTests.swift; sourceTree = "<group>"; };
-		8B451238240F606E00EAFEFC /* ShowSample.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ShowSample.json; sourceTree = "<group>"; };
-		8B45123A240F6C4C00EAFEFC /* PlaySample.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = PlaySample.json; sourceTree = "<group>"; };
-		8B45123C240F6C7000EAFEFC /* PlayResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayResult.swift; sourceTree = "<group>"; };
-		8B45123E2410A4D500EAFEFC /* PlayResultParseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayResultParseTests.swift; sourceTree = "<group>"; };
-		8B46C4BF22DEC811003E5277 /* UIImageView+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Loading.swift"; sourceTree = "<group>"; };
-		8B46C4C322DEE016003E5277 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
-		8B5EB7102992184700AD9588 /* Publishing KEXPPower */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Publishing KEXPPower"; sourceTree = "<group>"; };
-		8B7D0C9E22F27452007875A3 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = KEXPPower/Documentation/README.md; sourceTree = SOURCE_ROOT; };
-		8B81465723617389008EDF50 /* AppleMusicSample.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AppleMusicSample.json; sourceTree = "<group>"; };
-		8B81465923628A1B008EDF50 /* AppleMusicResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicResult.swift; sourceTree = "<group>"; };
-		8B81465B23628BD0008EDF50 /* AppleMusicResultParseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicResultParseTests.swift; sourceTree = "<group>"; };
-		8BA96518250D4BF300A9244B /* ShowStartSample.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ShowStartSample.json; sourceTree = "<group>"; };
-		8BA9651A250D4C6D00A9244B /* ShowStartResultParseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowStartResultParseTests.swift; sourceTree = "<group>"; };
-		8BB9AF612454C71C004DCD20 /* DateShows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateShows.swift; sourceTree = "<group>"; };
-		8BB9AF632454E85E004DCD20 /* ShowNameShows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowNameShows.swift; sourceTree = "<group>"; };
-		8BB9AF6524551133004DCD20 /* HostNameShows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostNameShows.swift; sourceTree = "<group>"; };
-		8BD1638124551394006BF61F /* GenreShows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreShows.swift; sourceTree = "<group>"; };
-		8BEA9AD023555C0900C5F010 /* ArchiveShowStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchiveShowStart.swift; sourceTree = "<group>"; };
+		887D2DD0B4466BDE3608BEDC /* ArtworkLoader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ArtworkLoader.swift; sourceTree = "<group>"; };
 		8BFFECB522C95E6100E3378C /* KEXPPower.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KEXPPower.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8BFFECB822C95E6100E3378C /* KEXPPower.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KEXPPower.h; sourceTree = "<group>"; };
-		8BFFECB922C95E6100E3378C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8BFFECBE22C95E6100E3378C /* KEXPPowerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KEXPPowerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		8BFFECC522C95E6200E3378C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8BFFECD322C95FB300E3378C /* KEXPPowerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KEXPPowerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		8BFFECD522C95FB300E3378C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		8BFFECD722C95FB300E3378C /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		8BFFECDC22C95FB900E3378C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		8BFFECE122C95FB900E3378C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8BFFECE522C9632500E3378C /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
-		8BFFECF622C96F6000E3378C /* XCTestCase+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Helpers.swift"; sourceTree = "<group>"; };
-		8BFFECFB22CB073100E3378C /* DateFormatter+StandardFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+StandardFormatters.swift"; sourceTree = "<group>"; };
-		8BFFED0222D43EA100E3378C /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
-		8BFFED0422D43EE700E3378C /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
-		8BFFED0722D43F3800E3378C /* KEXPPower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KEXPPower.swift; sourceTree = "<group>"; };
-		8BFFED0922DBD2DE00E3378C /* KEXPPower.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = KEXPPower.podspec; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		CFA34E5729BA309E00CF45B0 /* PlayFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayFormatters.swift; sourceTree = "<group>"; };
-		CFA34E5D29BA314C00CF45B0 /* PlayFormattersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayFormattersTests.swift; sourceTree = "<group>"; };
+		9AB02E9335D79398B148ACE1 /* KEXPPowerAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KEXPPowerAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BAACEDCB09A8C0408183AE4E /* NowPlayingSnapshot.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NowPlayingSnapshot.swift; sourceTree = "<group>"; };
+		F478354AB15736CA0D325E03 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,41 +91,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3BD8D5DD14914B8F3A2721F3 /* KEXPPower in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		72873C0027A8D3C200132B62 /* Frameworks */ = {
+		9A7DBE40BA997FDA82F08400 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		72873C0C27A8D3C200132B62 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8BFFECB222C95E6100E3378C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8BFFECBB22C95E6100E3378C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8BFFECD022C95FB300E3378C /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				5C8856D425FA331DD91B6BE8 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,6 +114,9 @@
 				7219D8242BEBBD860079B78E /* AudioPlayerView.swift */,
 				7219D8262BEBCA200079B78E /* AVPlayer.swift */,
 				7219D8282BEBD1270079B78E /* VideoPlayer.swift */,
+				887D2DD0B4466BDE3608BEDC /* ArtworkLoader.swift */,
+				BAACEDCB09A8C0408183AE4E /* NowPlayingSnapshot.swift */,
+				6D8164F358A4D6B820413FE9 /* NowPlayingPublishing.swift */,
 			);
 			path = "Audio Player";
 			sourceTree = "<group>";
@@ -302,7 +125,6 @@
 			isa = PBXGroup;
 			children = (
 				7219D82A2BEBD1FF0079B78E /* PlayerView.swift */,
-				72873C3527A998E400132B62 /* PlayResultStore.swift */,
 				72F4993A2BFD2E7100A8B8B6 /* TestView.swift */,
 				7219D8192BEA66C70079B78E /* CombinedView.swift */,
 				7219D81F2BEAAAD20079B78E /* ImageView.swift */,
@@ -325,6 +147,7 @@
 		72873BE927A8D21500132B62 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D53B512343A47555C3192043 /* iOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -341,6 +164,7 @@
 				7272836D27B2C77900021CD4 /* Song List */,
 				72873BF227A8D3C200132B62 /* Assets.xcassets */,
 				72873C3D27AB7CDC00132B62 /* To Add.md */,
+				55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */,
 			);
 			path = "KEXPPower SwiftUI";
 			sourceTree = "<group>";
@@ -351,24 +175,6 @@
 				72873BFE27A8D3C200132B62 /* macOS.entitlements */,
 			);
 			path = macOS;
-			sourceTree = "<group>";
-		};
-		72873C0627A8D3C200132B62 /* Tests iOS */ = {
-			isa = PBXGroup;
-			children = (
-				72873C0727A8D3C200132B62 /* Tests_iOS.swift */,
-				72873C0927A8D3C200132B62 /* Tests_iOSLaunchTests.swift */,
-			);
-			path = "Tests iOS";
-			sourceTree = "<group>";
-		};
-		72873C1227A8D3C200132B62 /* Tests macOS */ = {
-			isa = PBXGroup;
-			children = (
-				72873C1327A8D3C200132B62 /* Tests_macOS.swift */,
-				72873C1527A8D3C200132B62 /* Tests_macOSLaunchTests.swift */,
-			);
-			path = "Tests macOS";
 			sourceTree = "<group>";
 		};
 		72F499402BFE990000A8B8B6 /* Retrievers */ = {
@@ -383,74 +189,8 @@
 		72F499412BFF64DF00A8B8B6 /* PlayerController */ = {
 			isa = PBXGroup;
 			children = (
-				72F499422BFF64ED00A8B8B6 /* updateNotificationView.swift */,
 			);
 			path = PlayerController;
-			sourceTree = "<group>";
-		};
-		8B159DBF233C665200BCB7AB /* Archive */ = {
-			isa = PBXGroup;
-			children = (
-				8BB9AF602454C6C8004DCD20 /* Models */,
-				8B159DC0233C66E500BCB7AB /* ArchiveManager.swift */,
-			);
-			path = Archive;
-			sourceTree = "<group>";
-		};
-		8B159DC4233C689F00BCB7AB /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				8B451235240F603D00EAFEFC /* ShowResultParseTests.swift */,
-				8B45123E2410A4D500EAFEFC /* PlayResultParseTests.swift */,
-				8BA9651A250D4C6D00A9244B /* ShowStartResultParseTests.swift */,
-				8B437FB2234EE8F6002EDB91 /* ArchiveStreamParseTests.swift */,
-				8B81465B23628BD0008EDF50 /* AppleMusicResultParseTests.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		8B5EB70F299217E700AD9588 /* Documentation */ = {
-			isa = PBXGroup;
-			children = (
-				8B7D0C9E22F27452007875A3 /* README.md */,
-				8B5EB7102992184700AD9588 /* Publishing KEXPPower */,
-			);
-			path = Documentation;
-			sourceTree = "<group>";
-		};
-		8B961EE0236162BD00085D05 /* KEXP */ = {
-			isa = PBXGroup;
-			children = (
-				8B3C37AC234021E800413329 /* ArchiveShow.swift */,
-				8BEA9AD023555C0900C5F010 /* ArchiveShowStart.swift */,
-				8B437FB0234EE45B002EDB91 /* ArchiveStreamResult.swift */,
-				8B45123C240F6C7000EAFEFC /* PlayResult.swift */,
-				728DA59327B33C8E00EE38A4 /* PlayResult Fixture.swift */,
-				7272837127B3207D00021CD4 /* Play Fixture.swift */,
-				8B451232240F5C1300EAFEFC /* ShowResult.swift */,
-				728DA59527B33D1700EE38A4 /* ShowResult Fixture.swift */,
-				7272837327B322C800021CD4 /* Show Fixture.swift */,
-			);
-			path = KEXP;
-			sourceTree = "<group>";
-		};
-		8B961EE1236162E900085D05 /* AppleMusic */ = {
-			isa = PBXGroup;
-			children = (
-				8B81465923628A1B008EDF50 /* AppleMusicResult.swift */,
-			);
-			path = AppleMusic;
-			sourceTree = "<group>";
-		};
-		8BB9AF602454C6C8004DCD20 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				8BB9AF612454C71C004DCD20 /* DateShows.swift */,
-				8BB9AF632454E85E004DCD20 /* ShowNameShows.swift */,
-				8BB9AF6524551133004DCD20 /* HostNameShows.swift */,
-				8BD1638124551394006BF61F /* GenreShows.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		8BFFECAB22C95E6100E3378C = {
@@ -458,15 +198,11 @@
 			children = (
 				72952B572BEC2FE500C2A0DA /* KEXPPowerExampleSwiftUI--iOS--Info.plist */,
 				7272836427B1BBAC00021CD4 /* KEXPPowerExampleSwiftUI (iOS).entitlements */,
-				8BFFECB722C95E6100E3378C /* KEXPPower */,
-				8BFFECC222C95E6100E3378C /* KEXPPowerTests */,
-				8BFFECD422C95FB300E3378C /* KEXPPowerExample */,
 				72873BEF27A8D3C100132B62 /* KEXPPower SwiftUI */,
 				72873BFD27A8D3C200132B62 /* macOS */,
-				72873C0627A8D3C200132B62 /* Tests iOS */,
-				72873C1227A8D3C200132B62 /* Tests macOS */,
 				8BFFECB622C95E6100E3378C /* Products */,
 				72873BE927A8D21500132B62 /* Frameworks */,
+				C09C0245055B1825A0CF9C6A /* KEXPPowerAppTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -479,130 +215,50 @@
 				72873BF727A8D3C200132B62 /* KEXPPowerExampleSwiftUI.app */,
 				72873C0327A8D3C200132B62 /* Tests iOS.xctest */,
 				72873C0F27A8D3C200132B62 /* Tests macOS.xctest */,
+				9AB02E9335D79398B148ACE1 /* KEXPPowerAppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		8BFFECB722C95E6100E3378C /* KEXPPower */ = {
+		C09C0245055B1825A0CF9C6A /* KEXPPowerAppTests */ = {
 			isa = PBXGroup;
 			children = (
-				8B5EB70F299217E700AD9588 /* Documentation */,
-				8BFFED0922DBD2DE00E3378C /* KEXPPower.podspec */,
-				8B159DBF233C665200BCB7AB /* Archive */,
-				8BFFED0622D43F0B00E3378C /* Public API */,
-				8BFFED0122D43E6400E3378C /* Networking */,
-				8BFFECFA22CB071100E3378C /* Helpers */,
-				8BFFECE722C9656100E3378C /* Models */,
-				8BFFECB822C95E6100E3378C /* KEXPPower.h */,
-				8BFFECB922C95E6100E3378C /* Info.plist */,
+				194EA0B2BC30640BD0198702 /* ArtworkLoaderTests.swift */,
+				5B31F30C218CB6953AAC0790 /* NowPlayingSnapshotTests.swift */,
 			);
-			path = KEXPPower;
+			name = KEXPPowerAppTests;
+			path = KEXPPowerAppTests;
 			sourceTree = "<group>";
 		};
-		8BFFECC222C95E6100E3378C /* KEXPPowerTests */ = {
+		D53B512343A47555C3192043 /* iOS */ = {
 			isa = PBXGroup;
 			children = (
-				8BFFECF122C9694200E3378C /* Tests */,
-				8BFFECF022C9692B00E3378C /* Samples */,
-				8BFFECF622C96F6000E3378C /* XCTestCase+Helpers.swift */,
-				8BFFECC522C95E6200E3378C /* Info.plist */,
+				F478354AB15736CA0D325E03 /* Foundation.framework */,
 			);
-			path = KEXPPowerTests;
-			sourceTree = "<group>";
-		};
-		8BFFECD422C95FB300E3378C /* KEXPPowerExample */ = {
-			isa = PBXGroup;
-			children = (
-				8BFFECE522C9632500E3378C /* LaunchScreen.storyboard */,
-				8BFFECD522C95FB300E3378C /* AppDelegate.swift */,
-				8BFFECD722C95FB300E3378C /* ViewController.swift */,
-				8BFFECDC22C95FB900E3378C /* Assets.xcassets */,
-				8BFFECE122C95FB900E3378C /* Info.plist */,
-			);
-			path = KEXPPowerExample;
-			sourceTree = "<group>";
-		};
-		8BFFECE722C9656100E3378C /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				8B961EE1236162E900085D05 /* AppleMusic */,
-				8B961EE0236162BD00085D05 /* KEXP */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		8BFFECF022C9692B00E3378C /* Samples */ = {
-			isa = PBXGroup;
-			children = (
-				8B451238240F606E00EAFEFC /* ShowSample.json */,
-				8B45123A240F6C4C00EAFEFC /* PlaySample.json */,
-				8BA96518250D4BF300A9244B /* ShowStartSample.json */,
-				8B437FAE234EE3CE002EDB91 /* ArchiveStreamSample.json */,
-				8B81465723617389008EDF50 /* AppleMusicSample.json */,
-			);
-			path = Samples;
-			sourceTree = "<group>";
-		};
-		8BFFECF122C9694200E3378C /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-				CFA34E5C29BA313500CF45B0 /* Helpers */,
-				8B159DC4233C689F00BCB7AB /* Model */,
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		8BFFECFA22CB071100E3378C /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				8BFFECFB22CB073100E3378C /* DateFormatter+StandardFormatters.swift */,
-				CFA34E5729BA309E00CF45B0 /* PlayFormatters.swift */,
-				8B46C4BF22DEC811003E5277 /* UIImageView+Loading.swift */,
-			);
-			path = Helpers;
-			sourceTree = "<group>";
-		};
-		8BFFED0122D43E6400E3378C /* Networking */ = {
-			isa = PBXGroup;
-			children = (
-				8BFFED0222D43EA100E3378C /* Router.swift */,
-				8BFFED0422D43EE700E3378C /* NetworkManager.swift */,
-				8B46C4C322DEE016003E5277 /* Reachability.swift */,
-			);
-			path = Networking;
-			sourceTree = "<group>";
-		};
-		8BFFED0622D43F0B00E3378C /* Public API */ = {
-			isa = PBXGroup;
-			children = (
-				8BFFED0722D43F3800E3378C /* KEXPPower.swift */,
-				8B1AE2EB27CC29EA000BFE1F /* AvailableStreams.swift */,
-			);
-			path = "Public API";
-			sourceTree = "<group>";
-		};
-		CFA34E5C29BA313500CF45B0 /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				CFA34E5D29BA314C00CF45B0 /* PlayFormattersTests.swift */,
-			);
-			path = Helpers;
+			name = iOS;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		8BFFECB022C95E6100E3378C /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8BFFECC622C95E6200E3378C /* KEXPPower.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
+		0B988C4C7A1AF47EEBD8F9A6 /* KEXPPowerAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3301E7117B760ACE576F49D1 /* Build configuration list for PBXNativeTarget "KEXPPowerAppTests" */;
+			buildPhases = (
+				D7B24F4021A1F7DFCCA4E2E1 /* Sources */,
+				9A7DBE40BA997FDA82F08400 /* Frameworks */,
+				2F9B776373B472EBEDB6F593 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F25EBD3C2C644A627065921E /* PBXTargetDependency */,
+			);
+			name = KEXPPowerAppTests;
+			productName = KEXPPowerAppTests;
+			productReference = 9AB02E9335D79398B148ACE1 /* KEXPPowerAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		72873BF627A8D3C200132B62 /* KEXPPowerExampleSwiftUI (iOS) */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 72873C1D27A8D3C200132B62 /* Build configuration list for PBXNativeTarget "KEXPPowerExampleSwiftUI (iOS)" */;
@@ -616,98 +272,11 @@
 			dependencies = (
 			);
 			name = "KEXPPowerExampleSwiftUI (iOS)";
+			packageProductDependencies = (
+				389B2E62968225912A149478 /* KEXPPower */,
+			);
 			productName = "KEXPPowerExampleSwiftUI (iOS)";
 			productReference = 72873BF727A8D3C200132B62 /* KEXPPowerExampleSwiftUI.app */;
-			productType = "com.apple.product-type.application";
-		};
-		72873C0227A8D3C200132B62 /* Tests iOS */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 72873C2327A8D3C200132B62 /* Build configuration list for PBXNativeTarget "Tests iOS" */;
-			buildPhases = (
-				72873BFF27A8D3C200132B62 /* Sources */,
-				72873C0027A8D3C200132B62 /* Frameworks */,
-				72873C0127A8D3C200132B62 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				72873C0527A8D3C200132B62 /* PBXTargetDependency */,
-			);
-			name = "Tests iOS";
-			productName = "Tests iOS";
-			productReference = 72873C0327A8D3C200132B62 /* Tests iOS.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
-		72873C0E27A8D3C200132B62 /* Tests macOS */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 72873C2627A8D3C200132B62 /* Build configuration list for PBXNativeTarget "Tests macOS" */;
-			buildPhases = (
-				72873C0B27A8D3C200132B62 /* Sources */,
-				72873C0C27A8D3C200132B62 /* Frameworks */,
-				72873C0D27A8D3C200132B62 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "Tests macOS";
-			productName = "Tests macOS";
-			productReference = 72873C0F27A8D3C200132B62 /* Tests macOS.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
-		8BFFECB422C95E6100E3378C /* KEXPPower */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8BFFECC922C95E6200E3378C /* Build configuration list for PBXNativeTarget "KEXPPower" */;
-			buildPhases = (
-				8BFFECB022C95E6100E3378C /* Headers */,
-				8BFFECB122C95E6100E3378C /* Sources */,
-				8BFFECB222C95E6100E3378C /* Frameworks */,
-				8BFFECB322C95E6100E3378C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = KEXPPower;
-			productName = KEXPPower;
-			productReference = 8BFFECB522C95E6100E3378C /* KEXPPower.framework */;
-			productType = "com.apple.product-type.framework";
-		};
-		8BFFECBD22C95E6100E3378C /* KEXPPowerTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8BFFECCC22C95E6200E3378C /* Build configuration list for PBXNativeTarget "KEXPPowerTests" */;
-			buildPhases = (
-				8BFFECBA22C95E6100E3378C /* Sources */,
-				8BFFECBB22C95E6100E3378C /* Frameworks */,
-				8BFFECBC22C95E6100E3378C /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				8BFFECC122C95E6100E3378C /* PBXTargetDependency */,
-			);
-			name = KEXPPowerTests;
-			productName = KEXPPowerTests;
-			productReference = 8BFFECBE22C95E6100E3378C /* KEXPPowerTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		8BFFECD222C95FB300E3378C /* KEXPPowerExample */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8BFFECE422C95FB900E3378C /* Build configuration list for PBXNativeTarget "KEXPPowerExample" */;
-			buildPhases = (
-				8BFFECCF22C95FB300E3378C /* Sources */,
-				8BFFECD022C95FB300E3378C /* Frameworks */,
-				8BFFECD122C95FB300E3378C /* Resources */,
-				72873BEE27A8D21500132B62 /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				72873BED27A8D21500132B62 /* PBXTargetDependency */,
-			);
-			name = KEXPPowerExample;
-			productName = KEXPPowerExample;
-			productReference = 8BFFECD322C95FB300E3378C /* KEXPPowerExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -752,70 +321,33 @@
 				Base,
 			);
 			mainGroup = 8BFFECAB22C95E6100E3378C;
+			packageReferences = (
+				E0677C3B28D3E95134F60740 /* XCLocalSwiftPackageReference "KEXPPowerKit" */,
+			);
 			productRefGroup = 8BFFECB622C95E6100E3378C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8BFFECB422C95E6100E3378C /* KEXPPower */,
-				8BFFECBD22C95E6100E3378C /* KEXPPowerTests */,
-				8BFFECD222C95FB300E3378C /* KEXPPowerExample */,
 				72873BF627A8D3C200132B62 /* KEXPPowerExampleSwiftUI (iOS) */,
-				72873C0227A8D3C200132B62 /* Tests iOS */,
-				72873C0E27A8D3C200132B62 /* Tests macOS */,
+				0B988C4C7A1AF47EEBD8F9A6 /* KEXPPowerAppTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2F9B776373B472EBEDB6F593 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		72873BF527A8D3C200132B62 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				72873C1B27A8D3C200132B62 /* Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		72873C0127A8D3C200132B62 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		72873C0D27A8D3C200132B62 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8BFFECB322C95E6100E3378C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8B5EB7112992184700AD9588 /* Publishing KEXPPower in Resources */,
-				8B7D0C9F22F27452007875A3 /* README.md in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8BFFECBC22C95E6100E3378C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8B437FAF234EE3CE002EDB91 /* ArchiveStreamSample.json in Resources */,
-				8B45123B240F6C4C00EAFEFC /* PlaySample.json in Resources */,
-				8B451239240F606E00EAFEFC /* ShowSample.json in Resources */,
-				8BA96519250D4BF300A9244B /* ShowStartSample.json in Resources */,
-				8B81465823617389008EDF50 /* AppleMusicSample.json in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8BFFECD122C95FB300E3378C /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8BFFECDD22C95FB900E3378C /* Assets.xcassets in Resources */,
-				8BFFECE622C9632500E3378C /* LaunchScreen.storyboard in Resources */,
+				3BA956736E6DE724B118062C /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -826,164 +358,86 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7219D7EA2BEA60CB0079B78E /* DateFormatter+StandardFormatters.swift in Sources */,
-				7219D7EB2BEA60CB0079B78E /* PlayFormatters.swift in Sources */,
 				72873C1927A8D3C200132B62 /* ContentView.swift in Sources */,
-				7219D80A2BEA60E90079B78E /* AvailableStreams.swift in Sources */,
 				7219D8292BEBD1270079B78E /* VideoPlayer.swift in Sources */,
-				7219D80B2BEA60E90079B78E /* KEXPPower.swift in Sources */,
 				7272836727B2AE6900021CD4 /* ShowStore.swift in Sources */,
 				7219D81A2BEA66C70079B78E /* CombinedView.swift in Sources */,
 				7272836A27B2BF5E00021CD4 /* ProgramView.swift in Sources */,
 				7244DDE72B7E73E100375023 /* Logger.swift in Sources */,
-				7219D8102BEA60F20079B78E /* ShowNameShows.swift in Sources */,
-				7219D8112BEA60F20079B78E /* GenreShows.swift in Sources */,
-				7219D8122BEA60F20079B78E /* HostNameShows.swift in Sources */,
-				7219D8132BEA60F20079B78E /* DateShows.swift in Sources */,
-				7219D7F82BEA60E00079B78E /* ShowResult Fixture.swift in Sources */,
 				7219D8252BEBBD860079B78E /* AudioPlayerView.swift in Sources */,
-				7219D7F92BEA60E00079B78E /* Show Fixture.swift in Sources */,
 				72F4993F2BFE767B00A8B8B6 /* AppleMusicRetriever.swift in Sources */,
-				7219D7FA2BEA60E00079B78E /* ArchiveShowStart.swift in Sources */,
-				7219D7FB2BEA60E00079B78E /* PlayResult.swift in Sources */,
-				7219D7FC2BEA60E00079B78E /* ArchiveShow.swift in Sources */,
-				7219D7FD2BEA60E00079B78E /* Play Fixture.swift in Sources */,
-				7219D7FE2BEA60E00079B78E /* PlayResult Fixture.swift in Sources */,
-				7219D7FF2BEA60E00079B78E /* ShowResult.swift in Sources */,
-				7219D8002BEA60E00079B78E /* ArchiveStreamResult.swift in Sources */,
 				72F4993B2BFD2E7100A8B8B6 /* TestView.swift in Sources */,
 				7219D8202BEAAAD20079B78E /* ImageView.swift in Sources */,
 				7219D81C2BEAA8710079B78E /* Extended View.swift in Sources */,
-				7219D7F72BEA60DB0079B78E /* AppleMusicResult.swift in Sources */,
-				72873C3627A998E400132B62 /* PlayResultStore.swift in Sources */,
 				7219D8232BEBBBFB0079B78E /* AudioPlayerViewModel.swift in Sources */,
 				7272836C27B2C4D100021CD4 /* ShowView.swift in Sources */,
 				7219D8272BEBCA200079B78E /* AVPlayer.swift in Sources */,
-				7219D7ED2BEA60D00079B78E /* NetworkManager.swift in Sources */,
 				7219D81E2BEAA8B80079B78E /* CompactView.swift in Sources */,
-				7219D7EE2BEA60D00079B78E /* Router.swift in Sources */,
-				7219D80F2BEA60EE0079B78E /* ArchiveManager.swift in Sources */,
-				7219D7EF2BEA60D00079B78E /* Reachability.swift in Sources */,
 				7219D82B2BEBD1FF0079B78E /* PlayerView.swift in Sources */,
 				72873C1727A8D3C200132B62 /* KEXPPowerExampleSwiftUIApp.swift in Sources */,
-				72F499432BFF64ED00A8B8B6 /* updateNotificationView.swift in Sources */,
 				72F4993D2BFE6B0700A8B8B6 /* ResultRetriever.swift in Sources */,
+				90154A7C06635F45181ABEFA /* ArtworkLoader.swift in Sources */,
+				B52A0E6BD1CB1EFBFEEBAEA3 /* NowPlayingSnapshot.swift in Sources */,
+				63957A89CFEAE6A0655D9DFB /* NowPlayingPublishing.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		72873BFF27A8D3C200132B62 /* Sources */ = {
+		D7B24F4021A1F7DFCCA4E2E1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7244DDED2B7E752800375023 /* Logger.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		72873C0B27A8D3C200132B62 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7244DDEE2B7E752900375023 /* Logger.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8BFFECB122C95E6100E3378C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8B159DC1233C66E500BCB7AB /* ArchiveManager.swift in Sources */,
-				7272837427B322C800021CD4 /* Show Fixture.swift in Sources */,
-				8BFFED0522D43EE700E3378C /* NetworkManager.swift in Sources */,
-				8BD1638224551394006BF61F /* GenreShows.swift in Sources */,
-				728DA59627B33D1700EE38A4 /* ShowResult Fixture.swift in Sources */,
-				8B46C4C022DEC811003E5277 /* UIImageView+Loading.swift in Sources */,
-				CFA34E5829BA309E00CF45B0 /* PlayFormatters.swift in Sources */,
-				7244DDEA2B7E752700375023 /* Logger.swift in Sources */,
-				8BFFED0822D43F3800E3378C /* KEXPPower.swift in Sources */,
-				8BB9AF642454E85E004DCD20 /* ShowNameShows.swift in Sources */,
-				8BEA9AD123555C0900C5F010 /* ArchiveShowStart.swift in Sources */,
-				728DA59427B33C8E00EE38A4 /* PlayResult Fixture.swift in Sources */,
-				8B437FB1234EE45B002EDB91 /* ArchiveStreamResult.swift in Sources */,
-				8BB9AF622454C71C004DCD20 /* DateShows.swift in Sources */,
-				8B81465A23628A1B008EDF50 /* AppleMusicResult.swift in Sources */,
-				8B451233240F5C1300EAFEFC /* ShowResult.swift in Sources */,
-				8BFFED0322D43EA100E3378C /* Router.swift in Sources */,
-				8B3C37AD234021E800413329 /* ArchiveShow.swift in Sources */,
-				8B1AE2EC27CC29EA000BFE1F /* AvailableStreams.swift in Sources */,
-				8B45123D240F6C7000EAFEFC /* PlayResult.swift in Sources */,
-				8BB9AF6624551133004DCD20 /* HostNameShows.swift in Sources */,
-				7272837227B3207D00021CD4 /* Play Fixture.swift in Sources */,
-				8B46C4C422DEE016003E5277 /* Reachability.swift in Sources */,
-				8BFFECFC22CB073100E3378C /* DateFormatter+StandardFormatters.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8BFFECBA22C95E6100E3378C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				CFA34E5E29BA314C00CF45B0 /* PlayFormattersTests.swift in Sources */,
-				8B81465C23628BD0008EDF50 /* AppleMusicResultParseTests.swift in Sources */,
-				8BA9651B250D4C6D00A9244B /* ShowStartResultParseTests.swift in Sources */,
-				8B451236240F603D00EAFEFC /* ShowResultParseTests.swift in Sources */,
-				8B45123F2410A4D500EAFEFC /* PlayResultParseTests.swift in Sources */,
-				8BFFECF722C96F6000E3378C /* XCTestCase+Helpers.swift in Sources */,
-				8B437FB3234EE8F6002EDB91 /* ArchiveStreamParseTests.swift in Sources */,
-				7244DDEB2B7E752700375023 /* Logger.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8BFFECCF22C95FB300E3378C /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7219D80E2BEA60ED0079B78E /* ArchiveManager.swift in Sources */,
-				7219D8012BEA60E00079B78E /* ShowResult Fixture.swift in Sources */,
-				7219D8022BEA60E00079B78E /* Show Fixture.swift in Sources */,
-				7219D8142BEA60F30079B78E /* ShowNameShows.swift in Sources */,
-				7219D8152BEA60F30079B78E /* GenreShows.swift in Sources */,
-				7219D8162BEA60F30079B78E /* HostNameShows.swift in Sources */,
-				7219D8172BEA60F30079B78E /* DateShows.swift in Sources */,
-				7219D8032BEA60E00079B78E /* ArchiveShowStart.swift in Sources */,
-				7219D8042BEA60E00079B78E /* PlayResult.swift in Sources */,
-				7219D8052BEA60E00079B78E /* ArchiveShow.swift in Sources */,
-				7219D8062BEA60E00079B78E /* Play Fixture.swift in Sources */,
-				7219D8072BEA60E00079B78E /* PlayResult Fixture.swift in Sources */,
-				7219D8082BEA60E00079B78E /* ShowResult.swift in Sources */,
-				7219D8092BEA60E00079B78E /* ArchiveStreamResult.swift in Sources */,
-				7244DDEC2B7E752800375023 /* Logger.swift in Sources */,
-				7219D7F32BEA60D60079B78E /* DateFormatter+StandardFormatters.swift in Sources */,
-				7219D80C2BEA60E90079B78E /* AvailableStreams.swift in Sources */,
-				7219D80D2BEA60E90079B78E /* KEXPPower.swift in Sources */,
-				7219D7F62BEA60DB0079B78E /* AppleMusicResult.swift in Sources */,
-				7219D7F42BEA60D60079B78E /* PlayFormatters.swift in Sources */,
-				7219D7F02BEA60D00079B78E /* NetworkManager.swift in Sources */,
-				7219D7F12BEA60D00079B78E /* Router.swift in Sources */,
-				7219D7F22BEA60D00079B78E /* Reachability.swift in Sources */,
+				53344C98D88110970F815A6E /* ArtworkLoaderTests.swift in Sources */,
+				F45A15232BCDD30EDA0A62F7 /* NowPlayingSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		72873BED27A8D21500132B62 /* PBXTargetDependency */ = {
+		F25EBD3C2C644A627065921E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8BFFECB422C95E6100E3378C /* KEXPPower */;
-			targetProxy = 72873BEC27A8D21500132B62 /* PBXContainerItemProxy */;
-		};
-		72873C0527A8D3C200132B62 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
+			name = "KEXPPowerExampleSwiftUI (iOS)";
 			target = 72873BF627A8D3C200132B62 /* KEXPPowerExampleSwiftUI (iOS) */;
-			targetProxy = 72873C0427A8D3C200132B62 /* PBXContainerItemProxy */;
-		};
-		8BFFECC122C95E6100E3378C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8BFFECB422C95E6100E3378C /* KEXPPower */;
-			targetProxy = 8BFFECC022C95E6100E3378C /* PBXContainerItemProxy */;
+			targetProxy = D5290FEE84E9DAFE9696730B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		3DC96F88DBF027C5CCCF31C2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.KEXPPowerAppTests;
+				PRODUCT_MODULE_NAME = KEXPPowerAppTests;
+				PRODUCT_NAME = KEXPPowerAppTests;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KEXPPowerExampleSwiftUI.app/KEXPPowerExampleSwiftUI";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5F1A0FC0B6ACD6A0DF521438 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.KEXPPowerAppTests;
+				PRODUCT_MODULE_NAME = KEXPPowerAppTests;
+				PRODUCT_NAME = KEXPPowerAppTests;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/KEXPPowerExampleSwiftUI.app/KEXPPowerExampleSwiftUI";
+			};
+			name = Debug;
+		};
 		72873C1E27A8D3C200132B62 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1061,94 +515,12 @@
 			};
 			name = Release;
 		};
-		72873C2427A8D3C200132B62 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BNDA9Y6YV9;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		72873C2527A8D3C200132B62 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = BNDA9Y6YV9;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-iOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		72873C2727A8D3C200132B62 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = BNDA9Y6YV9;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-macOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "KEXPPowerExampleSwiftUI (macOS)";
-			};
-			name = Debug;
-		};
-		72873C2827A8D3C200132B62 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = BNDA9Y6YV9;
-				GENERATE_INFOPLIST_FILE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.1;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.JPEnterprises.Tests-macOS";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TEST_TARGET_NAME = "KEXPPowerExampleSwiftUI (macOS)";
-			};
-			name = Release;
-		};
 		8BFFECC722C95E6200E3378C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1221,7 +593,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1284,191 +656,23 @@
 			};
 			name = Release;
 		};
-		8BFFECCA22C95E6200E3378C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = BNDA9Y6YV9;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				INFOPLIST_FILE = KEXPPower/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 3.0.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++14";
-				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPower;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-			};
-			name = Debug;
-		};
-		8BFFECCB22C95E6200E3378C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = BNDA9Y6YV9;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_MODULE_VERIFIER = YES;
-				INFOPLIST_FILE = KEXPPower/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 3.0.0;
-				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu11 gnu++14";
-				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPower;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-			};
-			name = Release;
-		};
-		8BFFECCD22C95E6200E3378C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7F4LVTRHRM;
-				INFOPLIST_FILE = KEXPPowerTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPowerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTS_MACCATALYST = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		8BFFECCE22C95E6200E3378C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 7F4LVTRHRM;
-				INFOPLIST_FILE = KEXPPowerTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPowerTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTS_MACCATALYST = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		8BFFECE222C95FB900E3378C /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = BNDA9Y6YV9;
-				INFOPLIST_FILE = KEXPPowerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPowerExample;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-			};
-			name = Debug;
-		};
-		8BFFECE322C95FB900E3378C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = BNDA9Y6YV9;
-				INFOPLIST_FILE = KEXPPowerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.kexp.KEXPPowerExample;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		3301E7117B760ACE576F49D1 /* Build configuration list for PBXNativeTarget "KEXPPowerAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DC96F88DBF027C5CCCF31C2 /* Release */,
+				5F1A0FC0B6ACD6A0DF521438 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		72873C1D27A8D3C200132B62 /* Build configuration list for PBXNativeTarget "KEXPPowerExampleSwiftUI (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				72873C1E27A8D3C200132B62 /* Debug */,
 				72873C1F27A8D3C200132B62 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		72873C2327A8D3C200132B62 /* Build configuration list for PBXNativeTarget "Tests iOS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				72873C2427A8D3C200132B62 /* Debug */,
-				72873C2527A8D3C200132B62 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		72873C2627A8D3C200132B62 /* Build configuration list for PBXNativeTarget "Tests macOS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				72873C2727A8D3C200132B62 /* Debug */,
-				72873C2827A8D3C200132B62 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1482,34 +686,21 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8BFFECC922C95E6200E3378C /* Build configuration list for PBXNativeTarget "KEXPPower" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8BFFECCA22C95E6200E3378C /* Debug */,
-				8BFFECCB22C95E6200E3378C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		8BFFECCC22C95E6200E3378C /* Build configuration list for PBXNativeTarget "KEXPPowerTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8BFFECCD22C95E6200E3378C /* Debug */,
-				8BFFECCE22C95E6200E3378C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		8BFFECE422C95FB900E3378C /* Build configuration list for PBXNativeTarget "KEXPPowerExample" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8BFFECE222C95FB900E3378C /* Debug */,
-				8BFFECE322C95FB900E3378C /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		E0677C3B28D3E95134F60740 /* XCLocalSwiftPackageReference "KEXPPowerKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../KEXPPowerKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		389B2E62968225912A149478 /* KEXPPower */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KEXPPower;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8BFFECAC22C95E6100E3378C /* Project object */;
 }

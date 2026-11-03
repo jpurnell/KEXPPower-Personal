@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import KEXPPower
 
 struct ShowView: View {
     var show: Show?

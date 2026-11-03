@@ -8,6 +8,7 @@
 
 import SwiftUI
 import OSLog
+import KEXPPower
 
 struct CompactView: View {
 	var play: Play?

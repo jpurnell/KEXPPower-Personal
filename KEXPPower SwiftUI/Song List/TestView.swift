@@ -8,6 +8,7 @@
 
 import SwiftUI
 import OSLog
+import KEXPPower
 
 struct TestView: View {
 	var play: Play = .fixture()

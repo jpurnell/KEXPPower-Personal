@@ -1,0 +1,170 @@
+# KEXPPower Master Plan
+
+**Purpose:** Source of truth for project vision, architecture, and goals.
+
+---
+
+## Project Overview
+
+### Mission
+A fast, friendly, native Apple-platform listener for KEXP 90.3 FM (Seattle): a live
+playlist, the live stream, and the tools to keep the music you hear. It is intended to be
+quicker and more pleasant to use than the existing KEXP app.
+
+### Target Users
+- KEXP listeners on iPhone, iPad, Mac, and Apple Vision Pro (and in the car via CarPlay)
+  who want to see what is playing now, hear it, and save it.
+- Distribution: personal and open source, but built and reviewed to public-release
+  standard. Privacy and KEXP branding are treated as approved.
+
+### Key Differentiators
+- Live playlist and now-playing as the primary screen, not a station brochure.
+- One-tap save to a dedicated Apple Music playlist, and jump to the song in Apple Music.
+- Archive playback from an arbitrary point in time.
+- Native on every Apple platform it targets, sharing one playback layer.
+
+---
+
+## Architecture
+
+### Technology Stack
+- **Language:** Swift 6.x, strict concurrency, Swift 6 language mode
+- **UI:** SwiftUI
+- **Build System:** Xcode project (app); the library is this repo's in-repo fork of KEXPPower (framework target); see ADR-001
+- **Testing:** Swift Testing for new tests; the existing XCTest suite stays until migrated
+- **Concurrency:** Swift 6 strict concurrency throughout
+- **Platforms:** iOS (primary, deployment target 17), macOS, visionOS, CarPlay. tvOS and watchOS are out of scope.
+- **System integration:** `MediaPlayer` (`MPNowPlayingInfoCenter`, `MPRemoteCommandCenter`) today; the iOS 27 `NowPlaying` framework behind `#available` later.
+- **Dependencies:** none external. KEXP public API (`api.kexp.org/v2`), StreamGuys streams, Apple Music (MusicKit / links).
+
+### Module Structure
+
+```
+KEXPPower/                    Forked library sources (kept; ADR-001)
+├── Models/KEXP/              Play, Show decoding
+├── Models/AppleMusic/        Apple Music search result
+├── Networking/               NetworkManager, Router, Reachability
+├── Public API/               KEXPPower config, AvailableStreams
+├── Helpers/                  Formatters, image loading
+└── Archive/                  ArchiveManager and archive models
+KEXPPower SwiftUI/            The app (shared SwiftUI target)
+├── Audio Player/             PlayerController, notification/Now Playing layer
+├── Retrievers/               ResultRetriever (play/show fetching)
+├── Song List/                Live playlist views
+└── Show Information/         Show views
+KEXPPowerTests/               Library tests
+project/                      Plans, proposals, decisions, summaries
+```
+
+### Key Types
+
+| Type | Purpose |
+|------|---------|
+| `KEXPPower` | Configuration singleton: base URL, bitrate, stream URL |
+| `NetworkManager` | KEXP API requests (plays, shows) |
+| `PlayResult`, `ShowResult` | Decoded API models |
+| `PlayerController` | Owns `AVPlayer`; drives playback state |
+| `NowPlayingPublishing` (Proposal 1) | Single seam to the system Now Playing state |
+| `ArtworkLoader` (Proposal 1) | Bounded, cancellable artwork fetch |
+
+### Data Flow
+
+```
+api.kexp.org/v2/plays ──> NetworkManager ──> ResultRetriever ──> SwiftUI views
+                                                   │
+streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPublishing ──> lock screen / Control Center / CarPlay
+```
+
+---
+
+## Core Architectural Decisions
+
+1. **One writer to system Now Playing state.** Playback code never touches `MP*` directly; a publisher does. This is what lets the iOS 27 framework replace it without a rewrite.
+2. **Availability-gated adoption.** The minimum stays iOS 17. iOS 27 features are added behind `#available`; the legacy Now Playing path remains the implementation below 27.
+3. **`MusicContent` (not `RadioContent`) for the modern API.** The station-oriented type has no song, artist, or album field.
+4. **Keep the in-repo fork of KEXPPower** (ADR-001). It is async/await and more modern than upstream 4.1.0; we hand-port upstream changes we want and do not send PRs to the package that powers KEXP's official app.
+5. **Public-release bar.** Zero-warning quality gate, no force-unwraps or `try!` in shipping code.
+
+---
+
+## Current Status
+
+### What's Working
+- [x] Live KEXP playlist retrieval (`/v2/plays`, `/v2/shows` verified live 2026-11-02)
+- [x] Live stream playback (64 and 160 kbps AAC)
+- [x] Lock-screen / Control Center Now Playing (with known defects, see Proposal 1)
+- [x] Apple Music search link (partial)
+
+### Known Problems
+- `try!` crash on artwork fetch; artwork never reaches the system (Proposal 1, G1–G3)
+- Five independent writers to Now Playing state; `isPlaying` can drift (G4–G7)
+- Library fork vs upstream 4.1.0: missing `Show.programImageURI` and the 14-day archive lookback (fork uses 13); `ArchiveManager`'s async conversion is commented out (`//TODO: - ASYNC`), so archive loading does not work in the fork today
+- Library endpoints: `get_streaming_url` now redirects and `get_show_start` requires a timestamp, so those are suspect
+- Library models import SwiftUI/Combine and `Play` is a class; acceptable for now, but a portability cost for macOS
+- Project still in Swift 5 language mode
+
+### What's Next
+- [ ] Playback hardening (approved): `project/plans/upcoming/PlaybackHardening.md`
+- [x] Library extracted to `jpurnell/KEXPPowerKit` (ADR-002): Swift 6, `programImageURI`, 14-day lookback, UIKit removed, 34 tests
+- [x] App switched to the package (local path `../KEXPPowerKit`); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Uncommitted.
+- [ ] Library: fix `Play.playType` decoding, drop placeholder defaults, `Sendable` structs + app `PlayItem`
+- [ ] Finish async `ArchiveManager` (iOS 27.2 follow-up)
+- [ ] iOS 27 `NowPlaying` adoption: `project/plans/proposals/NowPlayingFramework.md`
+
+---
+
+## Quality Standards
+
+### Code Quality
+- All code follows `coding_rules.md`
+- TDD: failing tests before implementation
+- Documentation for all public APIs
+- No warnings in build output
+- Quality gate: 0 errors, 0 warnings before every commit
+
+### Documentation Quality
+- DocC comments for all public functions
+- Usage examples in documentation
+- Articles for complex topics
+
+---
+
+## Collaboration Principles
+
+### AI as Sparring Partner, Not Oracle
+
+AI proposes; the human interrogates. High AI confidence triggers harder questions, not faster acceptance.
+
+- **Interrogate confident outputs.** When the AI states something with certainty, ask for the counterargument before accepting.
+- **Demand counterarguments.** Before locking in an approach, require an explicit case for the strongest alternative.
+- **Sit with discomfort.** Resist the pull to take the first plausible answer.
+
+This principle is operationalized in the **Adversarial Review** step of `design_proposal.md`.
+
+---
+
+## Roadmap
+
+### Phase 1: Solid foundation on current OS (now)
+- [ ] Playback hardening and Swift 6 (iOS 17+)
+- [ ] Fork upkeep (ADR-001): program image field, 14-day lookback, Swift 6 mode for the framework
+
+### Phase 2: The features this app exists for
+- [ ] Apple Music: add to a dedicated KEXP playlist; open the song in Apple Music (finish)
+- [ ] Archive playback from an arbitrary point (needs the async `ArchiveManager` finished)
+- [ ] Other links: Spotify, Bandcamp, links parsed from DJ comments
+
+### Phase 3: Platforms
+- [ ] iOS 27 `NowPlaying` adoption behind `#available`
+- [ ] Native macOS target (fork's UIKit-only helper needs a guard)
+- [ ] visionOS polish
+- [ ] CarPlay (requires an Apple audio-app entitlement; confirm eligibility first)
+
+### Future
+- Track history by song and by DJ ("what usually follows this song")
+- Spotify add-to-playlist
+- tvOS and watchOS were considered and are out of scope for now; watchOS streaming looked feasible but was not verified on a device.
+
+---
+
+**Last Updated:** 2026-11-02 (filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)

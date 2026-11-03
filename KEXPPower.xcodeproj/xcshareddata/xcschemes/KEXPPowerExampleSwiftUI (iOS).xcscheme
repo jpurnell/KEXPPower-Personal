@@ -40,6 +40,16 @@
                ReferencedContainer = "container:KEXPPower.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0B988C4C7A1AF47EEBD8F9A6"
+               BuildableName = "KEXPPowerAppTests.xctest"
+               BlueprintName = "KEXPPowerAppTests"
+               ReferencedContainer = "container:KEXPPower.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

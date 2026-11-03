@@ -7,13 +7,11 @@
 //
 
 import Foundation
-import OSLog
+import KEXPPower
 
 @MainActor
 @Observable
 public class AppleMusicRetriever {
-	let logger = Logger(#function)
-	let networkManager = NetworkManager()
 	var appleMusicURL: URL?
 	
 	func getAppleMusicResult(artist: String, track: String, album: String) async throws -> URL? {

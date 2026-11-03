@@ -7,8 +7,10 @@
 //
 
 import SwiftUI
+import KEXPPower
 
 struct ProgramView: View {
+    @ScaledMetric(relativeTo: .largeTitle) private var placeholderSize = 75
     var imageURL: String = "https://www.kexp.org/filer/canonical/1614617435/24778/"
     var programName: String = "The Morning Show"
     var hostName: [String] = ["John Richards"]
@@ -23,7 +25,11 @@ struct ProgramView: View {
                     .aspectRatio(contentMode: .fit)
             } placeholder: {
                 if imageURL == "" {
-                    Image(systemName: "person.fill").font(.system(size: 75)) }
+                    Image(systemName: "person.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: placeholderSize, height: placeholderSize)
+                        .accessibilityHidden(true) }
                 else {
                     ProgressView().progressViewStyle(.circular)
                 }

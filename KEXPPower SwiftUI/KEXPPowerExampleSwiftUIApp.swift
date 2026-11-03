@@ -21,6 +21,10 @@ struct KEXPPowerExampleSwiftUIApp: App {
         WindowGroup {
 			ContentView()
         }
+        .commands {
+            // One window, no documents: File > New Window has nothing sensible to open.
+            CommandGroup(replacing: .newItem) {}
+        }
     }
 }
 
@@ -35,7 +39,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		#if os(iOS) || os(visionOS)
 		// Configure the audio session for background audio and video services
 		let audioSession = AVAudioSession.sharedInstance()
-		application.beginReceivingRemoteControlEvents()
 		do {
 			// Set the audio session category to playback
 			let audioSessionCategory: AVAudioSession.Category = .playback
@@ -51,11 +54,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		}
 		#endif
 		
-		#if os(macOS)
-		let macViewController = MPMusicPlayerController()
-		macViewController
-		MPNowPlayingInfoCenter.default().playbackState = .stopped
-		#endif
 		return true
 	}
 }
