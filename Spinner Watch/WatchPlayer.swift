@@ -21,6 +21,8 @@ final class WatchPlayer {
     /// True from the tap until audio is actually playing, which takes a few seconds on a live stream.
     private(set) var isBuffering = false
     private(set) var artwork: CGImage?
+    /// The system output volume, 0...1, as the Digital Crown changes it.
+    private(set) var volume: Float = 0
     private(set) var title = "KEXP"
     private(set) var artist = ""
     private(set) var notice: String?
@@ -37,6 +39,7 @@ final class WatchPlayer {
     @ObservationIgnored private var currentArtwork: CGImage?
     @ObservationIgnored private var statusObservation: AnyCancellable?
     @ObservationIgnored private var itemObservation: AnyCancellable?
+    @ObservationIgnored private var volumeObservation: AnyCancellable?
     @ObservationIgnored private let polling = PollingTask()
 
     init() {
@@ -68,6 +71,14 @@ final class WatchPlayer {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 MainActor.assumeIsolated { self?.timeControlStatusChanged(status) }
+            }
+
+        let session = AVAudioSession.sharedInstance()
+        volume = session.outputVolume
+        volumeObservation = session.publisher(for: \.outputVolume)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] value in
+                MainActor.assumeIsolated { self?.volume = value }
             }
 
         sessionCoordinator.observe { [weak self] action in
