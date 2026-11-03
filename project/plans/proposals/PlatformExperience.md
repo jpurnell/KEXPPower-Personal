@@ -132,7 +132,12 @@ KEXP is a well-funded public station; many public stations lack the resources to
 - **There are public widgets with no key** (`widgets.spinitron.com/widget/now-playing-v2?station=<name>`), but they are HTML/iframes; I found no documented public JSON endpoint, and scraping HTML would be fragile.
 - **A spin is richer than a pop track, in the way we need:** `artist`, `song`, `release`, `image`, `start`/`end`/`duration`/`timezone`, plus `classical`, `composer`, `work`, `conductor`, `performers`, `ensemble`, `catalog-number`, and standard identifiers **`isrc`, `upc`, `iswc`**. That confirms the credits-based `Track`, and means a Spinitron station can feed song matching directly from its ISRC with no MusicBrainz lookup.
 
-*What this means for a Spinitron adapter:* it is real and high-leverage (the mapping to `Track` is almost one-to-one), but it needs **a per-station relay**: a tiny service (for example a serverless function) holding the station's key as a secret, caching for 10–30 seconds, and exposing a read-only JSON feed. StationKit would define that feed as a **StationKit Now Playing JSON** format and ship relay templates (Spinitron first). The registry record then points at the relay's URL, never at a key. Any station with its own developer can emit the same JSON directly, so this is also how the declarative tier (3) works: "fetch this URL, decode StationKit Now Playing JSON". TuneIn and other platforms would get a relay template too, subject to their terms (not yet researched).
+*What this means for a Spinitron adapter:* it is real and high-leverage (the mapping to `Track` is almost one-to-one), but it needs **a per-station relay**: a tiny service (for example a serverless function) holding the station's key as a secret, caching for 10–30 seconds, and exposing a read-only JSON feed. StationKit would define that feed as a **StationKit Now Playing JSON** format and ship relay templates (Spinitron first). The registry record then points at the relay's URL, never at a key. Any station with its own developer can emit the same JSON directly, so this is also how the declarative tier (3) works: "fetch this URL, decode StationKit Now Playing JSON". TuneIn is a different case (below).
+
+*TuneIn (read 2026-11-03): a sink, not a source.* TuneIn's documented "AIR" API is **push-only**: a station's automation sends `title`, `artist`, `album` and a `commercial` flag to `air.radiotime.com/Playing.ashx` with a `partnerId`/`partnerKey` that TuneIn issues on request (tuneinonair@tunein.com). TuneIn documents **no way for a third party to read** now-playing data, and I could not read its terms of use (the policy site is a JavaScript page that returned no text), so I am **not** treating TuneIn as a data source and I am not relying on any undocumented directory endpoint. This does not change the shape of the design; it confirms three things:
+- **The real upstream is the station's playout/automation system** (Spinitron, a vendor product, or the station's own API), which is what TuneIn itself is fed from. We read that layer, not TuneIn.
+- **`NowPlaying` needs a "not a song" state**: TuneIn's `commercial=true` flag is the same idea as WFUV's `GENERICMSG` and WBUR's program-level "now playing".
+- Small stations already depend on vendors to wire their automation to services like TuneIn, so a relay template that a vendor or volunteer can set up is a familiar model for them.
 
 *What this evidence says about the design:*
 1. **`Track` must not be "title / artist / album".** All Classical's feed has composer, work, conductor, ensemble and soloist, and no "artist". `Track` should carry an ordered list of **credits** (`role` + `name`) and compute a display line from them. Pop stations fill one performer credit; classical fills several.
@@ -163,6 +168,8 @@ KEXP is a well-funded public station; many public stations lack the resources to
 6. The station's time zone and image hosts are configuration, never assumptions inside shared code.
 
 *What this does not decide, and I cannot:* offering this to other stations is an organizational decision with real costs: it involves KEXP's permission and branding, support for other stations' apps, App Store accounts and review per station, licensing (the code is private today), and who maintains adapters when a station changes its API. Those belong to a conversation with KEXP, not to this proposal.
+
+**Bundle ID (owner decision 2026-11-03):** the iOS, visionOS and macOS apps share one bundle ID, so they are one App Store Connect app with universal purchase; each platform is still its own target with its own entitlements, Info.plist and sandbox settings. The widget extension has its own ID, prefixed by the app's. (The current single target's ID is `com.JPEnterprises.KEXPPowerExampleSwiftUI`; whether to keep that name or choose a product-grade one is Open Question 8.)
 
 **Platform readiness (tvOS and watchOS "ready"):**
 - StationKit declares iOS 17, macOS 14, visionOS 1, tvOS 17 and watchOS 10 from day one, and CI builds all of them, so a platform that does not compile is caught immediately instead of at the moment a target is added.
@@ -290,7 +297,7 @@ N/A.
 **External (non-Apple):** MusicBrainz web service (public IDs only are sent; descriptive `User-Agent`, about 1 request/second, cached).
 **External (Apple):** MusicKit, WidgetKit, AppIntents (all present in the 27.2 SDKs on iOS and macOS; checked).
 **Library work needed:** async `ArchiveManager` (Phase D only).
-**Portal (user action, and each new target needs its own):** the paid Apple Developer Program team (the project already uses team `BNDA9Y6YV9`); an explicit App ID per target (iOS, visionOS, macOS, widget), each with the **MusicKit** service where it adds to playlists; and one **App Group** (for example `group.com.JPEnterprises.KEXP`) shared by the app and widget. With automatic signing, Xcode can register these from Signing & Capabilities.
+**Portal (user action, and each new target needs its own):** the paid Apple Developer Program team (the project already uses team `BNDA9Y6YV9`); one explicit App ID for the app across iOS, visionOS and macOS (a single bundle ID, so universal purchase) plus one for the widget extension (an extension's bundle ID is prefixed by its app's), each with the **MusicKit** service where it adds to playlists; and one **App Group** (for example `group.com.JPEnterprises.KEXP`) shared by the app and widget. With automatic signing, Xcode can register these from Signing & Capabilities.
 
 ### 11. Test Strategy
 
@@ -352,13 +359,14 @@ N/A.
 ### 16. Open Questions
 
 1. ~~One target or two?~~ Resolved: separate targets. Still open: Mac layout — sidebar (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface?
-   Resolved: the generic package is **StationKit**; adapters are `StationKitAdapter-<STATION>`. Resolved: HomeView is Apple's smart-home display (see the note above); licensing is MIT, so reuse is permitted. Open: whether the repos stay private for now, and bundle-ID strategy across iOS/visionOS/macOS (universal purchase or separate IDs).
+   Resolved: the generic package is **StationKit**; adapters are `StationKitAdapter-<STATION>`. Resolved: HomeView is Apple's smart-home display (see the note above); licensing is MIT, so reuse is permitted. Resolved (owner, 2026-11-03): repos stay **private until something works**; the iOS, visionOS and macOS apps share **a single bundle ID** (universal purchase); the relay model is adopted; TuneIn was researched and is not a data source (see above).
 2. ~~Confirm every add?~~ Resolved: ISRC-resolved songs add immediately with undo; fallback matches ask first. Still open: does the undo suit you, or should the ISRC path also confirm until you trust it?
 3. Dedicated playlist name — "KEXP"? One per user, created on first use?
 4. Widget sizes: small and medium only, or also a lock-screen accessory?
 5. Control Center control on iOS 18+: include in Phase C or defer?
 6. Archive playback: start from the show's beginning only, or an arbitrary minute?
 7. Are you willing to enable the MusicKit service and an App Group in the Developer portal now? (The widget and playlist phases are blocked without them.)
+8. Keep the bundle ID `com.JPEnterprises.KEXPPowerExampleSwiftUI`, or choose a product-grade one now (it cannot change after App Store submission)?
 
 ### 17. Documentation Strategy
 
