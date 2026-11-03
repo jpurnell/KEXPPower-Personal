@@ -104,9 +104,9 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 - Project still in Swift 5 language mode
 
 ### What's Next
-- [ ] Playback hardening (approved): `project/plans/upcoming/PlaybackHardening.md`
+- [x] Playback hardening: `project/plans/completed/PlaybackHardening.md` (G10, Swift 6 for the app, and the session coordinator remain open)
 - [x] Library extracted to `jpurnell/KEXPPowerKit` (ADR-002): Swift 6, `programImageURI`, 14-day lookback, UIKit removed, 34 tests
-- [x] App switched to the package (local path `../KEXPPowerKit`); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Uncommitted.
+- [x] App switched to the package (local path `../KEXPPowerKit`); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Committed in 53f58e6.
 - [ ] Library: fix `Play.playType` decoding, drop placeholder defaults, `Sendable` structs + app `PlayItem`
 - [ ] Finish async `ArchiveManager` (iOS 27.2 follow-up)
 - [ ] iOS 27 `NowPlaying` adoption: `project/plans/proposals/NowPlayingFramework.md`

@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-02
 **Category:** architecture
-**Status:** Accepted. Extraction done and the app builds against it (local path dependency); the app-side changes are not yet committed.
+**Status:** Accepted. Extraction done and the app builds against it (local path dependency); the app builds against it; committed in 53f58e6.
 **Amends:** ADR-001 (the fork is kept, but outside this repo).
 
 ## Decision
@@ -18,7 +18,7 @@ package dependency and delete its in-repo framework target.
 - UIKit removed from the library (`UIImageView+Loading.swift` had no callers).
 - Archive loading remains disabled and is deferred to the iOS 27.2 follow-up.
 
-## Done in this repo (uncommitted)
+## Done in this repo (53f58e6)
 - Package dependency added; framework, tests, UIKit example, podspec, dead UI test targets deleted; `import KEXPPower` added to 10 app files; `BUILD_LIBRARY_FOR_DISTRIBUTION` turned off for the app; stale `origin` removed.
 
 ## Still to do in this repo (original list, for the record)
