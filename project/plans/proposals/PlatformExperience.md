@@ -106,20 +106,29 @@ public struct Track: Sendable, Hashable, Identifiable {
 **Ecosystem intent: could other public radio stations use this? (owner direction 2026-11-03)**
 KEXP is a well-funded public station; many public stations lack the resources to build a good app. If the only thing that differs between stations is the endpoint, a shared app plus a small per-station adapter could raise the baseline for all of them. That is a worthwhile goal, and it argues for **scale-readiness in the architecture now**, even though no ecosystem tooling should be built yet.
 
-*What I checked (2026-11-03), to test "only the endpoints change":*
+*What I checked (2026-11-03), to test "only the endpoints change". KEXP, WFUV, All Classical Portland and WBUR all appear on, or stream from, StreamGuys (testimonials: https://www.streamguys.com/about-us/testimonials/; KEXP's stream host is `kexp.streamguys1.com`):*
 
-| Source | Shape | Result |
-|--------|-------|--------|
-| KEXP HTTP API (`/v2/plays`) | rich JSON: song, artist, album, art, MusicBrainz IDs, comment, show | works; this is what `KEXPPowerKit` wraps |
-| KEXP stream, in-stream (ICY) metadata | `icy-metaint: 4096` advertised | **not a drop-in**: in the first blocks read, `StreamTitle` was empty and the block was a pre-roll ad marker (`insertionType='preroll'`) while the API reported a real track |
-| KCRW public JSON API | different keys; includes affiliate links | exists and is readable, so a second real adapter is feasible |
-| WNYC | my guessed URL returned 404 | **inconclusive** (a bad guess, not evidence) |
+| Station | Now-playing source | Shape |
+|---------|--------------------|-------|
+| **KEXP** | HTTP API `/v2/plays` | rich JSON: song, artist, album, art, comment, MusicBrainz IDs, show |
+| **WFUV** | `wfuv.org/sites/default/files/player/playlist/now_playing.json` | `{"live": {artist, title, album, art{large,medium,small}, cut_id, duration, event_type, message, purchase_url, timestamp}}`; `event_type` is `GENERICMSG` when no song is on; timestamp is `MMDDYYYY-HHMMSS` **with no time zone** |
+| **All Classical Portland** | `daisy.allclassical.org/json/now_play3.json` | **classical metadata**: `composer`, `title` (the work), `conductor`, `ensemble`, `soloist`, `catalog`, `label`, `duration`, `end` (epoch), plus the host |
+| **WBUR** | no live track feed found | `api.wbur.org` exposes programs/channels/audio; "now playing" is a program or segment, not a song (I looked at the homepage only; absence of a feed is not proven) |
+| **All four's streams** | in-stream (ICY) metadata | see below |
 
-So the shapes do differ (KEXP vs KCRW), which supports a small adapter per station, and the one mechanism every Icecast/Shoutcast stream shares (ICY metadata) is useful but must be validated per station, as KEXP shows.
+*In-stream (ICY) metadata, corrected.* I first reported KEXP's stream metadata as "not a drop-in" after reading only the first 8 KB, where `StreamTitle` was empty and the block was a pre-roll ad marker. Watching for 45 seconds shows the opposite: **after the pre-roll block, the title arrives within seconds** on both KEXP (`StreamTitle='Thao - Sick of the Times'` at +1.8 s) and WFUV (`StreamTitle='New Constellations - Dandelion (Live at WFUV)'` at +7.1 s, then an empty title again at +31 s during a non-music event). Both streams use the same ad-marker convention (`adw_ad='true'`, `insertionType='preroll'`), which looks like a StreamGuys-wide feature. So ICY is a viable zero-adapter source if the parser (a) **ignores ad blocks without clearing the last known title**, (b) **treats an empty `StreamTitle` as "no track"**, and (c) accepts that the data is a single `Artist - Title` string (splitting on ` - ` is lossy for artists whose names contain a hyphen) with **no album or artwork**, which must be enriched separately.
+
+*What this evidence says about the design:*
+1. **`Track` must not be "title / artist / album".** All Classical's feed has composer, work, conductor, ensemble and soloist, and no "artist". `Track` should carry an ordered list of **credits** (`role` + `name`) and compute a display line from them. Pop stations fill one performer credit; classical fills several.
+2. **"Now playing" is not always a track.** WFUV reports a generic message between songs, and WBUR is a news/talk station. So `Station.nowPlaying()` returns a `NowPlaying` value that is a track, a program/segment, or nothing, not `Track?`.
+3. **Time zones are the adapter's job.** WFUV's timestamp has none. `StationConfiguration` carries the station's time zone, and adapters use it.
+4. **Artwork is often missing or a placeholder** (WFUV returns a stock image; ICY has none). Artwork needs a resolution chain (station art → MusicBrainz Cover Art Archive via release ID → catalog), and `ArtworkLoader`'s allow-list must cover each station's image hosts via configuration.
+5. **A StreamGuys stream-metadata parser is a reusable component** shared by every StreamGuys station, with or without an API.
+6. **Cover the genuine generic part with real fixtures:** four adapters' worth of recorded samples (KEXP, WFUV, All Classical, ICY) are enough to test whether `Station`/`NowPlaying`/`Track` are right *before* any code is written, which is cheaper than finding out from the second adapter.
 
 *Adapter tiers (StationKit would grow into these as evidence arrives, not before):*
 1. **Code adapter** (`StationKitAdapter-<STATION>`): a station with a rich API and features like an archive. KEXP is this.
-2. **Stream-metadata station** (in StationKit): a station with only a stream URL gets title/artist from ICY or HLS timed metadata. KEXP can serve as the first test of it (the same data from two independent sources).
+2. **Stream-metadata station** (in StationKit): a station with only a stream URL gets `Artist - Title` from ICY or HLS timed metadata, with the StreamGuys ad-marker handling above. KEXP and WFUV both provide it, so it can be tested against two real stations.
 3. **Declarative adapter** (a JSON manifest mapping a station's endpoint and fields to `Track`): the literal "only the endpoint changes" case, for stations without developers. Build it only after two code adapters show what really repeats.
 
 *Decision on `StreamingRadioKit`:* **not a separate package.** The generic layer you describe is the `Station` protocol plus these tiers inside StationKit; a third package would restate it. This also keeps `KEXPPowerKit` as exactly what it should be: one station's client that can grow on its own.
@@ -129,6 +138,8 @@ So the shapes do differ (KEXP vs KCRW), which supports a small adapter per stati
 2. Branding, stream list, accent color, and station identity live in one injected `StationConfiguration` value, supplied by the app target. That makes a white-label app a configuration change, not a fork.
 3. Station capabilities are separate protocols (already designed), so a small station with no archive or schedule still gets a complete app.
 4. Adapters ship with recorded API samples and tests, so another station's developer can contribute one and CI proves it works.
+5. `Track` carries credits (role + name), not just artist/album; `NowPlaying` can be a program or nothing.
+6. The station's time zone and image hosts are configuration, never assumptions inside shared code.
 
 *What this does not decide, and I cannot:* offering this to other stations is an organizational decision with real costs: it involves KEXP's permission and branding, support for other stations' apps, App Store accounts and review per station, licensing (the code is private today), and who maintains adapters when a station changes its API. Those belong to a conversation with KEXP, not to this proposal.
 
