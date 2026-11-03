@@ -54,13 +54,13 @@ SwiftUI shell            ← NavigationSplitView / TabView, per platform
 ```
 KEXPPowerKit (repo, exists)   KEXP's HTTP API only: plays, shows, stream URLs. Knows nothing about playback or UI.
         ▲
-KEXPStation  (new repo)       THE ADAPTER. Maps KEXPPowerKit's Play/Show onto StationKit's protocols. No UI, no playback.
+StationKitAdapter-KEXP  (new repo)       THE ADAPTER. Maps KEXPPowerKit's Play/Show onto StationKit's protocols. No UI, no playback.
         ▲                     Depends on KEXPPowerKit + StationKit.
         │
 StationKit   (new repo)       NOT station-specific. Defines `Station` and `Track`, and everything that works from them:
    ▲                          playback glue, Now Playing, audio session, artwork, link-outs, song matching, playlist saving.
    │
-   ├── KEXPPower (iOS app)           depends on StationKit + KEXPStation
+   ├── KEXPPower (iOS app)           depends on StationKit + StationKitAdapter-KEXP
    ├── KEXPPower Vision (visionOS)   own target (owner decision); spatial layout
    ├── KEXPPower Mac (macOS)         sidebar, menus, Settings, window management
    ├── KEXPWidget (extension)        iOS, macOS, visionOS, watchOS; links StationKit, never the player
@@ -99,9 +99,38 @@ public struct Track: Sendable, Hashable, Identifiable {
 }
 ```
 
-`KEXPStation` is the only code that knows both worlds: it wraps `KEXPPowerKit`'s `NetworkManager` and maps `Play` → `Track`, `Show` → `ShowInfo`, and bitrates → `StreamOption`. Station capabilities are separate protocols, so a station with no archive simply does not conform to `ArchiveProviding` and the app hides that section. **A second station needs one adapter package and no changes to StationKit or the apps' logic.**
+`StationKitAdapter-KEXP` is the only code that knows both worlds: it wraps `KEXPPowerKit`'s `NetworkManager` and maps `Play` → `Track`, `Show` → `ShowInfo`, and bitrates → `StreamOption`. Station capabilities are separate protocols, so a station with no archive simply does not conform to `ArchiveProviding` and the app hides that section. **A second station needs one adapter package and no changes to StationKit or the apps' logic.**
 
-**On a further `StreamingRadioKit` split (not now):** the generic "streaming radio" layer you are describing already exists in this design: it is the `Station` protocol. Splitting `KEXPPowerKit` into a generic radio-API client plus a KEXP plugin would add a third abstraction that restates `Station`, and every station's HTTP API has a different shape, so a shared "radio API client" has nothing real to share until a second station exists. The better time to extract anything common is after two adapters exist, from what they actually duplicate. **Trigger to revisit:** the second adapter contains code copied from `KEXPStation`. Until then `KEXPPowerKit` stays a plain KEXP client that can grow on its own.
+**Naming:** adapter repositories follow `StationKitAdapter-<STATION>` (this one is `StationKitAdapter-KEXP`), so more stations can be added over time. SwiftUI/SwiftPM module names cannot contain a hyphen, so the module and library product are `StationKitAdapterKEXP`; only the repository name carries the hyphen.
+
+**Ecosystem intent: could other public radio stations use this? (owner direction 2026-11-03)**
+KEXP is a well-funded public station; many public stations lack the resources to build a good app. If the only thing that differs between stations is the endpoint, a shared app plus a small per-station adapter could raise the baseline for all of them. That is a worthwhile goal, and it argues for **scale-readiness in the architecture now**, even though no ecosystem tooling should be built yet.
+
+*What I checked (2026-11-03), to test "only the endpoints change":*
+
+| Source | Shape | Result |
+|--------|-------|--------|
+| KEXP HTTP API (`/v2/plays`) | rich JSON: song, artist, album, art, MusicBrainz IDs, comment, show | works; this is what `KEXPPowerKit` wraps |
+| KEXP stream, in-stream (ICY) metadata | `icy-metaint: 4096` advertised | **not a drop-in**: in the first blocks read, `StreamTitle` was empty and the block was a pre-roll ad marker (`insertionType='preroll'`) while the API reported a real track |
+| KCRW public JSON API | different keys; includes affiliate links | exists and is readable, so a second real adapter is feasible |
+| WNYC | my guessed URL returned 404 | **inconclusive** (a bad guess, not evidence) |
+
+So the shapes do differ (KEXP vs KCRW), which supports a small adapter per station, and the one mechanism every Icecast/Shoutcast stream shares (ICY metadata) is useful but must be validated per station, as KEXP shows.
+
+*Adapter tiers (StationKit would grow into these as evidence arrives, not before):*
+1. **Code adapter** (`StationKitAdapter-<STATION>`): a station with a rich API and features like an archive. KEXP is this.
+2. **Stream-metadata station** (in StationKit): a station with only a stream URL gets title/artist from ICY or HLS timed metadata. KEXP can serve as the first test of it (the same data from two independent sources).
+3. **Declarative adapter** (a JSON manifest mapping a station's endpoint and fields to `Track`): the literal "only the endpoint changes" case, for stations without developers. Build it only after two code adapters show what really repeats.
+
+*Decision on `StreamingRadioKit`:* **not a separate package.** The generic layer you describe is the `Station` protocol plus these tiers inside StationKit; a third package would restate it. This also keeps `KEXPPowerKit` as exactly what it should be: one station's client that can grow on its own.
+
+*Cheap rules to follow now so the ecosystem door stays open:*
+1. No KEXP identifiers, colors, URLs or strings in StationKit or in the shared app-shell code.
+2. Branding, stream list, accent color, and station identity live in one injected `StationConfiguration` value, supplied by the app target. That makes a white-label app a configuration change, not a fork.
+3. Station capabilities are separate protocols (already designed), so a small station with no archive or schedule still gets a complete app.
+4. Adapters ship with recorded API samples and tests, so another station's developer can contribute one and CI proves it works.
+
+*What this does not decide, and I cannot:* offering this to other stations is an organizational decision with real costs: it involves KEXP's permission and branding, support for other stations' apps, App Store accounts and review per station, licensing (the code is private today), and who maintains adapters when a station changes its API. Those belong to a conversation with KEXP, not to this proposal.
 
 **Platform readiness (tvOS and watchOS "ready"):**
 - StationKit declares iOS 17, macOS 14, visionOS 1, tvOS 17 and watchOS 10 from day one, and CI builds all of them, so a platform that does not compile is caught immediately instead of at the moment a target is added.
@@ -114,9 +143,9 @@ public struct Track: Sendable, Hashable, Identifiable {
 **Cost, stated honestly:** a second consumer does not exist yet. The mitigation is the dependency rule above and an adapter seam, so StationKit stays honest rather than becoming "the KEXP app in a package".
 
 **Phase 0 (before Phase A):**
-1. Create the `StationKit` and `KEXPStation` repositories (private to start; guidelines scaffold; Swift 6; the five platforms).
+1. Create the `StationKit` and `StationKitAdapter-KEXP` repositories (private to start; guidelines scaffold; Swift 6; the five platforms).
 2. Move the already-generic, already-tested pieces with their tests (`NowPlayingSnapshot`, publisher, `AudioSessionCoordinator`, `ArtworkLoader` with injectable domains, `MusicLinks`); make the public surface explicit.
-3. Write `KEXPStation` (test-first, against recorded API samples) so the app asks a `Station` for its now-playing track instead of calling `KEXPPowerKit` directly. The app consumes StationKit and KEXPStation by tagged URL, as it does KEXPPowerKit.
+3. Write `StationKitAdapter-KEXP` (test-first, against recorded API samples) so the app asks a `Station` for its now-playing track instead of calling `KEXPPowerKit` directly. The app consumes StationKit and StationKitAdapter-KEXP by tagged URL, as it does KEXPPowerKit.
 4. Split the single multiplatform target into iOS, visionOS and macOS app targets.
 
 #### 3b. Navigation shell
@@ -256,7 +285,7 @@ N/A.
 - Amends ADR-003 (publisher seam) — no, extends it: macOS uses the same publisher.
 - **New ADR-004:** *The app/widget/intents share a `LiveActivityService`; the player is not a data source.*
 - **New ADR-005:** *Navigation is an `AppSection` shell (sidebar on Mac/iPad, tabs on iPhone).*
-- **New ADR-006:** *Separate app targets per platform (iOS, visionOS, macOS; tvOS/watchOS kept ready). Station-agnostic code lives in `StationKit`; each station is an adapter package (`KEXPStation`) over its own API client (`KEXPPowerKit`). StationKit never imports a station's API.*
+- **New ADR-006:** *Separate app targets per platform (iOS, visionOS, macOS; tvOS/watchOS kept ready). Station-agnostic code lives in `StationKit`; each station is an adapter package (`StationKitAdapter-KEXP`) over its own API client (`KEXPPowerKit`). StationKit never imports a station's API.*
 - **New ADR-007:** *Songs are matched by MusicBrainz recording ID → ISRC → MusicKit, with text search plus confirmation only as the fallback.*
 
 ### 13. Adversarial Review
@@ -280,6 +309,7 @@ N/A.
 ### 15. Future Directions
 
 - Could add a Live Activity / Dynamic Island for the current track.
+- Could build the stream-metadata tier and, later, the declarative adapter tier (see Ecosystem intent).
 - Could add audio fingerprinting (AcoustID/Chromaprint, as `concordance` does) as a last-resort matcher for the ~5% of plays with no MusicBrainz ID, by sampling the live stream.
 - Could add CarPlay (needs Apple's audio-app entitlement; confirm eligibility first).
 - Could add Spotify playlist add (needs OAuth and a registered app).
@@ -290,7 +320,7 @@ N/A.
 ### 16. Open Questions
 
 1. ~~One target or two?~~ Resolved: separate targets. Still open: Mac layout — sidebar (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface?
-   Resolved: the generic package is **StationKit**; adapters are separate packages. Open: the adapter's name (`KEXPStation`, or `KEXPStationKit`), and what "HomeView" is.
+   Resolved: the generic package is **StationKit**; adapters are `StationKitAdapter-<STATION>`. Open: what "HomeView" is; and whether KEXP is aware of or interested in the ecosystem direction (it shapes licensing and whether the repos stay private).
 2. ~~Confirm every add?~~ Resolved: ISRC-resolved songs add immediately with undo; fallback matches ask first. Still open: does the undo suit you, or should the ISRC path also confirm until you trust it?
 3. Dedicated playlist name — "KEXP"? One per user, created on first use?
 4. Widget sizes: small and medium only, or also a lock-screen accessory?
