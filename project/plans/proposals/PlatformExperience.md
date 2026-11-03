@@ -1,6 +1,6 @@
 # Design Proposal: Navigation Shell, Mac Playback and Layout, Apple Music Playlists, Widget and App Intents
 
-**Status:** Proposed — revised 2026-11-03 (separate per-platform targets; generic ListenKit repo; ISRC-based song matching; tvOS/watchOS kept ready) — awaiting approval
+**Status:** Proposed — revised 2026-11-03 (separate per-platform targets; generic StationKit repo; ISRC-based song matching; tvOS/watchOS kept ready) — awaiting approval
 **Date:** 2026-11-02
 **Delivery:** four phases, each independently shippable and each gated by its own tests. Phase D (archive) is design-only until the library's async `ArchiveManager` exists (iOS 27.2 follow-up).
 **Not in scope:** the iOS 27 `NowPlaying` framework (on hold). The `NowPlayingPublishing` seam (ADR-003) keeps it a later, small change.
@@ -52,19 +52,23 @@ SwiftUI shell            ← NavigationSplitView / TabView, per platform
 **Separate app targets per platform, one shared generic package in its own repository.**
 
 ```
-KEXPPowerKit (repo, exists)     KEXP's API only: plays, shows, stream URLs. Knows nothing about playback or UI.
-ListenKit    (new repo)         NOT KEXP-specific. Live-stream playback glue, Now Playing publishing, audio session,
-   ▲                            artwork loading, link-out builders, song matching, playlist saving. Working name; see Q1.
+KEXPPowerKit (repo, exists)   KEXP's HTTP API only: plays, shows, stream URLs. Knows nothing about playback or UI.
+        ▲
+KEXPStation  (new repo)       THE ADAPTER. Maps KEXPPowerKit's Play/Show onto StationKit's protocols. No UI, no playback.
+        ▲                     Depends on KEXPPowerKit + StationKit.
+        │
+StationKit   (new repo)       NOT station-specific. Defines `Station` and `Track`, and everything that works from them:
+   ▲                          playback glue, Now Playing, audio session, artwork, link-outs, song matching, playlist saving.
    │
-   ├── KEXPPower (iOS app)           iOS shell; CarPlay scene later
+   ├── KEXPPower (iOS app)           depends on StationKit + KEXPStation
    ├── KEXPPower Vision (visionOS)   own target (owner decision); spatial layout
    ├── KEXPPower Mac (macOS)         sidebar, menus, Settings, window management
-   ├── KEXPWidget (extension)        iOS, macOS, visionOS, watchOS; links ListenKit, never the player
+   ├── KEXPWidget (extension)        iOS, macOS, visionOS, watchOS; links StationKit, never the player
    ├── tvOS app    ── "ready", not built in this proposal
    └── watchOS app ── "ready", not built in this proposal
 ```
 
-**What is generic (moves to ListenKit) and what stays:**
+**What is generic (moves to StationKit) and what stays:**
 
 | Piece | Today | Generic? | Change needed to extract |
 |-------|-------|----------|--------------------------|
@@ -72,27 +76,47 @@ ListenKit    (new repo)         NOT KEXP-specific. Live-stream playback glue, No
 | `AudioSessionCoordinator` | app (iOS) | Yes | keep behind `#if`; macOS gets a no-op |
 | `ArtworkLoader` | app | Yes, **but** hard-codes `kexp.org` / `archive.org` | allowed domains become an init parameter; return a platform-neutral image (macOS has no `UIImage`) |
 | `MusicLinks` (Spotify/Bandcamp searches, comment links) | app | Yes | none |
-| `SongResolver`, `PlaylistService` (MBID → ISRC → MusicKit) | proposed | Yes | built in ListenKit from the start |
+| `SongResolver`, `PlaylistService` (MBID → ISRC → MusicKit) | proposed | Yes | built in StationKit from the start |
 | `PlaybackController` | app | Mostly | inject the stream URL and metadata source instead of reading `ResultRetriever` |
-| `LiveActivityService` (fetch current play) | proposed | **No** | stays in the KEXP app, as an adapter from `KEXPPowerKit` to a ListenKit `NowPlayingSource` protocol |
+| `LiveActivityService` (fetch current play) | proposed | **No** | stays in the KEXP app, as an adapter from `KEXPPowerKit` to a StationKit `NowPlayingSource` protocol |
 | `Play`, `Show`, stream bitrates, KEXP branding | library/app | **No** | stay in `KEXPPowerKit` and the app |
 
-**The rule that keeps it generic:** ListenKit never imports `KEXPPower`. It defines small protocols (`NowPlayingSource`, `StreamDescriptor`) and a plain `Track` value type (title, artist, album, artwork URL, optional MusicBrainz recording ID / ISRC). The KEXP app adapts `Play` to `Track`. A second station or service needs only its own adapter.
+**The rule that keeps it generic:** StationKit never imports `KEXPPower` (or any station's API). It defines the seam every station plugs into:
+
+```swift
+public protocol Station: Sendable {
+    var id: String { get }
+    var name: String { get }
+    var streams: [StreamOption] { get }                       // e.g. 64 / 160 kbps, or HLS
+    func nowPlaying() async throws -> Track?                  // nil during an airbreak / talk segment
+    func recentTracks(limit: Int) async throws -> [Track]
+}
+public protocol ShowProviding: Station { func currentShow() async throws -> ShowInfo }      // optional capability
+public protocol ArchiveProviding: Station { /* days, shows, stream-at-time */ }            // optional capability
+
+public struct Track: Sendable, Hashable, Identifiable {
+    // title, artist, album, artworkURL, airDate; optional musicBrainzRecordingID, isrc
+}
+```
+
+`KEXPStation` is the only code that knows both worlds: it wraps `KEXPPowerKit`'s `NetworkManager` and maps `Play` → `Track`, `Show` → `ShowInfo`, and bitrates → `StreamOption`. Station capabilities are separate protocols, so a station with no archive simply does not conform to `ArchiveProviding` and the app hides that section. **A second station needs one adapter package and no changes to StationKit or the apps' logic.**
+
+**On a further `StreamingRadioKit` split (not now):** the generic "streaming radio" layer you are describing already exists in this design: it is the `Station` protocol. Splitting `KEXPPowerKit` into a generic radio-API client plus a KEXP plugin would add a third abstraction that restates `Station`, and every station's HTTP API has a different shape, so a shared "radio API client" has nothing real to share until a second station exists. The better time to extract anything common is after two adapters exist, from what they actually duplicate. **Trigger to revisit:** the second adapter contains code copied from `KEXPStation`. Until then `KEXPPowerKit` stays a plain KEXP client that can grow on its own.
 
 **Platform readiness (tvOS and watchOS "ready"):**
-- ListenKit declares iOS 17, macOS 14, visionOS 1, tvOS 17 and watchOS 10 from day one, and CI builds all of them, so a platform that does not compile is caught immediately instead of at the moment a target is added.
+- StationKit declares iOS 17, macOS 14, visionOS 1, tvOS 17 and watchOS 10 from day one, and CI builds all of them, so a platform that does not compile is caught immediately instead of at the moment a target is added.
 - Verified in the 27.2 SDKs: `MediaPlayer`, `AVFoundation`, `MusicKit`, `AppIntents` and `NowPlaying` exist on iOS, tvOS, watchOS and visionOS; `WidgetKit` exists on watchOS and visionOS but **not tvOS**; `CarPlay` is iOS only. Per-API availability inside those frameworks (for example `MPNowPlayingInfoCenter` on watchOS) is checked when each target is built, not assumed.
-- No `UIKit` in ListenKit's public API (macOS lacks it), so images cross the boundary as `CGImage`/`Data` with a thin SwiftUI `Image` helper.
+- No `UIKit` in StationKit's public API (macOS lacks it), so images cross the boundary as `CGImage`/`Data` with a thin SwiftUI `Image` helper.
 
-**CarPlay (iOS target, later, not built here):** CarPlay audio apps are driven by `CPNowPlayingTemplate`, which reads the same `MPNowPlayingInfoCenter` state our `NowPlayingPublishing` already feeds, plus list templates for browsing. So most of what CarPlay needs is a by-product of ListenKit's publisher, not a separate UI. It still requires Apple's CarPlay audio entitlement. *On "HomeView": I found nothing by that name in the 27.2 SDKs (only `HomeKit` and `HomeExtensions`), so I am not designing for it. If it is a surface that reads Now Playing state, it should work through the same seam; that is a hope, not something verified.*
+**CarPlay (iOS target, later, not built here):** CarPlay audio apps are driven by `CPNowPlayingTemplate`, which reads the same `MPNowPlayingInfoCenter` state our `NowPlayingPublishing` already feeds, plus list templates for browsing. So most of what CarPlay needs is a by-product of StationKit's publisher, not a separate UI. It still requires Apple's CarPlay audio entitlement. *On "HomeView": I found nothing by that name in the 27.2 SDKs (only `HomeKit` and `HomeExtensions`), so I am not designing for it. If it is a surface that reads Now Playing state, it should work through the same seam; that is a hope, not something verified.*
 
-**Why separate targets and a separate repo:** per-platform shells, entitlements and menus diverge, and ListenKit's tests run with `swift test` in seconds, without a simulator host (today's hosted tests take about 35 seconds).
-**Cost, stated honestly:** a second consumer does not exist yet. The mitigation is the dependency rule above and an adapter seam, so ListenKit stays honest rather than becoming "the KEXP app in a package".
+**Why separate targets and a separate repo:** per-platform shells, entitlements and menus diverge, and StationKit's tests run with `swift test` in seconds, without a simulator host (today's hosted tests take about 35 seconds).
+**Cost, stated honestly:** a second consumer does not exist yet. The mitigation is the dependency rule above and an adapter seam, so StationKit stays honest rather than becoming "the KEXP app in a package".
 
 **Phase 0 (before Phase A):**
-1. Create the `ListenKit` repository (private to start; guidelines scaffold; Swift 6; the five platforms).
+1. Create the `StationKit` and `KEXPStation` repositories (private to start; guidelines scaffold; Swift 6; the five platforms).
 2. Move the already-generic, already-tested pieces with their tests (`NowPlayingSnapshot`, publisher, `AudioSessionCoordinator`, `ArtworkLoader` with injectable domains, `MusicLinks`); make the public surface explicit.
-3. The KEXP app consumes ListenKit by tagged URL, as it does KEXPPowerKit.
+3. Write `KEXPStation` (test-first, against recorded API samples) so the app asks a `Station` for its now-playing track instead of calling `KEXPPowerKit` directly. The app consumes StationKit and KEXPStation by tagged URL, as it does KEXPPowerKit.
 4. Split the single multiplatform target into iOS, visionOS and macOS app targets.
 
 #### 3b. Navigation shell
@@ -232,7 +256,7 @@ N/A.
 - Amends ADR-003 (publisher seam) — no, extends it: macOS uses the same publisher.
 - **New ADR-004:** *The app/widget/intents share a `LiveActivityService`; the player is not a data source.*
 - **New ADR-005:** *Navigation is an `AppSection` shell (sidebar on Mac/iPad, tabs on iPhone).*
-- **New ADR-006:** *Separate app targets per platform (iOS, visionOS, macOS; tvOS/watchOS kept ready); platform-neutral code lives in `ListenKit`, its own repository, which never imports `KEXPPower`.*
+- **New ADR-006:** *Separate app targets per platform (iOS, visionOS, macOS; tvOS/watchOS kept ready). Station-agnostic code lives in `StationKit`; each station is an adapter package (`KEXPStation`) over its own API client (`KEXPPowerKit`). StationKit never imports a station's API.*
 - **New ADR-007:** *Songs are matched by MusicBrainz recording ID → ISRC → MusicKit, with text search plus confirmation only as the fallback.*
 
 ### 13. Adversarial Review
@@ -265,8 +289,8 @@ N/A.
 
 ### 16. Open Questions
 
-1. ~~One target or two?~~ Resolved: a separate Mac target. Still open: sidebar layout (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface? 
-   New Q: package name — `ListenKit` is a working name (alternatives: `StationKit`, `StreamDeck`-free names only; avoid `NowPlayingKit`, which collides conceptually with Apple's `NowPlaying` framework). And: what is "HomeView"?
+1. ~~One target or two?~~ Resolved: separate targets. Still open: Mac layout — sidebar (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface?
+   Resolved: the generic package is **StationKit**; adapters are separate packages. Open: the adapter's name (`KEXPStation`, or `KEXPStationKit`), and what "HomeView" is.
 2. ~~Confirm every add?~~ Resolved: ISRC-resolved songs add immediately with undo; fallback matches ask first. Still open: does the undo suit you, or should the ISRC path also confirm until you trust it?
 3. Dedicated playlist name — "KEXP"? One per user, created on first use?
 4. Widget sizes: small and medium only, or also a lock-screen accessory?

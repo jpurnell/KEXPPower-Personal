@@ -33,7 +33,7 @@ quicker and more pleasant to use than the existing KEXP app.
 - **Build System:** Xcode project (app); the library is the `jpurnell/KEXPPowerKit` package (a fork of KEXPPower), pinned `from: 4.0.0`; see ADR-001/002
 - **Testing:** Swift Testing for new tests; the existing XCTest suite stays until migrated
 - **Concurrency:** Swift 6 strict concurrency throughout
-- **Platforms:** iOS (primary, deployment target 17), macOS, visionOS, CarPlay. tvOS and watchOS are kept *ready* (the generic `ListenKit` package compiles for them) but not built yet.
+- **Platforms:** iOS (primary, deployment target 17), macOS, visionOS, CarPlay. tvOS and watchOS are kept *ready* (the generic `StationKit` package compiles for them) but not built yet.
 - **System integration:** `MediaPlayer` (`MPNowPlayingInfoCenter`, `MPRemoteCommandCenter`) today; the iOS 27 `NowPlaying` framework behind `#available` later.
 - **Dependencies:** none external. KEXP public API (`api.kexp.org/v2`), StreamGuys streams, Apple Music (MusicKit / links).
 
@@ -109,7 +109,7 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 - [x] App switched to the package (`jpurnell/KEXPPowerKit` 4.0.0, by URL; verified running on a physical iPhone); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Committed in 53f58e6.
 - [x] Library: `Play.playType` decoding fixed, placeholder defaults removed, `Sendable` structs (no app `PlayItem` needed: the app only uses `Play` as a value), KEXPPowerKit `f1c7fc0`
 - [ ] Finish async `ArchiveManager` (iOS 27.2 follow-up)
-- [ ] Navigation shell, Mac playback/layout, Apple Music playlists, widget + App Intents, archive UI: `project/plans/proposals/PlatformExperience.md` (proposed; revised 2026-11-03: separate iOS/visionOS/macOS targets, generic `ListenKit` repo, ISRC-based song matching)
+- [ ] Navigation shell, Mac playback/layout, Apple Music playlists, widget + App Intents, archive UI: `project/plans/proposals/PlatformExperience.md` (proposed; revised 2026-11-03: separate iOS/visionOS/macOS targets, generic `StationKit` repo + `KEXPStation` adapter repo, ISRC-based song matching)
 - [ ] iOS 27 `NowPlaying` adoption: `project/plans/proposals/NowPlayingFramework.md` (on hold)
 
 ---
