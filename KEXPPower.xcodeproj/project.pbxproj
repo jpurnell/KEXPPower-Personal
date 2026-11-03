@@ -7,11 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1476F17453204F9D2BEDF587 /* SpinnerWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB9519A3E3C59652BC44B48 /* SpinnerWatchApp.swift */; };
+		15C39B3CCBDD239C919AAD6B /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = D57BF9D21786FB032B915526 /* StationKitAdapterKEXP */; };
 		17AFFC0C3BFFCF684D8D581A /* MusicLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */; };
 		3BA956736E6DE724B118062C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */; };
 		3BD8D5DD14914B8F3A2721F3 /* KEXPPower in Frameworks */ = {isa = PBXBuildFile; productRef = 389B2E62968225912A149478 /* KEXPPower */; };
+		3CF90FF93222450CC00975C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CA6C4099197D2A7731C6508 /* Assets.xcassets */; };
+		4BFC6CE38F9372B5EFD76F5A /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1E1AE6BCC0646A0E8C4526E6 /* StationKit */; };
 		55BA219965B9320FA7A7DFD2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */; };
 		5C8856D425FA331DD91B6BE8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F478354AB15736CA0D325E03 /* Foundation.framework */; };
+		6637D63621745475499BEA32 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C895B019C2EAD90B83BC21BB /* WatchContentView.swift */; };
 		7219D81A2BEA66C70079B78E /* CombinedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8192BEA66C70079B78E /* CombinedView.swift */; };
 		7219D81C2BEAA8710079B78E /* Extended View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81B2BEAA8710079B78E /* Extended View.swift */; };
 		7219D81E2BEAA8B80079B78E /* CompactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81D2BEAA8B80079B78E /* CompactView.swift */; };
@@ -33,8 +38,10 @@
 		72F4993F2BFE767B00A8B8B6 /* AppleMusicRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F4993E2BFE767B00A8B8B6 /* AppleMusicRetriever.swift */; };
 		8F8468319F4A1DFE2E8C875E /* StreamQualityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */; };
 		A1D78A1AAC027092544D6499 /* MusicLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6451106690A5AA44BE387834 /* MusicLinks.swift */; };
+		B19648898476BD9E82290A84 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 708FECEEE21F1BE9070C2690 /* Foundation.framework */; };
 		C1011BC886E933FBF05CB940 /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = BBAB57C5E9B7981118104FC1 /* StationKitAdapterKEXP */; };
 		CE83D3943B7CFAA6125DE961 /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E5C39D633A905CCAC41BF1 /* StationKit */; };
+		F05853C3218C278B66BD42A0 /* WatchPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820CD5465D780A78350BCECB /* WatchPlayer.swift */; };
 		F662F0BB86EF034D6A462B6B /* StreamQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA518B0C7861569CC6A87A7E /* StreamQuality.swift */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +60,8 @@
 		55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MusicLinksTests.swift; sourceTree = "<group>"; };
 		6451106690A5AA44BE387834 /* MusicLinks.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MusicLinks.swift; sourceTree = "<group>"; };
+		6CA6C4099197D2A7731C6508 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		708FECEEE21F1BE9070C2690 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		7219D8192BEA66C70079B78E /* CombinedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedView.swift; sourceTree = "<group>"; };
 		7219D81B2BEAA8710079B78E /* Extended View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extended View.swift"; sourceTree = "<group>"; };
 		7219D81D2BEAA8B80079B78E /* CompactView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactView.swift; sourceTree = "<group>"; };
@@ -79,16 +88,30 @@
 		72F4993A2BFD2E7100A8B8B6 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		72F4993C2BFE6B0700A8B8B6 /* ResultRetriever.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultRetriever.swift; sourceTree = "<group>"; };
 		72F4993E2BFE767B00A8B8B6 /* AppleMusicRetriever.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleMusicRetriever.swift; sourceTree = "<group>"; };
+		820CD5465D780A78350BCECB /* WatchPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchPlayer.swift; sourceTree = "<group>"; };
 		8BFFECB522C95E6100E3378C /* KEXPPower.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KEXPPower.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BFFECBE22C95E6100E3378C /* KEXPPowerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KEXPPowerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BFFECD322C95FB300E3378C /* KEXPPowerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KEXPPowerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AB02E9335D79398B148ACE1 /* KEXPPowerAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KEXPPowerAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA518B0C7861569CC6A87A7E /* StreamQuality.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQuality.swift; sourceTree = "<group>"; };
+		C895B019C2EAD90B83BC21BB /* WatchContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
+		DBB9519A3E3C59652BC44B48 /* SpinnerWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpinnerWatchApp.swift; sourceTree = "<group>"; };
 		E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQualityTests.swift; sourceTree = "<group>"; };
 		F478354AB15736CA0D325E03 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		F91060B80CB56756A0E46BFC /* Spinner Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spinner Watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		486C53A12C91711722272A30 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B19648898476BD9E82290A84 /* Foundation.framework in Frameworks */,
+				4BFC6CE38F9372B5EFD76F5A /* StationKit in Frameworks */,
+				15C39B3CCBDD239C919AAD6B /* StationKitAdapterKEXP in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		72873BF427A8D3C200132B62 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -110,6 +133,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4E9DFBA6E4319146A45C69E7 /* watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				708FECEEE21F1BE9070C2690 /* Foundation.framework */,
+			);
+			name = watchOS;
+			sourceTree = "<group>";
+		};
+		5F8E8A1495D144338A842961 /* Spinner Watch */ = {
+			isa = PBXGroup;
+			children = (
+				DBB9519A3E3C59652BC44B48 /* SpinnerWatchApp.swift */,
+				820CD5465D780A78350BCECB /* WatchPlayer.swift */,
+				C895B019C2EAD90B83BC21BB /* WatchContentView.swift */,
+				6CA6C4099197D2A7731C6508 /* Assets.xcassets */,
+			);
+			name = "Spinner Watch";
+			path = "Spinner Watch";
+			sourceTree = "<group>";
+		};
 		7219D8212BEBBBE30079B78E /* Audio Player */ = {
 			isa = PBXGroup;
 			children = (
@@ -149,6 +192,7 @@
 			isa = PBXGroup;
 			children = (
 				D53B512343A47555C3192043 /* iOS */,
+				4E9DFBA6E4319146A45C69E7 /* watchOS */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -207,6 +251,7 @@
 				8BFFECB622C95E6100E3378C /* Products */,
 				72873BE927A8D21500132B62 /* Frameworks */,
 				C09C0245055B1825A0CF9C6A /* KEXPPowerAppTests */,
+				5F8E8A1495D144338A842961 /* Spinner Watch */,
 			);
 			sourceTree = "<group>";
 		};
@@ -220,6 +265,7 @@
 				72873C0327A8D3C200132B62 /* Tests iOS.xctest */,
 				72873C0F27A8D3C200132B62 /* Tests macOS.xctest */,
 				9AB02E9335D79398B148ACE1 /* KEXPPowerAppTests.xctest */,
+				F91060B80CB56756A0E46BFC /* Spinner Watch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -262,6 +308,27 @@
 			productName = KEXPPowerAppTests;
 			productReference = 9AB02E9335D79398B148ACE1 /* KEXPPowerAppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		277CF9D58DFAE7DD5EF566A7 /* Spinner Watch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8FACFFA2E9CB22FAA025A7A8 /* Build configuration list for PBXNativeTarget "Spinner Watch" */;
+			buildPhases = (
+				05F6C21155C2CE1131AE9C05 /* Sources */,
+				486C53A12C91711722272A30 /* Frameworks */,
+				794EBC99FDCA40F1E401DB41 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Spinner Watch";
+			packageProductDependencies = (
+				1E1AE6BCC0646A0E8C4526E6 /* StationKit */,
+				D57BF9D21786FB032B915526 /* StationKitAdapterKEXP */,
+			);
+			productName = "Spinner Watch";
+			productReference = F91060B80CB56756A0E46BFC /* Spinner Watch.app */;
+			productType = "com.apple.product-type.application";
 		};
 		72873BF627A8D3C200132B62 /* KEXPPowerExampleSwiftUI (iOS) */ = {
 			isa = PBXNativeTarget;
@@ -338,6 +405,7 @@
 			targets = (
 				72873BF627A8D3C200132B62 /* KEXPPowerExampleSwiftUI (iOS) */,
 				0B988C4C7A1AF47EEBD8F9A6 /* KEXPPowerAppTests */,
+				277CF9D58DFAE7DD5EF566A7 /* Spinner Watch */,
 			);
 		};
 /* End PBXProject section */
@@ -359,9 +427,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		794EBC99FDCA40F1E401DB41 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3CF90FF93222450CC00975C1 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		05F6C21155C2CE1131AE9C05 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1476F17453204F9D2BEDF587 /* SpinnerWatchApp.swift in Sources */,
+				F05853C3218C278B66BD42A0 /* WatchPlayer.swift in Sources */,
+				6637D63621745475499BEA32 /* WatchContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		72873BF327A8D3C200132B62 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -428,6 +514,32 @@
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
+		};
+		41B182D80E2A393D3E8C8EE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_UIBackgroundModes = audio;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.JPEnterprises.Spinner;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
 		};
 		5F1A0FC0B6ACD6A0DF521438 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -664,6 +776,33 @@
 			};
 			name = Release;
 		};
+		CCB197F80761608C7BC8691C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_UIBackgroundModes = audio;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.JPEnterprises.Spinner;
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -694,6 +833,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		8FACFFA2E9CB22FAA025A7A8 /* Build configuration list for PBXNativeTarget "Spinner Watch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CCB197F80761608C7BC8691C /* Release */,
+				41B182D80E2A393D3E8C8EE2 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -710,7 +858,7 @@
 			repositoryURL = "git@github.com:jpurnell/StationKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.2.0;
+				minimumVersion = 0.3.0;
 			};
 		};
 		AB6DF3C2B3BF307D38068231 /* XCRemoteSwiftPackageReference "StationKitAdapterKEXP" */ = {
@@ -724,6 +872,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1E1AE6BCC0646A0E8C4526E6 /* StationKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 97A49C75DB4DAD4BE7C42135 /* XCRemoteSwiftPackageReference "StationKit" */;
+			productName = StationKit;
+		};
 		389B2E62968225912A149478 /* KEXPPower */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 15838809A2B3C0A208FE8634 /* XCRemoteSwiftPackageReference "KEXPPowerKit" */;
@@ -735,6 +888,11 @@
 			productName = StationKit;
 		};
 		BBAB57C5E9B7981118104FC1 /* StationKitAdapterKEXP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AB6DF3C2B3BF307D38068231 /* XCRemoteSwiftPackageReference "StationKitAdapterKEXP" */;
+			productName = StationKitAdapterKEXP;
+		};
+		D57BF9D21786FB032B915526 /* StationKitAdapterKEXP */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AB6DF3C2B3BF307D38068231 /* XCRemoteSwiftPackageReference "StationKitAdapterKEXP" */;
 			productName = StationKitAdapterKEXP;

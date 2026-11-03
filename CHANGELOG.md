@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- A standalone watchOS app, `Spinner Watch` (`com.JPEnterprises.Spinner.watchkitapp`, watchOS 10): live KEXP stream on the 64 kbps option, now-playing and play/pause, lock-screen and remote-command integration through `StationKit`, long-form audio session. Not yet embedded in the iOS app.
+
 ### Changed
 - Player glue (Now Playing snapshot and publisher, audio session coordinator, artwork loader) now comes from `StationKit` 0.2.0, and the KEXP stream and now-playing mapping from `StationKitAdapterKEXP` 0.2.0; the app's copies and their tests (moved to StationKit) are removed. `KEXPPowerKit` is 4.0.1.
 - visionOS: the app icon's last layer is opaque and the logo is its own transparent layer; the App Store icon has no alpha; the macOS icon fills the standard icon grid. `allowsExternalPlayback` is not used on visionOS, where it does not exist.

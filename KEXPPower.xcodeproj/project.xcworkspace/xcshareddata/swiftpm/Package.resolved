@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:jpurnell/StationKit.git",
       "state" : {
-        "revision" : "c75a64b5be745523eeeb225c6f40e9564a17a09c",
-        "version" : "0.2.0"
+        "revision" : "dfa124b8b8aa46a168c1e58acb1853405b9d6cca",
+        "version" : "0.3.0"
       }
     },
     {
