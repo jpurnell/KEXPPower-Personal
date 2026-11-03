@@ -1,6 +1,6 @@
 # Design Proposal: Navigation Shell, Mac Playback and Layout, Apple Music Playlists, Widget and App Intents
 
-**Status:** Proposed — awaiting approval
+**Status:** Proposed — revised 2026-11-03 with two owner decisions (a separate macOS target; ISRC-based song matching) — awaiting approval
 **Date:** 2026-11-02
 **Delivery:** four phases, each independently shippable and each gated by its own tests. Phase D (archive) is design-only until the library's async `ArchiveManager` exists (iOS 27.2 follow-up).
 **Not in scope:** the iOS 27 `NowPlaying` framework (on hold). The `NowPlayingPublishing` seam (ADR-003) keeps it a later, small change.
@@ -47,12 +47,25 @@ PlaylistService          ← new: MusicKit find/create/add; behind a protocol fo
 SwiftUI shell            ← NavigationSplitView / TabView, per platform
 ```
 
+#### 3a-2. Targets (owner decision 2026-11-03: a separate macOS target)
+```
+KEXPShared (local Swift package, in this repo)   platform-neutral services (LiveActivityService, PlaylistService,
+   │                                              SongResolver), MusicLinks, ArtworkLoader, NowPlaying*, shared views
+   ├── KEXPPower (iOS + visionOS app)            iOS shell: TabView / compact navigation, AudioSessionCoordinator
+   ├── KEXPPower Mac (macOS app, new)            Mac shell: sidebar, menus, Settings, window management
+   └── KEXPWidget (widget extension)             iOS + macOS; links KEXPShared, never the player
+```
+- **Why a package rather than shared file membership:** the same sources compile into three targets; `swift test` runs them in seconds without a simulator host (today's hosted tests take about 35 seconds); and the widget and intents link it without dragging in app code.
+- **Per-target, not shared:** navigation shells, menus, entitlements, Info.plist, bundle IDs and signing, `Settings`, and anything touching `AVAudioSession`.
+- **Mac target specifics:** App Sandbox with network-client (and audio output as needed), its own bundle ID, Apple Music usage description, Hardened Runtime for distribution.
+- **Cost, stated honestly:** moving today's files into a package is mechanical but wide (every `internal` type the shells use must become `public`), and the single multiplatform target is retired. This is Phase 0.
+
 #### 3b. Navigation shell
 - **macOS and iPad (regular width):** `NavigationSplitView` with a sidebar: Live, Archive, Playlists. Detail pane per selection.
 - **iPhone (compact):** `TabView` with the same three destinations, Settings in a sheet.
 - One `AppSection` enum drives both; selection is the only shared state. Archive is present but shows "coming soon" until Phase D.
 
-#### 3c. Mac playback and layout
+#### 3c. Mac playback and layout (in the separate Mac target)
 - `PlayerController` becomes `PlaybackController`. Platform differences are isolated behind small protocols, not `#if` through the file:
   - `AudioSessionCoordinator` stays iOS/visionOS; macOS gets a no-op that satisfies the same protocol (macOS has no `AVAudioSession`).
   - Now Playing publishing via `LegacyNowPlayingPublisher` is unchanged (`MPNowPlayingInfoCenter` / `MPRemoteCommandCenter` exist on macOS), so media keys and Control Center work on the Mac.
@@ -64,7 +77,14 @@ SwiftUI shell            ← NavigationSplitView / TabView, per platform
   - `authorize()` via `MusicAuthorization.request()`.
   - `ensureKEXPPlaylist()`: find the user's playlist by stored ID, else by name, else `MusicLibrary.shared.createPlaylist(name:)`. The ID is stored in `UserDefaults`.
   - `add(play:)`: resolve the play to a catalog `Song`, then `MusicLibrary.shared.add(song, to: playlist)`.
-- **Resolving the song is the risky step.** KEXP's API has no ISRC, so the match is by artist/track/album. The existing iTunes search returns a track ID usable with `MusicCatalogResourceRequest<Song>`. To avoid silently adding the wrong recording, the UI shows the *matched* title/artist/album and adds on confirm (Open Question 2).
+- **Resolving the song uses identifiers, not guesses.** KEXP's API already gives each trackplay a MusicBrainz *recording ID* (`recording_id`; 38 of the last 40 trackplays carry one). The pipeline:
+  1. `Play.recordingID` → **MusicBrainz** `recording/<id>?inc=isrcs` → one or more ISRCs (checked live: R.E.M. "Blue" → `USWB11004206`, `USWB11400926`; Ceremony "Other Hells" → `US2642664602`).
+  2. ISRC → **MusicKit** `MusicCatalogResourceRequest<Song>(matching: \.isrc, equalTo:)` (type-checks against the macOS SDK; iOS 16+/macOS 14+). Try each ISRC and take the song available in the user's storefront.
+  3. **If that resolves, add immediately** (with an undo): an ISRC identifies the recording.
+  4. **If it does not** (no recording ID, no ISRC, not in the user's catalog), fall back to text search (the existing iTunes lookup) and **ask the user to confirm** the matched title/artist/album before adding.
+- **Why not an audio-matching service (the AcoustID/Chromaprint approach in `concordance`)?** Fingerprinting needs audio in hand and returns a MusicBrainz recording ID, which KEXP already supplies. The identification step is done for us; an audio service would add a third party, captured audio and latency to arrive where we start. It stays a last-resort fallback for plays with no MBID (Future Directions).
+- **Library change (additive, KEXPPowerKit 4.1.0):** the 2024 model trim dropped `track_id`, `recording_id`, `release_id` and `release_group_id`; `Play` regains them as optional fields, test-first.
+- **MusicBrainz etiquette:** needs a descriptive `User-Agent` and about one request per second; results are cached by recording ID; `musicbrainz.org` joins the host allow-list.
 - States the UI must show: not authorized, matching, added, already in playlist, no match, failed.
 - Platform support verified in the SDK: `MusicLibrary`, `createPlaylist`, `add(_:to:)` and `MusicAuthorization.request()` are available on iOS 16+, macOS 14+ and visionOS 1+.
 
@@ -138,6 +158,7 @@ N/A.
 - Live view: 50 plays per refresh every 5 seconds (existing).
 - Archive day list: one 14-day window of shows, roughly 170–200 shows (one request at `limit=200`).
 **Held vs streamed:** the widget holds one decoded thumbnail. The app keeps at most the 50 latest plays. The "already added" set is capped at 1,000 play IDs.
+**MusicBrainz:** at most one lookup per added song, cached by recording ID; cache capped at 500 entries (a few hundred bytes each).
 **Growth:** none with uptime; each cap is fixed.
 **Budget:** widget extension 10 MB peak (WidgetKit's limit is tighter than the app's; the number is a target to be measured); app artwork cache stays 4 MB; added-IDs set under 50 KB.
 **Measured by:** a test that feeds 5,000 plays to the playlist store and asserts the added-ID cap; the widget's memory measured on device with Instruments before release.
@@ -145,7 +166,8 @@ N/A.
 
 ### 10. Dependencies
 
-**Internal:** `KEXPPower` 4.0.0, `ArtworkLoader`, `NowPlayingPublishing`, `AudioSessionCoordinator`, `MusicLinks`.
+**Internal:** `KEXPPower` 4.1.0 (adds MusicBrainz IDs to `Play`), `ArtworkLoader`, `NowPlayingPublishing`, `AudioSessionCoordinator`, `MusicLinks`.
+**External (non-Apple):** MusicBrainz web service (public IDs only are sent; descriptive `User-Agent`, about 1 request/second, cached).
 **External (Apple):** MusicKit, WidgetKit, AppIntents (all present in the 27.2 SDKs on iOS and macOS; checked).
 **Library work needed:** async `ArchiveManager` (Phase D only).
 **Portal:** MusicKit App ID service and an App Group (user action).
@@ -156,6 +178,7 @@ N/A.
 **Test categories:**
 - **Shell:** `AppSection` ↔ selection mapping; a pure `NavigationModel` (what is shown for each size class) tested without a view.
 - **LiveActivityService:** decodes a recorded `/v2/plays/?limit=1` response; failure → typed error.
+- **SongResolver:** recorded MusicBrainz responses (R.E.M. "Blue" → two ISRCs; Ceremony "Other Hells" → one) through a fake MusicKit adapter. ISRC hit adds immediately; first ISRC misses and second hits; no ISRC → fallback requires confirmation; no MBID → fallback; MusicBrainz down or rate-limited → fallback; cache hit makes no request.
 - **PlaylistService (the careful one):** a fake MusicKit adapter. Golden path (authorized, playlist exists, match, add → `.added`), already in playlist, denied authorization, no match, wrong-match confirmation required, duplicate add, network failure. No test touches the real library.
 - **Intents:** `WhatsPlayingIntent` result string for a fixture play; airbreak (no song) phrasing.
 - **Widget:** timeline entry building for a play and for failure (shows last-known), refresh policy date.
@@ -174,13 +197,15 @@ N/A.
 - Amends ADR-003 (publisher seam) — no, extends it: macOS uses the same publisher.
 - **New ADR-004:** *The app/widget/intents share a `LiveActivityService`; the player is not a data source.*
 - **New ADR-005:** *Navigation is an `AppSection` shell (sidebar on Mac/iPad, tabs on iPhone).*
+- **New ADR-006:** *A separate macOS app target; platform-neutral code lives in a local `KEXPShared` package.*
+- **New ADR-007:** *Songs are matched by MusicBrainz recording ID → ISRC → MusicKit, with text search plus confirmation only as the fallback.*
 
 ### 13. Adversarial Review
 
 **Strongest case for a different approach:** ship only the Apple Music playlist button and the "what's playing" intent. A sidebar shell, a menu bar extra, a widget and a Control Center control add four surfaces to maintain for a one-developer app, and the widget cannot be live.
 
 **Where this design is most likely wrong:**
-1. **Song matching.** With no ISRC, searching by artist/track can return a live version or a compilation. Adding the wrong recording to someone's library is worse than not adding. Mitigation is the confirm step, but it adds a tap to the headline feature.
+1. **Song matching.** The MBID → ISRC path is precise, but a MusicBrainz recording can carry several ISRCs, and an ISRC can map to a different release than the one KEXP played (a reissue, a compilation). A near-duplicate is a smaller error than the wrong song. The fallback text search can still return a live version, so it asks first. About 5% of trackplays have no MBID and take the fallback.
 2. **Widget freshness.** Users will read "now playing" as live; a widget that is 10 minutes stale is wrong in a way the app never is. The design shows "last played at", but the expectation gap may remain.
 3. **Mac playback parity.** `MPNowPlayingInfoCenter` behaves differently on macOS (no `AVAudioSession`, different interruption model); media keys may not route as on iOS.
 
@@ -188,7 +213,7 @@ N/A.
 
 ### 14. Alternatives Considered
 
-**Alternative 1: A separate Mac app target.** Cleaner per-platform UI, but duplicates the shared logic the multiplatform target already provides. Rejected.
+**Alternative 1: One multiplatform target with `#if os(macOS)`.** Least wiring, but shells, entitlements and menus diverge enough that `#if` spreads through every file. *Rejected by the owner in favor of a separate Mac target, with shared code in a local package.*
 **Alternative 2: Mac Catalyst.** Cheap, but the target is already a native multiplatform one and Catalyst would regress it.
 **Alternative 3: Add to the Apple Music library directly via the iTunes track ID, with no confirm step.** Fewer taps, higher wrong-song risk. Kept as a setting ("Add without asking") rather than the default.
 **Alternative 4: Share the widget's data through the player's `ResultRetriever`.** Couples the widget to app lifecycle; widgets run when the app does not. Rejected.
@@ -196,6 +221,7 @@ N/A.
 ### 15. Future Directions
 
 - Could add a Live Activity / Dynamic Island for the current track.
+- Could add audio fingerprinting (AcoustID/Chromaprint, as `concordance` does) as a last-resort matcher for the ~5% of plays with no MusicBrainz ID, by sampling the live stream.
 - Could add CarPlay (needs Apple's audio-app entitlement; confirm eligibility first).
 - Could add Spotify playlist add (needs OAuth and a registered app).
 - Could add a share extension ("add this link to my KEXP playlist").
@@ -204,8 +230,8 @@ N/A.
 
 ### 16. Open Questions
 
-1. Sidebar layout for the Mac (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface?
-2. Playlist add: confirm the matched song every time, or add immediately with undo?
+1. ~~One target or two?~~ Resolved: a separate Mac target. Still open: sidebar layout (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface? And is a local `KEXPShared` package acceptable (recommended), or do you prefer shared file membership?
+2. ~~Confirm every add?~~ Resolved: ISRC-resolved songs add immediately with undo; fallback matches ask first. Still open: does the undo suit you, or should the ISRC path also confirm until you trust it?
 3. Dedicated playlist name — "KEXP"? One per user, created on first use?
 4. Widget sizes: small and medium only, or also a lock-screen accessory?
 5. Control Center control on iOS 18+: include in Phase C or defer?
