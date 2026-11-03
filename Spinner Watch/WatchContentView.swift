@@ -10,6 +10,14 @@ struct WatchContentView: View {
 
     var body: some View {
         VStack(spacing: 6) {
+            if let artwork = player.artwork {
+                Image(decorative: artwork, scale: 1)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxHeight: 90)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .accessibilityHidden(true)
+            }
             Text(player.title)
                 .font(.headline)
                 .multilineTextAlignment(.center)
@@ -23,11 +31,15 @@ struct WatchContentView: View {
             Button {
                 player.toggle()
             } label: {
-                Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.title)
+                if player.isBuffering {
+                    ProgressView()
+                } else {
+                    Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                        .font(.title)
+                }
             }
             .buttonStyle(.borderedProminent)
-            .accessibilityLabel(player.isPlaying ? "Pause" : "Play")
+            .accessibilityLabel(player.isPlaying ? "Pause" : (player.isBuffering ? "Loading" : "Play"))
             if let notice = player.notice {
                 Text(notice)
                     .font(.caption2)

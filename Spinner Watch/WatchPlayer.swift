@@ -18,6 +18,9 @@ import StationKitAdapterKEXP
 @Observable
 final class WatchPlayer {
     private(set) var isPlaying = false
+    /// True from the tap until audio is actually playing, which takes a few seconds on a live stream.
+    private(set) var isBuffering = false
+    private(set) var artwork: CGImage?
     private(set) var title = "KEXP"
     private(set) var artist = ""
     private(set) var notice: String?
@@ -85,7 +88,9 @@ final class WatchPlayer {
     }
 
     private func startPlayback() async {
+        isBuffering = true
         guard await sessionCoordinator.activateForPlayback() else {
+            isBuffering = false
             notice = "Choose an audio output to listen"
             return
         }
@@ -95,16 +100,18 @@ final class WatchPlayer {
 
     /// Pauses playback.
     func pause() {
+        isBuffering = false
         player?.pause()
     }
 
     /// Plays when paused and pauses when playing.
     func toggle() {
-        isPlaying ? pause() : play()
+        isPlaying || isBuffering ? pause() : play()
     }
 
     private func timeControlStatusChanged(_ status: AVPlayer.TimeControlStatus) {
         isPlaying = status == .playing
+        if isPlaying { isBuffering = false }
         snapshot.state = isPlaying ? .playing : .paused
         publisher.publish(snapshot, artwork: currentArtwork)
     }
@@ -123,6 +130,7 @@ final class WatchPlayer {
             if let url = next.artworkURL { artwork = await artworkLoader.image(for: url) }
             guard snapshot.artworkURL == next.artworkURL, snapshot.title == next.title else { return }
             currentArtwork = artwork
+            self.artwork = artwork
             publisher.publish(snapshot, artwork: artwork)
         } catch {
             let message = "Refresh failed: \(error.localizedDescription)"
