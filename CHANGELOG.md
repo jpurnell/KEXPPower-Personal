@@ -24,6 +24,7 @@
 - `beginReceivingRemoteControlEvents()` and a dead macOS block in the app delegate.
 
 ### Added
+- Links out: Spotify and Bandcamp searches for the playing track, and web links in DJ comments are now tappable (`MusicLinks`).
 - `AudioSessionCoordinator` owns the audio session; the app delegate is removed.
 - The app and its tests build in Swift 6 language mode.
 - Stream quality setting (160 kbps standard, 64 kbps data saver), in Settings on macOS.

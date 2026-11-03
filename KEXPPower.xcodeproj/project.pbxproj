@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		17AFFC0C3BFFCF684D8D581A /* MusicLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */; };
 		3BA956736E6DE724B118062C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */; };
 		3BD8D5DD14914B8F3A2721F3 /* KEXPPower in Frameworks */ = {isa = PBXBuildFile; productRef = 389B2E62968225912A149478 /* KEXPPower */; };
 		3E6D1A6E931937E93135528E /* AudioSessionCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC28CE91608589838D9B94EB /* AudioSessionCoordinatorTests.swift */; };
@@ -35,6 +36,7 @@
 		72F4993F2BFE767B00A8B8B6 /* AppleMusicRetriever.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72F4993E2BFE767B00A8B8B6 /* AppleMusicRetriever.swift */; };
 		8F8468319F4A1DFE2E8C875E /* StreamQualityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */; };
 		90154A7C06635F45181ABEFA /* ArtworkLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887D2DD0B4466BDE3608BEDC /* ArtworkLoader.swift */; };
+		A1D78A1AAC027092544D6499 /* MusicLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6451106690A5AA44BE387834 /* MusicLinks.swift */; };
 		B52A0E6BD1CB1EFBFEEBAEA3 /* NowPlayingSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAACEDCB09A8C0408183AE4E /* NowPlayingSnapshot.swift */; };
 		F45A15232BCDD30EDA0A62F7 /* NowPlayingSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B31F30C218CB6953AAC0790 /* NowPlayingSnapshotTests.swift */; };
 		F662F0BB86EF034D6A462B6B /* StreamQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA518B0C7861569CC6A87A7E /* StreamQuality.swift */; };
@@ -56,6 +58,8 @@
 		51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		5B31F30C218CB6953AAC0790 /* NowPlayingSnapshotTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NowPlayingSnapshotTests.swift; sourceTree = "<group>"; };
+		604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MusicLinksTests.swift; sourceTree = "<group>"; };
+		6451106690A5AA44BE387834 /* MusicLinks.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MusicLinks.swift; sourceTree = "<group>"; };
 		6D8164F358A4D6B820413FE9 /* NowPlayingPublishing.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NowPlayingPublishing.swift; sourceTree = "<group>"; };
 		7219D8192BEA66C70079B78E /* CombinedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedView.swift; sourceTree = "<group>"; };
 		7219D81B2BEAA8710079B78E /* Extended View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Extended View.swift"; sourceTree = "<group>"; };
@@ -178,6 +182,7 @@
 				55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */,
 				BA518B0C7861569CC6A87A7E /* StreamQuality.swift */,
 				51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */,
+				6451106690A5AA44BE387834 /* MusicLinks.swift */,
 			);
 			path = "KEXPPower SwiftUI";
 			sourceTree = "<group>";
@@ -240,6 +245,7 @@
 				5B31F30C218CB6953AAC0790 /* NowPlayingSnapshotTests.swift */,
 				AC28CE91608589838D9B94EB /* AudioSessionCoordinatorTests.swift */,
 				E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */,
+				604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */,
 			);
 			name = KEXPPowerAppTests;
 			path = KEXPPowerAppTests;
@@ -397,6 +403,7 @@
 				F727520C3ED6F4D58DD7F0DC /* AudioSessionCoordinator.swift in Sources */,
 				F662F0BB86EF034D6A462B6B /* StreamQuality.swift in Sources */,
 				55BA219965B9320FA7A7DFD2 /* SettingsView.swift in Sources */,
+				A1D78A1AAC027092544D6499 /* MusicLinks.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,6 +415,7 @@
 				F45A15232BCDD30EDA0A62F7 /* NowPlayingSnapshotTests.swift in Sources */,
 				3E6D1A6E931937E93135528E /* AudioSessionCoordinatorTests.swift in Sources */,
 				8F8468319F4A1DFE2E8C875E /* StreamQualityTests.swift in Sources */,
+				17AFFC0C3BFFCF684D8D581A /* MusicLinksTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

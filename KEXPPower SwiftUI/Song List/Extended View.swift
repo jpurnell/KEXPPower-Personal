@@ -32,16 +32,25 @@ struct ExtendedView: View {
                     }
                     Text(play?.artist ?? "").font(.caption)
                     Text(play?.album ?? "").font(.caption).foregroundColor(.gray)
+                    HStack {
+                        if let url = MusicLinks.spotifySearchURL(artist: play?.artist, track: play?.song) {
+                            Link("Spotify", destination: url)
+                        }
+                        if let url = MusicLinks.bandcampSearchURL(artist: play?.artist, album: play?.album) {
+                            Link("Bandcamp", destination: url)
+                        }
+                    }
+                    .font(.caption)
                 }
 
             }
             ScrollView(.vertical, showsIndicators: true) {
                 #if os(macOS)
-                    Text(.init(stringLiteral: play?.comment ?? ""))
+                    Text(MusicLinks.linkedComment(play?.comment ?? ""))
                         .lineLimit(15)
                         .multilineTextAlignment(.leading)
                 #endif
-				Text(.init(stringLiteral: play?.comment ?? ""))
+				Text(MusicLinks.linkedComment(play?.comment ?? ""))
 					.lineLimit(nil)
                     .multilineTextAlignment(.leading)
             }
