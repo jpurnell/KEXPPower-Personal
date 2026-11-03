@@ -1,6 +1,6 @@
 # Design Proposal: Navigation Shell, Mac Playback and Layout, Apple Music Playlists, Widget and App Intents
 
-**Status:** Proposed — revised 2026-11-03 with two owner decisions (a separate macOS target; ISRC-based song matching) — awaiting approval
+**Status:** Proposed — revised 2026-11-03 (separate per-platform targets; generic ListenKit repo; ISRC-based song matching; tvOS/watchOS kept ready) — awaiting approval
 **Date:** 2026-11-02
 **Delivery:** four phases, each independently shippable and each gated by its own tests. Phase D (archive) is design-only until the library's async `ArchiveManager` exists (iOS 27.2 follow-up).
 **Not in scope:** the iOS 27 `NowPlaying` framework (on hold). The `NowPlayingPublishing` seam (ADR-003) keeps it a later, small change.
@@ -47,18 +47,53 @@ PlaylistService          ← new: MusicKit find/create/add; behind a protocol fo
 SwiftUI shell            ← NavigationSplitView / TabView, per platform
 ```
 
-#### 3a-2. Targets (owner decision 2026-11-03: a separate macOS target)
+#### 3a-2. Targets and the generic package (owner decisions 2026-11-03)
+
+**Separate app targets per platform, one shared generic package in its own repository.**
+
 ```
-KEXPShared (local Swift package, in this repo)   platform-neutral services (LiveActivityService, PlaylistService,
-   │                                              SongResolver), MusicLinks, ArtworkLoader, NowPlaying*, shared views
-   ├── KEXPPower (iOS + visionOS app)            iOS shell: TabView / compact navigation, AudioSessionCoordinator
-   ├── KEXPPower Mac (macOS app, new)            Mac shell: sidebar, menus, Settings, window management
-   └── KEXPWidget (widget extension)             iOS + macOS; links KEXPShared, never the player
+KEXPPowerKit (repo, exists)     KEXP's API only: plays, shows, stream URLs. Knows nothing about playback or UI.
+ListenKit    (new repo)         NOT KEXP-specific. Live-stream playback glue, Now Playing publishing, audio session,
+   ▲                            artwork loading, link-out builders, song matching, playlist saving. Working name; see Q1.
+   │
+   ├── KEXPPower (iOS app)           iOS shell; CarPlay scene later
+   ├── KEXPPower Vision (visionOS)   own target (owner decision); spatial layout
+   ├── KEXPPower Mac (macOS)         sidebar, menus, Settings, window management
+   ├── KEXPWidget (extension)        iOS, macOS, visionOS, watchOS; links ListenKit, never the player
+   ├── tvOS app    ── "ready", not built in this proposal
+   └── watchOS app ── "ready", not built in this proposal
 ```
-- **Why a package rather than shared file membership:** the same sources compile into three targets; `swift test` runs them in seconds without a simulator host (today's hosted tests take about 35 seconds); and the widget and intents link it without dragging in app code.
-- **Per-target, not shared:** navigation shells, menus, entitlements, Info.plist, bundle IDs and signing, `Settings`, and anything touching `AVAudioSession`.
-- **Mac target specifics:** App Sandbox with network-client (and audio output as needed), its own bundle ID, Apple Music usage description, Hardened Runtime for distribution.
-- **Cost, stated honestly:** moving today's files into a package is mechanical but wide (every `internal` type the shells use must become `public`), and the single multiplatform target is retired. This is Phase 0.
+
+**What is generic (moves to ListenKit) and what stays:**
+
+| Piece | Today | Generic? | Change needed to extract |
+|-------|-------|----------|--------------------------|
+| `NowPlayingSnapshot`, `NowPlayingPublishing`, `LegacyNowPlayingPublisher` | app | Yes | none; they already take plain strings |
+| `AudioSessionCoordinator` | app (iOS) | Yes | keep behind `#if`; macOS gets a no-op |
+| `ArtworkLoader` | app | Yes, **but** hard-codes `kexp.org` / `archive.org` | allowed domains become an init parameter; return a platform-neutral image (macOS has no `UIImage`) |
+| `MusicLinks` (Spotify/Bandcamp searches, comment links) | app | Yes | none |
+| `SongResolver`, `PlaylistService` (MBID → ISRC → MusicKit) | proposed | Yes | built in ListenKit from the start |
+| `PlaybackController` | app | Mostly | inject the stream URL and metadata source instead of reading `ResultRetriever` |
+| `LiveActivityService` (fetch current play) | proposed | **No** | stays in the KEXP app, as an adapter from `KEXPPowerKit` to a ListenKit `NowPlayingSource` protocol |
+| `Play`, `Show`, stream bitrates, KEXP branding | library/app | **No** | stay in `KEXPPowerKit` and the app |
+
+**The rule that keeps it generic:** ListenKit never imports `KEXPPower`. It defines small protocols (`NowPlayingSource`, `StreamDescriptor`) and a plain `Track` value type (title, artist, album, artwork URL, optional MusicBrainz recording ID / ISRC). The KEXP app adapts `Play` to `Track`. A second station or service needs only its own adapter.
+
+**Platform readiness (tvOS and watchOS "ready"):**
+- ListenKit declares iOS 17, macOS 14, visionOS 1, tvOS 17 and watchOS 10 from day one, and CI builds all of them, so a platform that does not compile is caught immediately instead of at the moment a target is added.
+- Verified in the 27.2 SDKs: `MediaPlayer`, `AVFoundation`, `MusicKit`, `AppIntents` and `NowPlaying` exist on iOS, tvOS, watchOS and visionOS; `WidgetKit` exists on watchOS and visionOS but **not tvOS**; `CarPlay` is iOS only. Per-API availability inside those frameworks (for example `MPNowPlayingInfoCenter` on watchOS) is checked when each target is built, not assumed.
+- No `UIKit` in ListenKit's public API (macOS lacks it), so images cross the boundary as `CGImage`/`Data` with a thin SwiftUI `Image` helper.
+
+**CarPlay (iOS target, later, not built here):** CarPlay audio apps are driven by `CPNowPlayingTemplate`, which reads the same `MPNowPlayingInfoCenter` state our `NowPlayingPublishing` already feeds, plus list templates for browsing. So most of what CarPlay needs is a by-product of ListenKit's publisher, not a separate UI. It still requires Apple's CarPlay audio entitlement. *On "HomeView": I found nothing by that name in the 27.2 SDKs (only `HomeKit` and `HomeExtensions`), so I am not designing for it. If it is a surface that reads Now Playing state, it should work through the same seam; that is a hope, not something verified.*
+
+**Why separate targets and a separate repo:** per-platform shells, entitlements and menus diverge, and ListenKit's tests run with `swift test` in seconds, without a simulator host (today's hosted tests take about 35 seconds).
+**Cost, stated honestly:** a second consumer does not exist yet. The mitigation is the dependency rule above and an adapter seam, so ListenKit stays honest rather than becoming "the KEXP app in a package".
+
+**Phase 0 (before Phase A):**
+1. Create the `ListenKit` repository (private to start; guidelines scaffold; Swift 6; the five platforms).
+2. Move the already-generic, already-tested pieces with their tests (`NowPlayingSnapshot`, publisher, `AudioSessionCoordinator`, `ArtworkLoader` with injectable domains, `MusicLinks`); make the public surface explicit.
+3. The KEXP app consumes ListenKit by tagged URL, as it does KEXPPowerKit.
+4. Split the single multiplatform target into iOS, visionOS and macOS app targets.
 
 #### 3b. Navigation shell
 - **macOS and iPad (regular width):** `NavigationSplitView` with a sidebar: Live, Archive, Playlists. Detail pane per selection.
@@ -197,7 +232,7 @@ N/A.
 - Amends ADR-003 (publisher seam) — no, extends it: macOS uses the same publisher.
 - **New ADR-004:** *The app/widget/intents share a `LiveActivityService`; the player is not a data source.*
 - **New ADR-005:** *Navigation is an `AppSection` shell (sidebar on Mac/iPad, tabs on iPhone).*
-- **New ADR-006:** *A separate macOS app target; platform-neutral code lives in a local `KEXPShared` package.*
+- **New ADR-006:** *Separate app targets per platform (iOS, visionOS, macOS; tvOS/watchOS kept ready); platform-neutral code lives in `ListenKit`, its own repository, which never imports `KEXPPower`.*
 - **New ADR-007:** *Songs are matched by MusicBrainz recording ID → ISRC → MusicKit, with text search plus confirmation only as the fallback.*
 
 ### 13. Adversarial Review
@@ -230,7 +265,8 @@ N/A.
 
 ### 16. Open Questions
 
-1. ~~One target or two?~~ Resolved: a separate Mac target. Still open: sidebar layout (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface? And is a local `KEXPShared` package acceptable (recommended), or do you prefer shared file membership?
+1. ~~One target or two?~~ Resolved: a separate Mac target. Still open: sidebar layout (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface? 
+   New Q: package name — `ListenKit` is a working name (alternatives: `StationKit`, `StreamDeck`-free names only; avoid `NowPlayingKit`, which collides conceptually with Apple's `NowPlaying` framework). And: what is "HomeView"?
 2. ~~Confirm every add?~~ Resolved: ISRC-resolved songs add immediately with undo; fallback matches ask first. Still open: does the undo suit you, or should the ISRC path also confirm until you trust it?
 3. Dedicated playlist name — "KEXP"? One per user, created on first use?
 4. Widget sizes: small and medium only, or also a lock-screen accessory?
