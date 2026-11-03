@@ -125,6 +125,15 @@ KEXP is a well-funded public station; many public stations lack the resources to
 
 *Applied here:* that is exactly our tier 2 (stream-metadata station) plus a **station registry** (a public JSON file of station records: id, name, stream URLs and kind (Icecast/HLS), time zone, branding, and an optional adapter id such as `spinitron` or `streamguys-icy`). Stations contribute a record by pull request, which costs a station no hosting, no server and no developer, which suits the goal of helping under-resourced stations. A rich adapter is then an *upgrade* for stations that want an archive, schedule or credits, not a prerequisite for being in the app.
 
+*Spinitron API v2 (read from its OpenAPI spec, 2026-11-03).* Base `https://spinitron.com/api`; resources `/spins`, `/playlists`, `/shows`, `/personas`; page size 20 (max 200); JSON. Facts that shape the design:
+- **Keys belong to each station.** "Your API key is in the Spinitron web app… Admin → Automation & API." A shared app cannot use Spinitron for a station unless that station hands over its key.
+- **The same key appears to authorize writing.** The spec has `POST /spins` ("Log a Spin") under the same bearer scheme; I could not confirm whether keys can be scoped read-only. **A key must never ship inside an app binary or sit in a public registry file**, because a leaked key could let anyone log spins into a station's playlist.
+- **Spinitron asks integrators to cache** ("Do not query the API on every page request you serve"). Hundreds of clients polling every few seconds is the wrong shape; a small cached relay is the right one.
+- **There are public widgets with no key** (`widgets.spinitron.com/widget/now-playing-v2?station=<name>`), but they are HTML/iframes; I found no documented public JSON endpoint, and scraping HTML would be fragile.
+- **A spin is richer than a pop track, in the way we need:** `artist`, `song`, `release`, `image`, `start`/`end`/`duration`/`timezone`, plus `classical`, `composer`, `work`, `conductor`, `performers`, `ensemble`, `catalog-number`, and standard identifiers **`isrc`, `upc`, `iswc`**. That confirms the credits-based `Track`, and means a Spinitron station can feed song matching directly from its ISRC with no MusicBrainz lookup.
+
+*What this means for a Spinitron adapter:* it is real and high-leverage (the mapping to `Track` is almost one-to-one), but it needs **a per-station relay**: a tiny service (for example a serverless function) holding the station's key as a secret, caching for 10–30 seconds, and exposing a read-only JSON feed. StationKit would define that feed as a **StationKit Now Playing JSON** format and ship relay templates (Spinitron first). The registry record then points at the relay's URL, never at a key. Any station with its own developer can emit the same JSON directly, so this is also how the declarative tier (3) works: "fetch this URL, decode StationKit Now Playing JSON". TuneIn and other platforms would get a relay template too, subject to their terms (not yet researched).
+
 *What this evidence says about the design:*
 1. **`Track` must not be "title / artist / album".** All Classical's feed has composer, work, conductor, ensemble and soloist, and no "artist". `Track` should carry an ordered list of **credits** (`role` + `name`) and compute a display line from them. Pop stations fill one performer credit; classical fills several.
 2. **"Now playing" is not always a track.** WFUV reports a generic message between songs, and WBUR is a news/talk station. So `Station.nowPlaying()` returns a `NowPlaying` value that is a track, a program/segment, or nothing, not `Track?`.
@@ -143,6 +152,8 @@ KEXP is a well-funded public station; many public stations lack the resources to
 
 *Decision on `StreamingRadioKit`:* **not a separate package.** The generic layer you describe is the `Station` protocol plus these tiers inside StationKit; a third package would restate it. This also keeps `KEXPPowerKit` as exactly what it should be: one station's client that can grow on its own.
 
+*Owner decisions (2026-11-03): the registry-with-tiers model is adopted; KEXP remains the priority, and other stations' fixtures serve as samples and minimal test adapters, not as scope that delays KEXP. The code is MIT-licensed, so reuse and redistribution are already permitted.*
+
 *Cheap rules to follow now so the ecosystem door stays open:*
 1. No KEXP identifiers, colors, URLs or strings in StationKit or in the shared app-shell code.
 2. Branding, stream list, accent color, and station identity live in one injected `StationConfiguration` value, supplied by the app target. That makes a white-label app a configuration change, not a fork.
@@ -158,7 +169,7 @@ KEXP is a well-funded public station; many public stations lack the resources to
 - Verified in the 27.2 SDKs: `MediaPlayer`, `AVFoundation`, `MusicKit`, `AppIntents` and `NowPlaying` exist on iOS, tvOS, watchOS and visionOS; `WidgetKit` exists on watchOS and visionOS but **not tvOS**; `CarPlay` is iOS only. Per-API availability inside those frameworks (for example `MPNowPlayingInfoCenter` on watchOS) is checked when each target is built, not assumed.
 - No `UIKit` in StationKit's public API (macOS lacks it), so images cross the boundary as `CGImage`/`Data` with a thin SwiftUI `Image` helper.
 
-**CarPlay (iOS target, later, not built here):** CarPlay audio apps are driven by `CPNowPlayingTemplate`, which reads the same `MPNowPlayingInfoCenter` state our `NowPlayingPublishing` already feeds, plus list templates for browsing. So most of what CarPlay needs is a by-product of StationKit's publisher, not a separate UI. It still requires Apple's CarPlay audio entitlement. *On "HomeView": I found nothing by that name in the 27.2 SDKs (only `HomeKit` and `HomeExtensions`), so I am not designing for it. If it is a surface that reads Now Playing state, it should work through the same seam; that is a hope, not something verified.*
+**CarPlay (iOS target, later, not built here):** CarPlay audio apps are driven by `CPNowPlayingTemplate`, which reads the same `MPNowPlayingInfoCenter` state our `NowPlayingPublishing` already feeds, plus list templates for browsing. So most of what CarPlay needs is a by-product of StationKit's publisher, not a separate UI. It still requires Apple's CarPlay audio entitlement. *On Apple HomeView (apple.com/apple-homeview, read 2026-11-03):* a 7-inch smart-home display (A18, "HomeView software 27.2"), available November 13. Apple says it "supports compatible third-party audio and video apps from your iPhone" and lets you "start content on iPhone and continue on HomeView". The page names no developer tools, CarPlay support, or radio apps, and does not say how third-party apps appear. **So I am not designing a HomeView target.** What we already do is the plausible route in: publish complete Now Playing metadata (artwork, title, credits) and support AirPlay routing (an `AVRoutePickerView` control on the player). The iOS 27 `HomeExtensions` framework is for home *accessory* manufacturers (`HMAccessory` setup and help content) and is unrelated to audio apps.*
 
 **Why separate targets and a separate repo:** per-platform shells, entitlements and menus diverge, and StationKit's tests run with `swift test` in seconds, without a simulator host (today's hosted tests take about 35 seconds).
 **Cost, stated honestly:** a second consumer does not exist yet. The mitigation is the dependency rule above and an adapter seam, so StationKit stays honest rather than becoming "the KEXP app in a package".
@@ -279,7 +290,7 @@ N/A.
 **External (non-Apple):** MusicBrainz web service (public IDs only are sent; descriptive `User-Agent`, about 1 request/second, cached).
 **External (Apple):** MusicKit, WidgetKit, AppIntents (all present in the 27.2 SDKs on iOS and macOS; checked).
 **Library work needed:** async `ArchiveManager` (Phase D only).
-**Portal:** MusicKit App ID service and an App Group (user action).
+**Portal (user action, and each new target needs its own):** the paid Apple Developer Program team (the project already uses team `BNDA9Y6YV9`); an explicit App ID per target (iOS, visionOS, macOS, widget), each with the **MusicKit** service where it adds to playlists; and one **App Group** (for example `group.com.JPEnterprises.KEXP`) shared by the app and widget. With automatic signing, Xcode can register these from Signing & Capabilities.
 
 ### 11. Test Strategy
 
@@ -341,7 +352,7 @@ N/A.
 ### 16. Open Questions
 
 1. ~~One target or two?~~ Resolved: separate targets. Still open: Mac layout — sidebar (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface?
-   Resolved: the generic package is **StationKit**; adapters are `StationKitAdapter-<STATION>`. Open: what "HomeView" is; and whether KEXP is aware of or interested in the ecosystem direction (it shapes licensing and whether the repos stay private).
+   Resolved: the generic package is **StationKit**; adapters are `StationKitAdapter-<STATION>`. Resolved: HomeView is Apple's smart-home display (see the note above); licensing is MIT, so reuse is permitted. Open: whether the repos stay private for now, and bundle-ID strategy across iOS/visionOS/macOS (universal purchase or separate IDs).
 2. ~~Confirm every add?~~ Resolved: ISRC-resolved songs add immediately with undo; fallback matches ask first. Still open: does the undo suit you, or should the ISRC path also confirm until you trust it?
 3. Dedicated playlist name — "KEXP"? One per user, created on first use?
 4. Widget sizes: small and medium only, or also a lock-screen accessory?
