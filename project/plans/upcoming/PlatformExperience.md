@@ -185,7 +185,7 @@ KEXP is a well-funded public station; many public stations lack the resources to
 1. Create the `StationKit` and `StationKitAdapterKEXP` repositories (private to start; guidelines scaffold; Swift 6; the five platforms).
 2. Move the already-generic, already-tested pieces with their tests (`NowPlayingSnapshot`, publisher, `AudioSessionCoordinator`, `ArtworkLoader` with injectable domains, `MusicLinks`); make the public surface explicit.
 3. Write `StationKitAdapterKEXP` (test-first, against recorded API samples) so the app asks a `Station` for its now-playing track instead of calling `KEXPPowerKit` directly. The app consumes StationKit and StationKitAdapterKEXP by tagged URL, as it does KEXPPowerKit.
-4. Split the single multiplatform target into iOS, visionOS and macOS app targets.
+4. Split the single multiplatform target into iOS, visionOS and macOS app targets. *Status 2026-11-04: macOS is split out as `Spinner Mac` (shared sources, own entitlements); visionOS still shares the iOS target.*
 
 #### 3b. Navigation shell
 - **macOS and iPad (regular width):** `NavigationSplitView` with a sidebar: Live, Archive, Playlists. Detail pane per selection.
