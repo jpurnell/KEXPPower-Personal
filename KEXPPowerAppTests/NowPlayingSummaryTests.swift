@@ -38,4 +38,11 @@ struct NowPlayingSummaryTests {
         #expect(summary.title == "Karma Police")
         #expect(summary.artist == "KEXP")
     }
+
+    @Test("The library the app builds against provides MusicBrainz ids, which matching songs to Apple Music needs")
+    func libraryProvidesIdentifiers() {
+        let play = Play.fixture()
+        #expect(play.recordingID == "00000000-0000-4000-8000-0000000000a1")
+        #expect(play.releaseID == "00000000-0000-4000-8000-0000000000a2")
+    }
 }
