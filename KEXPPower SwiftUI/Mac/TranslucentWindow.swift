@@ -14,7 +14,9 @@ import SwiftUI
 struct TranslucentWindow: NSViewRepresentable {
     func makeNSView(context: Context) -> NSVisualEffectView {
         let view = WindowStylingEffectView()
-        view.material = .hudWindow
+        // A material that follows the system appearance, so the text on it keeps its contrast in light and dark
+        // (the HUD material is always dark, which left dark text on a mid-gray backdrop).
+        view.material = .popover
         view.blendingMode = .behindWindow
         view.state = .active
         return view
