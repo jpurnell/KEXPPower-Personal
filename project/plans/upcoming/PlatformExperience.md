@@ -213,6 +213,7 @@ KEXP is a well-funded public station; many public stations lack the resources to
 - **Library change (additive, KEXPPowerKit 4.1.0):** the 2024 model trim dropped `track_id`, `recording_id`, `release_id` and `release_group_id`; `Play` regains them as optional fields, test-first.
 - **MusicBrainz etiquette:** needs a descriptive `User-Agent` and about one request per second; results are cached by recording ID; `musicbrainz.org` joins the host allow-list.
 - States the UI must show: not authorized, matching, added, already in playlist, no match, failed.
+- **Decisions (owner, 2026-11-04):** there is one default playlist, "KEXP", and **every add goes to it, no matter what**. A long-press on the add button also adds the song to a chosen existing playlist or a new one, in addition to KEXP. The Playlists section lists the user's Apple Music playlists (to choose and create) and a log of what was added from KEXP, including songs awaiting confirmation. "Add this show's songs" lives on the show header (Live now, Archive later), paced for the MusicBrainz limit, cancellable, ending in a summary. Archive and Playlists stay visible as placeholders while the app is for personal use.
 - Platform support verified in the SDK: `MusicLibrary`, `createPlaylist`, `add(_:to:)` and `MusicAuthorization.request()` are available on iOS 16+, macOS 14+ and visionOS 1+.
 
 #### 3e. Widget and App Intents
