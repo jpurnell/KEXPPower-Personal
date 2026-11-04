@@ -44,11 +44,19 @@ struct ExtendedView: View {
                 }
 
             }
-            ScrollView(.vertical, showsIndicators: true) {
-				Text(MusicLinks.linkedComment(play?.comment ?? ""))
-					.lineLimit(nil)
+            #if os(macOS)
+                // The whole page scrolls on the Mac. An inner scroll view here would take every click in its frame,
+                // so a click on the row would not reach the row.
+                Text(MusicLinks.linkedComment(play?.comment ?? ""))
                     .multilineTextAlignment(.leading)
-            }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            #else
+                ScrollView(.vertical, showsIndicators: true) {
+                    Text(MusicLinks.linkedComment(play?.comment ?? ""))
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.leading)
+                }
+            #endif
         }
         .task { await lookUpAppleMusic() }
     }

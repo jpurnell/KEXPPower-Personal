@@ -66,7 +66,7 @@ struct ContentView: View {
                     }
                     .padding([.horizontal, .bottom])
                 }
-                .background(OverlayScrollers())
+                .background(OverlayScrollers().frame(width: 0, height: 0).allowsHitTesting(false))
             #else
                 List(previousPlays) { play in
                     CombinedView(play: play)

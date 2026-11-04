@@ -17,6 +17,9 @@ struct OverlayScrollers: NSViewRepresentable {
 
     /// A zero-size view that finds the window's scroll views and sets their scroller style.
     final class ScrollerProbe: NSView {
+        /// The probe is only there to find scroll views. It must never take a click meant for the content under it.
+        override func hitTest(_ point: NSPoint) -> NSView? { nil }
+
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
             apply()
