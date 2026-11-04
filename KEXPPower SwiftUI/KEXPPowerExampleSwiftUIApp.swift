@@ -18,12 +18,15 @@ enum SceneID {
 struct KEXPPowerExampleSwiftUIApp: App {
     /// The one player and playlist, shared by every window and by the menus.
     @State private var model = ResultRetriever()
+    /// Saves songs to the listener's playlists; the add buttons read it from the environment.
+    @State private var saving = AppSongSaver.makeModel()
 
     var body: some Scene {
         #if os(macOS)
         // A single window, so "Show Full Window" brings the existing one back instead of opening another.
         Window("Spinner", id: SceneID.main) {
             RootView(model: model)
+                .environment(saving)
         }
         .defaultSize(width: 780, height: 900)
         .commands {
@@ -46,6 +49,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
         #else
         WindowGroup {
             RootView(model: model)
+                .environment(saving)
         }
         .commands {
             CommandGroup(replacing: .newItem) {}

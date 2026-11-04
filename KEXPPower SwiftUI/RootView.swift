@@ -82,4 +82,5 @@ struct ComingSoonView: View {
 
 #Preview {
     RootView(model: ResultRetriever())
+        .environment(AppSongSaver.makeModel())
 }

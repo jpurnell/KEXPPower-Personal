@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### Added
+- Add to playlist (iPhone, iPad, Vision Pro): a button on each play, and on the Now Playing row. A tap adds the song to a "KEXP" playlist (made on first use); a press and hold also offers another of your playlists, or a new one, to add it to as well. Songs are matched by ISRC when KEXP supplies a MusicBrainz recording id (looked up on MusicBrainz, paced and cached), otherwise by a text search that asks "Is this the song?" before adding. A song is never added to the same playlist twice, including across launches. The button shows added, partly added, needs confirmation, not found, Apple Music unavailable, and needs permission. Needs the MusicKit service on the App ID and an Apple Music subscription.
+- macOS has no add button: MusicKit marks adding to playlists and creating them unavailable on the Mac (checked in the macOS 27.2 SDK). The Mac can search the catalog and read the library; the plan's earlier note that it could write was wrong and is corrected.
 - macOS: a mini player window, translucent (the desktop shows through, blurred; solid with Reduce Transparency; draggable by its background), with just what is playing (artwork, title, artist, play/pause and a button back to the full window). Playback menu: Show Mini Player (⇧⌘M) and Show Full Window (⌥⌘M). The main window is a single-instance window, so switching never opens a second one.
 - `NowPlayingSummary`: the title and artist lines shown for a play ("Airbreak" and "KEXP" when missing), shared by the mini player and, later, the widget.
 

@@ -61,6 +61,11 @@ struct CombinedView: View {
         // Fill the row, so an expanded one is as wide as a collapsed one.
         .frame(maxWidth: .infinity)
         .padding(8)
+        .overlay(alignment: .topTrailing) {
+            if AppSongSaver.canSaveToPlaylists, let play {
+                SaveButton(play: play).padding(4)
+            }
+        }
         .foregroundStyle(.primary)
         .background { backdrop }
         .clipShape(RoundedRectangle(cornerRadius: corner))
@@ -90,4 +95,5 @@ struct CombinedView: View {
 
 #Preview(traits: .sizeThatFitsLayout) {
     CombinedView(play: .fixture())
+        .environment(AppSongSaver.makeModel())
 }
