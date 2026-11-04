@@ -10,13 +10,17 @@ import SwiftUI
 
 @main
 struct KEXPPowerExampleSwiftUIApp: App {
+    /// The one player and playlist, shared by every window and by the menus.
+    @State private var model = ResultRetriever()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(resultsRetriever: model)
         }
         .commands {
             // One window, no documents: File > New Window has nothing sensible to open.
             CommandGroup(replacing: .newItem) {}
+            PlaybackCommands(model: model)
         }
 
         #if os(macOS)

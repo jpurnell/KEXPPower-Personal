@@ -16,7 +16,8 @@ import KEXPPower
 struct ContentView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
 
-    var resultsRetriever: ResultRetriever = ResultRetriever()
+    /// The shared model; the app owns it, so every window shows the same player.
+    let resultsRetriever: ResultRetriever
     let logger = Logger(#function)
     @State var press: Bool = false
 
@@ -42,7 +43,7 @@ struct ContentView: View {
                                 .frame(width: 32, height: 32)
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(resultsRetriever.playerController.isPlaying ? "Pause" : "Play")
+                        .accessibilityLabel(PlaybackMenuState(isPlaying: resultsRetriever.playerController.isPlaying).title)
                     }
                     CombinedView(play: resultsRetriever.play)
                 }.padding(.horizontal)
@@ -97,7 +98,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(resultsRetriever: ResultRetriever())
             .previewLayout(.sizeThatFits)
     }
 }

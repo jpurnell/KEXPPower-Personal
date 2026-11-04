@@ -43,7 +43,7 @@ struct PlayerView: View {
 										.foregroundStyle(.primary)
 										.opacity(small ? 0.9 : 0)
 										.frame(minWidth: 64, idealWidth: 64, maxWidth: 64, minHeight: 64, idealHeight: 64, maxHeight: 64, alignment: .center)
-										.accessibilityLabel(resultsRetriever.playerController.isPlaying ? "Pause" : "Play")
+										.accessibilityLabel(PlaybackMenuState(isPlaying: resultsRetriever.playerController.isPlaying).title)
 								} : nil
 							}
 							(small ? nil : ExtendedView(play: resultsRetriever.play))
