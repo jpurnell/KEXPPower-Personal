@@ -1,6 +1,6 @@
 # Design Proposal: Now Playing Widget (small, medium, large) on iPhone, iPad, Mac and Vision Pro
 
-**Status:** APPROVED 2026-11-04 (owner: visionOS included, built last; refresh requested every 5 minutes; large size shows about six lines of the DJ comment; design for CarPlay now, verify later)
+**Status:** APPROVED 2026-11-04, first version built 2026-11-04 (StationKit 0.6.0, adapter 0.4.0, the `Spinner Widget` extension; awaiting a check on a device) (owner: visionOS included, built last; refresh requested every 5 minutes; large size shows about six lines of the DJ comment; design for CarPlay now, verify later)
 **Date:** 2026-11-04
 **Master Plan Reference:** `PlatformExperience.md` §3e (Widget and App Intents), widened from "small/medium" to three sizes by the owner on 2026-11-04.
 **Facts below marked (SDK) were read from the Xcode 27.2 SDK interfaces; anything not confirmed is marked *unverified*.**

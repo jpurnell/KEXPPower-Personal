@@ -27,6 +27,7 @@ public class ResultRetriever {
 	var playerController = PlayerController()
 
 	private let polling = PollingTask()
+	private let widgetPublisher = WidgetPublisher()
 
 	private var isPolling: Bool { polling.task != nil }
 
@@ -65,6 +66,7 @@ public class ResultRetriever {
 			show = showResult.shows?.first ?? Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"])
 
 			await playerController.updateNowPlaying(KEXPMapping.nowPlaying(from: plays.first))
+			await widgetPublisher.update(play: plays.first, show: show, isPlaying: playerController.isPlaying)
 		} catch {
 			logger.error("Refresh failed: \(error.localizedDescription, privacy: .public)")
 		}

@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- A Now Playing widget in three sizes (iPhone and iPad home screen, Mac desktop, Vision Pro on visionOS 26): small is the art with the song and artist; medium is the now-playing row (art, time, title, artist, album, release date and label) with play/pause; large adds the show and host, Spotify and Bandcamp links and the start of the DJ's comment. It shows "Last played 3:36 PM", never "live", and asks to be refreshed every five minutes (the system decides how often it actually does). The app publishes the current song to an App Group and reloads the widget only when the song, the show or the play state changes, so it does not spend WidgetKit's refresh budget on every poll. Play/pause runs in the app without opening it. Not yet verified on a device: please add the widget on Brawn and the Mac.
 - Add to playlist (iPhone, iPad, Vision Pro): a button on each song in the list, and one on the "Now Playing" line (not on airbreaks, which are not songs; the Now Playing row keeps its full width). A tap adds the song to a "KEXP" playlist (made on first use); a press and hold also offers another of your playlists, or a new one, to add it to as well. Songs are matched by ISRC when KEXP supplies a MusicBrainz recording id (looked up on MusicBrainz, paced and cached), otherwise by a text search that asks "Is this the song?" before adding. A song is never added to the same playlist twice, including across launches. The button shows added, partly added, needs confirmation, not found, Apple Music unavailable, and needs permission. Needs the MusicKit service on the App ID and an Apple Music subscription.
 - The iOS app declares the App Group `group.com.JPEnterprises.Spinner` (the widget will share data through it). That makes Xcode sign with a profile for the explicit App ID instead of the wildcard `*` profile, which grants no capabilities.
 - When an add to a playlist fails, the log records MusicKit's own error and the account state (authorization, catalog playback, cloud library), because MusicKit's description of these failures is often just "An unknown error occurred".
@@ -11,6 +12,7 @@
 - `NowPlayingSummary`: the title and artist lines shown for a play ("Airbreak" and "KEXP" when missing), shared by the mini player and, later, the widget.
 
 ### Changed
+- Requires `StationKit` 0.6.0 (the widget layer) and `StationKitAdapterKEXP` 0.4.0 (labels, release date and the current show), on top of the earlier requirements below.
 - Requires `StationKit` 0.4.0 (song matching) and `StationKitAdapterKEXP` 0.3.0 (the mapping carries the MusicBrainz recording id), as well as
   `KEXPPowerKit` 4.1.0, which gives `Play` its MusicBrainz ids (`recordingID`, `releaseID`, `releaseGroupID`, `trackID`) for matching songs to Apple Music.
 - The app has a frame: a sidebar (Live, Archive, Playlists) on the Mac, iPad and Vision Pro that can be shown and hidden (toolbar button, View menu), and tabs on the iPhone. Live is what the app showed before; Archive and Playlists say they are coming. `AppSection` drives both.

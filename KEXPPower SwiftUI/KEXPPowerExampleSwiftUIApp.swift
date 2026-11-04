@@ -17,9 +17,16 @@ enum SceneID {
 @main
 struct KEXPPowerExampleSwiftUIApp: App {
     /// The one player and playlist, shared by every window and by the menus.
-    @State private var model = ResultRetriever()
+    @State private var model: ResultRetriever
     /// Saves songs to the listener's playlists; the add buttons read it from the environment.
     @State private var saving = AppSongSaver.makeModel()
+
+    init() {
+        let model = ResultRetriever()
+        _model = State(initialValue: model)
+        // An App Intent from the widget reaches the player through this, even if no window has opened yet.
+        AppModelRegistry.model = model
+    }
 
     var body: some Scene {
         #if os(macOS)

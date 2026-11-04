@@ -165,13 +165,7 @@ import UniformTypeIdentifiers
         /// Encodes artwork as JPEG, the form AVFoundation metadata expects, without going through UIKit or AppKit.
         /// - Returns: The JPEG bytes, or `nil` if the image cannot be encoded.
         static func jpegData(from image: CGImage, quality: Double = 0.8) -> Data? {
-            let data = NSMutableData()
-            guard let destination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
-                return nil
-            }
-            CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: quality] as CFDictionary)
-            guard CGImageDestinationFinalize(destination) else { return nil }
-            return data as Data
+            ArtworkThumbnail.jpegData(from: image, quality: quality)
         }
 
         // MARK: - Playback Control
