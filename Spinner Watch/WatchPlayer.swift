@@ -65,7 +65,7 @@ final class WatchPlayer {
         volumeObservation = session.publisher(for: \.outputVolume)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] value in
-                MainActor.assumeIsolated { self?.volume = value }
+                MainActor.assumeIsolated { self?.volumeChanged(to: value) }
             }
 
         sessionCoordinator.observe { [weak self] action in
@@ -90,6 +90,14 @@ final class WatchPlayer {
                 try? await Task.sleep(for: .seconds(succeeded ? 15 : min(3 * failures, 15)))
             }
         }
+    }
+
+    private func volumeChanged(to value: Float) {
+        // The system repeats the notification while the crown turns; only a new level is news.
+        guard abs(value - volume) >= 0.001 else { return }
+        volume = value
+        let message = "Output volume \(value)"
+        logger.info("\(message, privacy: .public)")
     }
 
     /// Creates the player for the stream; also used to start over after a failed connection.
