@@ -102,6 +102,12 @@ final class SongSavingModel {
             createPlaylist: { try await playlists.createPlaylist(named: $0) })
     }
 
+    /// Whether a play is a song that can be saved: not an airbreak, and with a title and an id.
+    static func canSave(_ play: Play?) -> Bool {
+        guard let play else { return false }
+        return play.id != nil && KEXPMapping.track(from: play) != nil
+    }
+
     /// Where a play is in being saved.
     func state(for play: Play) -> SaveState {
         play.id.flatMap { states[$0] } ?? .idle
@@ -112,7 +118,7 @@ final class SongSavingModel {
     ///   - play: The play to save; airbreaks and plays without an id are ignored.
     ///   - extra: A second playlist to add it to as well.
     func save(_ play: Play, alsoTo extra: PlaylistSummary? = nil) async {
-        guard let id = play.id, let track = KEXPMapping.track(from: play) else { return }
+        guard Self.canSave(play), let id = play.id, let track = KEXPMapping.track(from: play) else { return }
         guard states[id] != .saving else { return }
         states[id] = .saving
         let outcome = await saveTrack(track, extra)

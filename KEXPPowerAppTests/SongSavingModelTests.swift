@@ -133,6 +133,15 @@ struct SongSavingModelTests {
         #expect(await failing.playlists().isEmpty)
     }
 
+    @Test("Only plays that are songs can be saved: not airbreaks, not plays with no song or no id")
+    func canSave() {
+        #expect(SongSavingModel.canSave(play))
+        #expect(!SongSavingModel.canSave(Play(id: 1, playType: .airbreak)))
+        #expect(!SongSavingModel.canSave(Play(id: 2, artist: "Someone", playType: .trackplay)))
+        #expect(!SongSavingModel.canSave(Play(song: "No id", playType: .trackplay)))
+        #expect(!SongSavingModel.canSave(nil))
+    }
+
     @Test("Each state has an icon and a spoken label")
     func presentation() {
         let states: [SaveState] = [

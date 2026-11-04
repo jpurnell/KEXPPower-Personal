@@ -62,7 +62,7 @@ struct CombinedView: View {
         .frame(maxWidth: .infinity)
         .padding(8)
         .overlay(alignment: .topTrailing) {
-            if AppSongSaver.canSaveToPlaylists, let play {
+            if AppSongSaver.canSaveToPlaylists, let play, SongSavingModel.canSave(play) {
                 SaveButton(play: play).padding(4)
             }
         }

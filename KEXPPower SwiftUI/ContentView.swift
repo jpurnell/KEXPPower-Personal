@@ -50,7 +50,14 @@ struct ContentView: View {
             #endif
             #if os(iOS) || os(visionOS)
                 VStack(alignment: .leading) {
-                    Text("Now Playing").fontWeight(.semibold)
+                    // The add button sits on the label line, so the row below keeps its whole width.
+                    HStack {
+                        Text("Now Playing").fontWeight(.semibold)
+                        Spacer()
+                        if AppSongSaver.canSaveToPlaylists, SongSavingModel.canSave(resultsRetriever.play) {
+                            SaveButton(play: resultsRetriever.play)
+                        }
+                    }
                     HStack(alignment: .center) {
                         PlayerView(resultsRetriever: resultsRetriever)
                     }
@@ -99,6 +106,7 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView(resultsRetriever: ResultRetriever())
+            .environment(AppSongSaver.makeModel())
             .previewLayout(.sizeThatFits)
     }
 }

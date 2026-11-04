@@ -36,7 +36,6 @@ struct PlayerView: View {
 									.frame(minWidth: 150, maxWidth: .infinity)
 									.padding(.leading)
 									.padding(.vertical) : nil)
-								(small && AppSongSaver.canSaveToPlaylists ? SaveButton(play: resultsRetriever.play) : nil)
 								small ?
 								Button(action: resultsRetriever.playerController.playOrPause) {
 									Image(systemName: resultsRetriever.playerController.isPlaying ? "pause.circle" : "play.circle")
@@ -77,6 +76,5 @@ struct PlayerView: View {
 
 #Preview {
 	PlayerView(resultsRetriever: ResultRetriever())
-		.environment(AppSongSaver.makeModel())
 }
 #endif
