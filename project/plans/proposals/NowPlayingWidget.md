@@ -1,6 +1,6 @@
 # Design Proposal: Now Playing Widget (small, medium, large) on iPhone, iPad, Mac and Vision Pro
 
-**Status:** Proposed — awaiting approval
+**Status:** APPROVED 2026-11-04 (owner: visionOS included, built last; refresh requested every 5 minutes; large size shows about six lines of the DJ comment; design for CarPlay now, verify later)
 **Date:** 2026-11-04
 **Master Plan Reference:** `PlatformExperience.md` §3e (Widget and App Intents), widened from "small/medium" to three sizes by the owner on 2026-11-04.
 **Facts below marked (SDK) were read from the Xcode 27.2 SDK interfaces; anything not confirmed is marked *unverified*.**
@@ -45,6 +45,9 @@ App (iOS, Mac)                              writes the store when the track or p
                                             asks WidgetKit to reload
 ```
 
+#### 3a-2. Two additive changes the medium and large sizes need
+- `Track` gains `labels: [String]` and `releaseDate: String?` (both optional or empty by default, so no adapter breaks), and `Station` gains `currentProgram() async throws -> ProgramInfo?` with a default that returns `nil`. `StationKitAdapterKEXP` 0.4.0 fills all three in from KEXP's plays and shows.
+
 #### 3b. One extension target, three platforms
 A single multiplatform widget extension (iOS, iPadOS, macOS, visionOS), embedded in the iOS app target and the Mac target with platform filters, the same way the watch app is embedded today. The home-screen sizes are `systemSmall`, `systemMedium` and `systemLarge` (SDK: iOS 14, macOS 11, visionOS 26).
 
@@ -55,7 +58,7 @@ A single multiplatform widget extension (iOS, iPadOS, macOS, visionOS), embedded
 4. While the app is running it writes the store and calls `WidgetCenter.reloadAllTimelines()` when the track or the play state changes.
 
 #### 3d. Refresh, stated honestly
-WidgetKit refreshes on a system budget of minutes, not seconds. The widget therefore shows "Last played 3:36 PM". It asks to be refreshed about every 15 minutes, and updates promptly only when the app is running and tells it so. It will not tick live. (The budget figure is the documented order of magnitude, not a guarantee.)
+WidgetKit refreshes on a system budget of minutes, not seconds. The widget therefore shows "Last played 3:36 PM". It asks to be refreshed **every 5 minutes** (owner decision 2026-11-04) and updates promptly when the app is running and tells it so. A request is not a guarantee: WidgetKit keeps the budget and, at 5 minutes, may refresh less often than asked (a day of 5-minute refreshes is more than the documented order of magnitude, so some will be skipped). It will not tick live. (The budget figure is the documented order of magnitude, not a guarantee.) The refresh interval is a constant in `WidgetRefreshPolicy`, so it can be tuned after seeing how often the system honours it.
 
 #### 3e. Play/pause
 `PlayPauseIntent` conforms to `AudioPlaybackIntent` (SDK: iOS 17, macOS 14, watchOS 10, tvOS 17), so playback can start without opening the app. The widget cannot ask the player whether it is playing, so the app writes a playing flag to the App Group and reloads the widget. If that flag is stale, the button shows the wrong icon until the next reload; this is the main correctness risk.
@@ -136,10 +139,9 @@ Nothing KEXP-specific is in the widget logic: it consumes `NowPlaying` from any 
 Watch Smart Stack and complications; a Control Center control; the add button once MusicKit is proven in an extension; configuration to choose the stream quality.
 
 ### 16. Open Questions
-1. Is a visionOS widget wanted in the first version, given it needs visionOS 26? (Recommend yes, built last.)
-2. Refresh cadence: about 15 minutes, or lower when the app is running? (Recommend as in §3d.)
-3. Large size: how much of the DJ comment? (Recommend about six lines.)
-4. CarPlay: build for it in the first version, or only check it later? (Recommend design for it, verify later.)
+All four are answered (2026-11-04): visionOS yes, built last; refresh requested every 5 minutes; about six lines of the DJ comment on the large size; design for CarPlay now and verify later.
+
+Still open: whether an app with a lower visionOS minimum can embed an extension that needs visionOS 26 (try first), and whether a widget in CarPlay needs an entitlement.
 
 ### 17. Documentation Strategy
 DocC on the StationKit types; README gains a Widget section and the platform matrix gains a widget column; CHANGELOG entries in StationKit and the app; the master plan's status updated.
