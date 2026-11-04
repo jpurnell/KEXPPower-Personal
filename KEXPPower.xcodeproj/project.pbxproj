@@ -1264,7 +1264,7 @@
 			repositoryURL = "git@github.com:jpurnell/StationKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.3.0;
+				minimumVersion = 0.4.0;
 			};
 		};
 		AB6DF3C2B3BF307D38068231 /* XCRemoteSwiftPackageReference "StationKitAdapterKEXP" */ = {
@@ -1272,7 +1272,7 @@
 			repositoryURL = "git@github.com:jpurnell/StationKitAdapterKEXP.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.2.0;
+				minimumVersion = 0.3.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

@@ -1,4 +1,6 @@
 import KEXPPower
+import StationKit
+import StationKitAdapterKEXP
 import Testing
 @testable import KEXPPowerExampleSwiftUI
 
@@ -44,5 +46,11 @@ struct NowPlayingSummaryTests {
         let play = Play.fixture()
         #expect(play.recordingID == "00000000-0000-4000-8000-0000000000a1")
         #expect(play.releaseID == "00000000-0000-4000-8000-0000000000a2")
+    }
+
+    @Test("The KEXP adapter carries the recording id onto the track, for matching a song by ISRC")
+    func adapterCarriesRecordingID() throws {
+        let track = try #require(KEXPMapping.track(from: .fixture()))
+        #expect(track.identifiers.musicBrainzRecordingID == "00000000-0000-4000-8000-0000000000a1")
     }
 }

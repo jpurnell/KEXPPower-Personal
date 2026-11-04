@@ -7,7 +7,8 @@
 - `NowPlayingSummary`: the title and artist lines shown for a play ("Airbreak" and "KEXP" when missing), shared by the mini player and, later, the widget.
 
 ### Changed
-- Requires `KEXPPowerKit` 4.1.0, which gives `Play` its MusicBrainz ids (`recordingID`, `releaseID`, `releaseGroupID`, `trackID`) for matching songs to Apple Music.
+- Requires `StationKit` 0.4.0 (song matching) and `StationKitAdapterKEXP` 0.3.0 (the mapping carries the MusicBrainz recording id), as well as
+  `KEXPPowerKit` 4.1.0, which gives `Play` its MusicBrainz ids (`recordingID`, `releaseID`, `releaseGroupID`, `trackID`) for matching songs to Apple Music.
 - The app has a frame: a sidebar (Live, Archive, Playlists) on the Mac, iPad and Vision Pro that can be shown and hidden (toolbar button, View menu), and tabs on the iPhone. Live is what the app showed before; Archive and Playlists say they are coming. `AppSection` drives both.
 - Starting the playlist is idempotent (`startIfNeeded`), so the mini window can start it on its own and several windows can ask.
 
