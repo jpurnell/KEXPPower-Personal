@@ -19,6 +19,7 @@
 - Controls honor Reduce Transparency; icons carry accessibility labels.
 
 ### Fixed
+- iOS: the play/pause button did not follow the player. `PlayerController` was an `ObservableObject` held by an `@Observable` `ResultRetriever`, so a change to `isPlaying` never reached the view; it is `@Observable` now, with a test that a view reading `isPlaying` is notified.
 - Playback resumes after an interruption (a phone call) when the system says it may, and pauses when headphones are unplugged.
 - Artwork loading no longer crashes on an unreachable or malformed URL (`try!`), and only contacts
   kexp.org and archive.org over https. Loaded artwork now actually reaches the lock screen.

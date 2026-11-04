@@ -12,6 +12,7 @@ import AVFoundation
 import AVKit
 import Combine
 import Foundation
+import Observation
 import OSLog
 import StationKit
 import UIKit
@@ -21,20 +22,21 @@ import UIKit
     /// `isPlaying` mirrors the player's own `timeControlStatus`; it is never toggled by hand, so a
     /// remote command, an interruption, or a route change cannot leave it out of step.
     @MainActor
-    final class PlayerController: ObservableObject {
+    @Observable
+    final class PlayerController {
 
         // MARK: - State
 
-        @Published private(set) var isPlaying = false
+        private(set) var isPlaying = false
 
-        private(set) var player: AVPlayer?
+        @ObservationIgnored private(set) var player: AVPlayer?
         let avPlayerViewController = AVPlayerViewController()
 
         private let stationName: String
         private let fallbackArtworkURL: URL?
-        private var snapshot: NowPlayingSnapshot
-        private var currentArtwork: CGImage?
-        private var statusObservation: AnyCancellable?
+        @ObservationIgnored private var snapshot: NowPlayingSnapshot
+        @ObservationIgnored private var currentArtwork: CGImage?
+        @ObservationIgnored private var statusObservation: AnyCancellable?
 
         private let artworkLoader: ArtworkLoader
         private let publisher: any NowPlayingPublishing
@@ -100,7 +102,7 @@ import UIKit
                 toggle: { [weak self] in self?.playOrPause() })
         }
 
-        private func timeControlStatusChanged(_ status: AVPlayer.TimeControlStatus) {
+        func timeControlStatusChanged(_ status: AVPlayer.TimeControlStatus) {
             let waitingReason = player?.reasonForWaitingToPlay?.rawValue ?? "none"
             let message = "timeControlStatus \(status.rawValue); waiting reason \(waitingReason)"
             logger.info("\(message, privacy: .public)")

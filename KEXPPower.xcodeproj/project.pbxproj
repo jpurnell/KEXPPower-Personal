@@ -10,6 +10,7 @@
 		1476F17453204F9D2BEDF587 /* SpinnerWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB9519A3E3C59652BC44B48 /* SpinnerWatchApp.swift */; };
 		15C39B3CCBDD239C919AAD6B /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = D57BF9D21786FB032B915526 /* StationKitAdapterKEXP */; };
 		17AFFC0C3BFFCF684D8D581A /* MusicLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */; };
+		3A466AB51A21129A4322E07B /* PlayerControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3585BE6827B310B19AEADD6 /* PlayerControllerTests.swift */; };
 		3BA956736E6DE724B118062C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */; };
 		3BD8D5DD14914B8F3A2721F3 /* KEXPPower in Frameworks */ = {isa = PBXBuildFile; productRef = 389B2E62968225912A149478 /* KEXPPower */; };
 		3CF90FF93222450CC00975C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CA6C4099197D2A7731C6508 /* Assets.xcassets */; };
@@ -123,6 +124,7 @@
 		BA518B0C7861569CC6A87A7E /* StreamQuality.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQuality.swift; sourceTree = "<group>"; };
 		C895B019C2EAD90B83BC21BB /* WatchContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		DBB9519A3E3C59652BC44B48 /* SpinnerWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpinnerWatchApp.swift; sourceTree = "<group>"; };
+		E3585BE6827B310B19AEADD6 /* PlayerControllerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerControllerTests.swift; sourceTree = "<group>"; };
 		E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQualityTests.swift; sourceTree = "<group>"; };
 		F478354AB15736CA0D325E03 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		F91060B80CB56756A0E46BFC /* Spinner Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spinner Watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -305,6 +307,7 @@
 			children = (
 				E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */,
 				604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */,
+				E3585BE6827B310B19AEADD6 /* PlayerControllerTests.swift */,
 			);
 			name = KEXPPowerAppTests;
 			path = KEXPPowerAppTests;
@@ -516,6 +519,7 @@
 			files = (
 				8F8468319F4A1DFE2E8C875E /* StreamQualityTests.swift in Sources */,
 				17AFFC0C3BFFCF684D8D581A /* MusicLinksTests.swift in Sources */,
+				3A466AB51A21129A4322E07B /* PlayerControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

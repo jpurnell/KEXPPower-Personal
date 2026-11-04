@@ -13,10 +13,10 @@ import AVKit
 #if os(iOS) || os(visionOS)
 // A SwiftUI view wrapper for an AVPlayerViewController
 struct VideoPlayer: UIViewControllerRepresentable {
-	// MARK: - Observed Object
+	// MARK: - Player
 	
-	// ObservedObject that manage the underlying AVPlayer and its playback state
-	@ObservedObject var playerController: PlayerController
+	// Manages the underlying AVPlayer and its playback state
+	let playerController: PlayerController
 	
 	// MARK: - UIViewControllerRepresentable Protocol Methods
 	
