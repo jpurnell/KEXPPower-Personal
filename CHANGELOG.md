@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Added
-- macOS: a mini player window with just what is playing (artwork, title, artist, play/pause and a button back to the full window). Playback menu: Show Mini Player (⇧⌘M) and Show Full Window (⌥⌘M). The main window is a single-instance window, so switching never opens a second one.
+- macOS: a mini player window, translucent (the desktop shows through, blurred; solid with Reduce Transparency; draggable by its background), with just what is playing (artwork, title, artist, play/pause and a button back to the full window). Playback menu: Show Mini Player (⇧⌘M) and Show Full Window (⌥⌘M). The main window is a single-instance window, so switching never opens a second one.
 - `NowPlayingSummary`: the title and artist lines shown for a play ("Airbreak" and "KEXP" when missing), shared by the mini player and, later, the widget.
 
 ### Changed

@@ -13,6 +13,7 @@
 		1476F17453204F9D2BEDF587 /* SpinnerWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB9519A3E3C59652BC44B48 /* SpinnerWatchApp.swift */; };
 		15C39B3CCBDD239C919AAD6B /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = D57BF9D21786FB032B915526 /* StationKitAdapterKEXP */; };
 		17AFFC0C3BFFCF684D8D581A /* MusicLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */; };
+		192C2A54A8056CFF4BD688EF /* TranslucentWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F4B6250D0471D69DE8986C /* TranslucentWindow.swift */; };
 		20004903B9393F0D972973B8 /* AudioPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8242BEBBD860079B78E /* AudioPlayerView.swift */; };
 		271E9E6733697073AD357D31 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
 		3005B030BCBDD7FAF7ABF7AB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EF30CA8E2C1E77C41691552 /* Cocoa.framework */; };
@@ -178,6 +179,7 @@
 		AAFBE4378A2DAC76125F8B3C /* PlaybackCommands.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlaybackCommands.swift; sourceTree = "<group>"; };
 		B3A1C72889750E42993F76F8 /* PlaybackMenuStateTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlaybackMenuStateTests.swift; sourceTree = "<group>"; };
 		B49CD0710D2AF055A317BEDA /* OverlayScrollers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OverlayScrollers.swift; sourceTree = "<group>"; };
+		B5F4B6250D0471D69DE8986C /* TranslucentWindow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TranslucentWindow.swift; sourceTree = "<group>"; };
 		BA518B0C7861569CC6A87A7E /* StreamQuality.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQuality.swift; sourceTree = "<group>"; };
 		C895B019C2EAD90B83BC21BB /* WatchContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		DBB9519A3E3C59652BC44B48 /* SpinnerWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpinnerWatchApp.swift; sourceTree = "<group>"; };
@@ -245,6 +247,7 @@
 			children = (
 				B49CD0710D2AF055A317BEDA /* OverlayScrollers.swift */,
 				E7C2F39956AFF7B54CCA1107 /* MiniPlayerView.swift */,
+				B5F4B6250D0471D69DE8986C /* TranslucentWindow.swift */,
 			);
 			path = Mac;
 			sourceTree = "<group>";
@@ -689,6 +692,7 @@
 				B0A3E40ACC55F03B274E3F8C /* PlaybackCommands.swift in Sources */,
 				3A702B78ABBE35D76C7AA21B /* NowPlayingSummary.swift in Sources */,
 				34648126F9C38138779F5E96 /* MiniPlayerView.swift in Sources */,
+				192C2A54A8056CFF4BD688EF /* TranslucentWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

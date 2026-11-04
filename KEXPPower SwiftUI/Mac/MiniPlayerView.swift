@@ -44,7 +44,15 @@ struct MiniPlayerView: View {
         }
         .padding(12)
         .frame(minWidth: 320, idealWidth: 380, maxWidth: 560)
-        .background(reduceTransparency ? AnyShapeStyle(.background) : AnyShapeStyle(.ultraThinMaterial))
+        // The window has no title bar, but its top edge is still a safe area (the traffic lights sit in it). The
+        // backdrop runs up under it so the whole window is translucent.
+        .background {
+            if reduceTransparency {
+                Rectangle().fill(.background).ignoresSafeArea()
+            } else {
+                TranslucentWindow().ignoresSafeArea()
+            }
+        }
         .task { await model.startIfNeeded() }
     }
 }

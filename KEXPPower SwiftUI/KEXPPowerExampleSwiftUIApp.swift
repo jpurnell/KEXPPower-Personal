@@ -35,6 +35,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
         Window("Mini Player", id: SceneID.mini) {
             MiniPlayerView(model: model)
         }
+        .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         .defaultSize(width: 420, height: 112)
 
