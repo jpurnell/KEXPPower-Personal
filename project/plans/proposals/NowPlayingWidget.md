@@ -110,7 +110,7 @@ Nothing KEXP-specific is in the widget logic: it consumes `NowPlaying` from any 
 
 ### 10. Dependencies
 **Internal:** StationKit 0.6.0, StationKitAdapterKEXP, KEXPPowerKit.
-**Portal (owner):** App Groups is **done** for `com.JPEnterprises.Spinner`. The extension's own App ID (`com.JPEnterprises.Spinner.widget`) needs the App Groups capability too; Xcode registers it on first build with `-allowProvisioningUpdates`, and I will confirm. The Mac app needs the App Group entitlement declared in `Spinner Mac.entitlements`.
+**Portal (owner):** App Groups is **done** for `com.JPEnterprises.Spinner` (iOS, visionOS: `group.com.JPEnterprises.Spinner`). **The Mac uses a different, Team-ID-prefixed group** (`BNDA9Y6YV9.com.JPEnterprises.Spinner`), which needs no portal registration: with automatic signing the Mac builds were signed with a wildcard profile that does not authorize a `group.` identifier, and the system then refused the app's writes (found by running it, 2026-11-04). The extension's own App ID (`com.JPEnterprises.Spinner.widget`) needs the App Groups capability too; Xcode registers it on first build with `-allowProvisioningUpdates`, and I will confirm. The Mac app needs the App Group entitlement declared in `Spinner Mac.entitlements`.
 **External:** none new.
 
 ### 11. Test Strategy (test first, in StationKit)

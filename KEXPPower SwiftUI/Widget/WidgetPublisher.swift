@@ -18,9 +18,6 @@ import WidgetKit
 /// starting or stopping, and not on the app's every five-second poll.
 @MainActor
 final class WidgetPublisher {
-    /// The App Group the app and the widget share.
-    static let groupID = "group.com.JPEnterprises.Spinner"
-
     private static let stationName = "KEXP"
     private static let logoURL = URL(string: "https://kexp.org/static/assets/img/kexp_logo.jpg")
 
@@ -33,7 +30,7 @@ final class WidgetPublisher {
     ///   - store: Where the widget reads from; the App Group by default.
     ///   - reload: Asks WidgetKit to reload the widget's timelines.
     init(
-        store: any NowPlayingStore = AppGroupNowPlayingStore(groupID: WidgetPublisher.groupID),
+        store: any NowPlayingStore = AppGroupNowPlayingStore(groupID: WidgetConstants.groupID),
         reload: @escaping @MainActor () -> Void = WidgetPublisher.reloadWidgets
     ) {
         self.store = store

@@ -48,6 +48,7 @@
 		4359EF6B37532CFF05CA60BB /* Spinner Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E1F3A0A25B67B4420DFAF25E /* Spinner Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		455D899381F48D30E988E777 /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3212E6F1A3139342DE7BC7F3 /* StationKit */; };
 		4694C4A7645F807E973C9A2E /* SongSavingModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B35617BDFD5A91A24B5285 /* SongSavingModelTests.swift */; };
+		46C52C054103626AA114A458 /* WidgetConstantsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B581D086F4D834217B4F630 /* WidgetConstantsTests.swift */; };
 		49A0D8BAE3BA3AED7652341A /* CompactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81D2BEAA8B80079B78E /* CompactView.swift */; };
 		4BFC6CE38F9372B5EFD76F5A /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1E1AE6BCC0646A0E8C4526E6 /* StationKit */; };
 		4C511420FAF041C41D91F90E /* VolumeBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499A6F19108336D3581B180E /* VolumeBar.swift */; };
@@ -122,6 +123,7 @@
 		BFCE405A2CBDDF7A63F76018 /* AppSongSaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AAD9C771211029F3467F3F /* AppSongSaver.swift */; };
 		C1011BC886E933FBF05CB940 /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = BBAB57C5E9B7981118104FC1 /* StationKitAdapterKEXP */; };
 		C7B96B15AAF8D1241F410897 /* PlayPauseIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E566CF41C97EAB3E3BBEC7 /* PlayPauseIntent.swift */; };
+		C93E4690292EFCEA372CFD3A /* WidgetConstantsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B581D086F4D834217B4F630 /* WidgetConstantsTests.swift */; };
 		CC6B1625F8C107A1ECFDA81D /* MusicKitCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AF82B259DB7031739958A9 /* MusicKitCatalog.swift */; };
 		CE83D3943B7CFAA6125DE961 /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E5C39D633A905CCAC41BF1 /* StationKit */; };
 		D17C87BCA75816FABECB60B8 /* WidgetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE396F6ECCCA376541188EA /* WidgetConstants.swift */; };
@@ -224,6 +226,7 @@
 /* Begin PBXFileReference section */
 		03AF82B259DB7031739958A9 /* MusicKitCatalog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MusicKitCatalog.swift; sourceTree = "<group>"; };
 		0A827B74B3EC0CD13F071668 /* AppSectionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppSectionTests.swift; sourceTree = "<group>"; };
+		0B581D086F4D834217B4F630 /* WidgetConstantsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetConstantsTests.swift; sourceTree = "<group>"; };
 		128FD3045AB9DCA0AFE0D2F2 /* WidgetContent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetContent.swift; sourceTree = "<group>"; };
 		12E1B8A2E3028D5783D9ACCE /* VolumeControlView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VolumeControlView.swift; sourceTree = "<group>"; };
 		18A1F2EA674772D621307418 /* SpinnerWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpinnerWidgetBundle.swift; sourceTree = "<group>"; };
@@ -595,6 +598,7 @@
 				BEB3043F7410E0CC237C8824 /* WidgetPublisherTests.swift */,
 				AF2385347778A1131F1F0B5D /* ArtworkThumbnailTests.swift */,
 				A86EC5D409F1E6CF1B5786F9 /* WidgetLayoutRenderTests.swift */,
+				0B581D086F4D834217B4F630 /* WidgetConstantsTests.swift */,
 			);
 			path = KEXPPowerAppTests;
 			sourceTree = "<group>";
@@ -956,6 +960,7 @@
 				F91BC33FF511D0FC89761472 /* WidgetPublisherTests.swift in Sources */,
 				8D6A074C33349FFF5CD947A4 /* ArtworkThumbnailTests.swift in Sources */,
 				5480A2DAAEAD1947A072FFDC /* WidgetLayoutRenderTests.swift in Sources */,
+				46C52C054103626AA114A458 /* WidgetConstantsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -989,6 +994,7 @@
 				3821578C0C7961141A91BE3F /* WidgetPublisherTests.swift in Sources */,
 				3E6CB2E4B5552C5116749B8C /* ArtworkThumbnailTests.swift in Sources */,
 				0D309F425C5FD651313A5862 /* WidgetLayoutRenderTests.swift in Sources */,
+				C93E4690292EFCEA372CFD3A /* WidgetConstantsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1163,6 +1169,8 @@
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
+				WIDGET_APP_GROUP = group.com.JPEnterprises.Spinner;
+				"WIDGET_APP_GROUP[sdk=macosx*]" = "$(TeamIdentifierPrefix)com.JPEnterprises.Spinner";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
@@ -1464,6 +1472,8 @@
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				VALIDATE_PRODUCT = YES;
+				WIDGET_APP_GROUP = group.com.JPEnterprises.Spinner;
+				"WIDGET_APP_GROUP[sdk=macosx*]" = "$(TeamIdentifierPrefix)com.JPEnterprises.Spinner";
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
