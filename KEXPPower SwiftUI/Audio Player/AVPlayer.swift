@@ -29,6 +29,9 @@ import UniformTypeIdentifiers
 
         private(set) var isPlaying = false
 
+        /// Called with the new value whenever the player starts or stops playing.
+        @ObservationIgnored var onPlayingChange: (@MainActor (Bool) -> Void)?
+
         @ObservationIgnored private(set) var player: AVPlayer?
         #if !os(macOS)
         let avPlayerViewController = AVPlayerViewController()
@@ -110,7 +113,9 @@ import UniformTypeIdentifiers
             let waitingReason = player?.reasonForWaitingToPlay?.rawValue ?? "none"
             let message = "timeControlStatus \(status.rawValue); waiting reason \(waitingReason)"
             logger.info("\(message, privacy: .public)")
+            let wasPlaying = isPlaying
             isPlaying = status == .playing
+            if isPlaying != wasPlaying { onPlayingChange?(isPlaying) }
             snapshot.state = isPlaying ? .playing : .paused
             publisher.publish(snapshot, artwork: currentArtwork)
         }

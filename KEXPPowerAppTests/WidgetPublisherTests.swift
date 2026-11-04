@@ -108,4 +108,45 @@ struct WidgetPublisherTests {
         #expect(await store.saved.isEmpty)
         #expect(reloads.count == 0)
     }
+
+    @Test("A play-state change alone is published at once: the flag is set and the widget reloads, with no snapshot")
+    func playStateOnly() async {
+        let store = FakeStore(), reloads = Reloads()
+        let publisher = makePublisher(store, reloads)
+        await publisher.updatePlayState(isPlaying: true, at: now)
+        #expect(await store.playing == [true])
+        #expect(await store.saved.isEmpty)
+        #expect(reloads.count == 1)
+    }
+
+    @Test("Setting the same play state again refreshes the flag without reloading the widget")
+    func playStateRepeated() async {
+        let store = FakeStore(), reloads = Reloads()
+        let publisher = makePublisher(store, reloads)
+        await publisher.updatePlayState(isPlaying: true, at: now)
+        await publisher.updatePlayState(isPlaying: true, at: now.addingTimeInterval(5))
+        #expect(await store.playing == [true, true])
+        #expect(reloads.count == 1)
+    }
+
+    @Test("A play-state change made early is not reloaded again when the next poll agrees")
+    func pollAgreesWithEarlierChange() async {
+        let store = FakeStore(), reloads = Reloads()
+        let publisher = makePublisher(store, reloads)
+        await publisher.update(play: sugar, show: nil, isPlaying: false, at: now)
+        await publisher.updatePlayState(isPlaying: true, at: now.addingTimeInterval(1))
+        await publisher.update(play: sugar, show: nil, isPlaying: true, at: now.addingTimeInterval(5))
+        #expect(reloads.count == 2)
+    }
+
+    @Test("An optimistic state that turns out wrong is corrected by the next poll")
+    func optimisticCorrected() async {
+        let store = FakeStore(), reloads = Reloads()
+        let publisher = makePublisher(store, reloads)
+        await publisher.update(play: sugar, show: nil, isPlaying: false, at: now)
+        await publisher.updatePlayState(isPlaying: true, at: now.addingTimeInterval(1))
+        await publisher.update(play: sugar, show: nil, isPlaying: false, at: now.addingTimeInterval(5))
+        #expect(await store.playing == [false, true, false])
+        #expect(reloads.count == 3)
+    }
 }

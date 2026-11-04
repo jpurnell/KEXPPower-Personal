@@ -71,6 +71,9 @@ struct NowPlayingProvider: AppIntentTimelineProvider {
             artwork: await artwork(for: shown.artworkURL),
             isPlaying: await store.isPlaying(),
             isStale: policy.isStale(fetchedAt: shown.fetchedAt, asOf: now))
+        let built = "Widget entry made: \(content.isPlaying ? "playing" : "paused"), \(succeeded ? "fresh from KEXP" : "from the saved snapshot")"
+        let logger = Logger(subsystem: "com.JPEnterprises.Spinner.widget", category: "NowPlayingProvider")
+        logger.info("\(built, privacy: .public)")
         return (NowPlayingEntry(date: now, content: content), succeeded)
     }
 

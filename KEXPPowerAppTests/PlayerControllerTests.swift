@@ -39,6 +39,19 @@ struct PlayerControllerTests {
         #expect(!controller.isPlaying)
     }
 
+    @Test("A change in whether it is playing is announced once, with the new value")
+    func announcesPlayingChanges() {
+        let controller = PlayerController()
+        var announced: [Bool] = []
+        controller.onPlayingChange = { announced.append($0) }
+
+        controller.timeControlStatusChanged(.playing)
+        controller.timeControlStatusChanged(.playing)
+        controller.timeControlStatusChanged(.paused)
+        controller.timeControlStatusChanged(.waitingToPlayAtSpecifiedRate)
+        #expect(announced == [true, false])
+    }
+
     @Test("Artwork is encoded as JPEG without UIKit or AppKit")
     func artworkEncodesAsJPEG() throws {
         let context = try #require(CGContext(

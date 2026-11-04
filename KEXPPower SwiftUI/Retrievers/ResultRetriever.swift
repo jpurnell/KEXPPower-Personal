@@ -28,6 +28,27 @@ public class ResultRetriever {
 
 	private let polling = PollingTask()
 	private let widgetPublisher = WidgetPublisher()
+	private var playExpectation = PlayStateExpectation()
+
+	public init() {
+		// Tell the widget the moment playback starts or stops, not on the next five-second poll.
+		playerController.onPlayingChange = { [weak self] _ in
+			guard let self else { return }
+			Task { await self.widgetPublisher.updatePlayState(isPlaying: self.publishedPlaying) }
+		}
+	}
+
+	/// Whether to tell the widget the stream is playing: the state just asked for while it is current, else the real one.
+	private var publishedPlaying: Bool {
+		playExpectation.effective(actual: playerController.isPlaying, at: Date())
+	}
+
+	/// Publishes the state a play/pause request is about to produce, so the widget shows it at once.
+	/// - Parameter playing: Whether the request will start (`true`) or pause (`false`) playback.
+	func expectPlayState(_ playing: Bool) async {
+		playExpectation.expect(playing: playing, until: Date().addingTimeInterval(6))
+		await widgetPublisher.updatePlayState(isPlaying: playing)
+	}
 
 	private var isPolling: Bool { polling.task != nil }
 
@@ -66,9 +87,11 @@ public class ResultRetriever {
 			show = showResult.shows?.first ?? Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"])
 
 			await playerController.updateNowPlaying(KEXPMapping.nowPlaying(from: plays.first))
-			await widgetPublisher.update(play: plays.first, show: show, isPlaying: playerController.isPlaying)
+			await widgetPublisher.update(play: plays.first, show: show, isPlaying: publishedPlaying)
 		} catch {
 			logger.error("Refresh failed: \(error.localizedDescription, privacy: .public)")
+			// A failed poll must not let the widget's playing flag go stale while the stream is still playing.
+			await widgetPublisher.updatePlayState(isPlaying: publishedPlaying)
 		}
 	}
 }

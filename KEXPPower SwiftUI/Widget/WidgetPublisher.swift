@@ -5,6 +5,7 @@
 
 import Foundation
 import KEXPPower
+import OSLog
 import StationKit
 import StationKitAdapterKEXP
 #if canImport(WidgetKit)
@@ -57,12 +58,33 @@ final class WidgetPublisher {
             await store.save(snapshot)
             lastPublished = snapshot
         }
-        // Every update, while playing, so the flag the widget reads never goes stale.
-        await store.setPlaying(isPlaying, at: date)
-
-        let playStateChanged = lastPlaying != isPlaying
-        lastPlaying = isPlaying
+        let playStateChanged = await publishPlayState(isPlaying, at: date)
         if contentChanged || playStateChanged { reload() }
+    }
+
+    /// Publishes whether playback is running, on its own, as soon as it is known.
+    ///
+    /// The app calls this when the player's state changes, and the widget's play/pause intent calls it with the state
+    /// it expects, so the widget need not wait for the next poll. It reloads the widget only if the state changed.
+    /// - Parameters:
+    ///   - isPlaying: Whether the stream is playing.
+    ///   - date: The time of this update.
+    func updatePlayState(isPlaying: Bool, at date: Date = Date()) async {
+        if await publishPlayState(isPlaying, at: date) { reload() }
+    }
+
+    /// Sets the playing flag, every time so it stays fresh, and reports whether it differs from the last one set.
+    private func publishPlayState(_ isPlaying: Bool, at date: Date) async -> Bool {
+        await store.setPlaying(isPlaying, at: date)
+        let changed = lastPlaying != isPlaying
+        lastPlaying = isPlaying
+        if changed {
+            // Only changes are logged: the heartbeat repeats every poll and would drown them.
+            let message = "Published play state \(isPlaying ? "playing" : "paused") for the widget"
+            let logger = Logger()
+            logger.info("\(message, privacy: .public)")
+        }
+        return changed
     }
 
     /// Whether two snapshots show the same thing, ignoring when they were made.

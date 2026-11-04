@@ -15,6 +15,8 @@ enum AppModelRegistry {
     /// has asked for it.
     static func togglePlayback() async {
         guard let model else { return }
+        // The widget reloads as soon as this returns, before the stream has started: tell it what is coming.
+        await model.expectPlayState(!model.playerController.isPlaying)
         await model.startIfNeeded()
         model.playerController.playOrPause()
     }
