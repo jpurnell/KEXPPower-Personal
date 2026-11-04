@@ -84,7 +84,7 @@ struct ContentView: View {
             #endif
         }
         .task {
-            let _ = await resultsRetriever.getResults()
+            await resultsRetriever.startIfNeeded()
         }
         .background(reduceTransparency ? AnyShapeStyle(.background) : AnyShapeStyle(.ultraThinMaterial))
         #if os(iOS) || os(visionOS)

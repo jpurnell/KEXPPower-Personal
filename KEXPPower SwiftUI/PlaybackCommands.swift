@@ -13,9 +13,14 @@ struct PlaybackMenuState: Equatable {
     var title: String { isPlaying ? "Pause" : "Play" }
 }
 
-/// The Playback menu: play or pause the stream from the keyboard.
+/// The Playback menu: play or pause the stream from the keyboard, and on the Mac switch between the two windows.
 struct PlaybackCommands: Commands {
     let model: ResultRetriever
+
+    #if os(macOS)
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
+    #endif
 
     var body: some Commands {
         CommandMenu("Playback") {
@@ -23,6 +28,19 @@ struct PlaybackCommands: Commands {
                 model.playerController.playOrPause()
             }
             .keyboardShortcut(.space, modifiers: [])
+            #if os(macOS)
+            Divider()
+            Button("Show Mini Player") {
+                openWindow(id: SceneID.mini)
+                dismissWindow(id: SceneID.main)
+            }
+            .keyboardShortcut("m", modifiers: [.command, .shift])
+            Button("Show Full Window") {
+                openWindow(id: SceneID.main)
+                dismissWindow(id: SceneID.mini)
+            }
+            .keyboardShortcut("m", modifiers: [.command, .option])
+            #endif
         }
     }
 }

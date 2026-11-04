@@ -28,6 +28,14 @@ public class ResultRetriever {
 
 	private let polling = PollingTask()
 
+	private var isPolling: Bool { polling.task != nil }
+
+	/// Starts following the station once; later calls do nothing, so several windows can each ask.
+	func startIfNeeded() async {
+		guard !isPolling else { return }
+		await getResults()
+	}
+
 	/// Starts refreshing the playlist and show every five seconds, replacing any earlier loop.
 	func getResults() async {
 		polling.task?.cancel()

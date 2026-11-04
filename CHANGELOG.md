@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Added
+- macOS: a mini player window with just what is playing (artwork, title, artist, play/pause and a button back to the full window). Playback menu: Show Mini Player (⇧⌘M) and Show Full Window (⌥⌘M). The main window is a single-instance window, so switching never opens a second one.
+- `NowPlayingSummary`: the title and artist lines shown for a play ("Airbreak" and "KEXP" when missing), shared by the mini player and, later, the widget.
+
+### Changed
+- Starting the playlist is idempotent (`startIfNeeded`), so the mini window can start it on its own and several windows can ask.
+
 ## 3.2.0 - 2026-11-04
 
 First tagged version of the app (the number continues this repository's tag history, which ends at 3.1.1 from the library it was forked from; `0.1.0` was already taken by an old upstream tag): live KEXP playlist and stream on iPhone, iPad, Mac, Vision Pro and Apple Watch, built on `StationKit`, `StationKitAdapterKEXP` and `KEXPPowerKit`. Private until it has been used for a while; the Apple Music playlist, widget and archive features are not built yet.
