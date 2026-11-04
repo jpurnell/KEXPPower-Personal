@@ -23,12 +23,13 @@ struct KEXPPowerExampleSwiftUIApp: App {
         #if os(macOS)
         // A single window, so "Show Full Window" brings the existing one back instead of opening another.
         Window("Spinner", id: SceneID.main) {
-            ContentView(resultsRetriever: model)
+            RootView(model: model)
         }
-        .defaultSize(width: 520, height: 900)
+        .defaultSize(width: 780, height: 900)
         .commands {
             // One window, no documents: File > New Window has nothing sensible to open.
             CommandGroup(replacing: .newItem) {}
+            SidebarCommands()
             PlaybackCommands(model: model)
         }
 
@@ -44,7 +45,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
         }
         #else
         WindowGroup {
-            ContentView(resultsRetriever: model)
+            RootView(model: model)
         }
         .commands {
             CommandGroup(replacing: .newItem) {}
