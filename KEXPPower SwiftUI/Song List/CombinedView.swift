@@ -6,76 +6,83 @@
 //  Copyright © 2024 KEXP. All rights reserved.
 //
 
-import OSLog
 import SwiftUI
 import KEXPPower
 
+/// One play: artwork, details, and a backdrop made from the artwork itself. Tapping expands it.
 struct CombinedView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
     var play: Play?
     var imageURL: String = "https://kexp.org/static/assets/img/kexp_logo.jpg"
     @State var small: Bool = true
 
-    var body: some View {
-        ZStack {
-//            // Bottom Layer: Large blurred ImageView
-            ImageView(play: play ?? .fixture())
-				.scaledToFill()
-                .blur(radius: reduceTransparency ? 0 : 20)
-                .frame(maxWidth: 500)
-				.clipped()
-				.frame(minHeight: 0, maxHeight: small ? 120 : 200)
+    private let corner: CGFloat = 12
 
-            // Middle Layer: UltraThinMaterial overlay
+    /// How wide and tall the expanded details may grow: a Mac window has room for a comfortable line length.
+    #if os(macOS)
+    private let detailWidth: CGFloat = 720
+    private let detailHeight: CGFloat = 600
+    #else
+    private let detailWidth: CGFloat = 340
+    private let detailHeight: CGFloat = 400
+    #endif
+
+    var body: some View {
+        Button(action: { small.toggle() }) {
+            VStack {
+                HStack {
+                    ImageView(play: play ?? .fixture())
+                        .frame(
+                            minWidth: small ? 120 : 200,
+                            idealWidth: small ? 120 : 400,
+                            maxWidth: small ? 120 : 400,
+                            minHeight: 120,
+                            idealHeight: small ? 120 : 400
+                        )
+                        .padding(small ? [.vertical] : [.all])
+                    (small ? CompactView(play: play ?? .fixture())
+                        .frame(minWidth: 200, maxWidth: .infinity)
+                        .padding(.leading)
+                        .padding(.vertical) : nil)
+                }
+                (small ? nil : ExtendedView(play: play ?? .fixture()))
+                    .frame(
+                        minWidth: 200,
+                        idealWidth: 200,
+                        maxWidth: detailWidth,
+                        minHeight: 100,
+                        idealHeight: 200,
+                        maxHeight: detailHeight,
+                        alignment: .center
+                    )
+                    .clipped()
+                    .padding(.bottom, 5).padding(.vertical)
+            }
+            // Fill the row, so an expanded one is as wide as a collapsed one.
+            .frame(maxWidth: .infinity)
+            // A plain button only counts its drawn content as clickable; the whole row should be.
+            .contentShape(Rectangle())
+        }
+        .accessibilityHint(small ? "Shows the details" : "Hides the details")
+        .buttonStyle(.plain)
+        .foregroundStyle(.primary)
+        .padding(8)
+        .background { backdrop }
+        .clipShape(RoundedRectangle(cornerRadius: corner))
+    }
+
+    /// The artwork, blurred, under a material. Clipped to the row so it can never spill onto neighbouring views.
+    private var backdrop: some View {
+        ZStack {
+            Color.clear
+                .overlay {
+                    ImageView(play: play ?? .fixture())
+                        .scaledToFill()
+                        .blur(radius: reduceTransparency ? 0 : 20)
+                }
+                .clipped()
             Rectangle()
                 .fill(reduceTransparency ? AnyShapeStyle(.background) : AnyShapeStyle(.ultraThinMaterial))
-				.scaledToFill()
-				.frame(minHeight: 0, maxHeight: small ? 120 : .infinity)
-//				.border(Color.blue)
-
-            // Button and other content can go here
-			Button(action: {
-						small.toggle()
-					},
-						   label: {
-						VStack{
-							HStack {
-								ImageView(play: play ?? .fixture())
-								.frame(
-									minWidth: small ? 120 : 200,
-									idealWidth: small ? 120 : 400,
-									maxWidth: small ? 120 : 400,
-									minHeight: small ?  120 : 120,
-									idealHeight: small ? 120 : 400
-								)
-								.padding(small ? [.vertical] : [.all])
-								(small ? CompactView(play: play ?? .fixture())
-									.frame(minWidth: 200, maxWidth: .infinity)
-									.padding(.leading)
-									.padding(.vertical) : nil)
-//									.border(Color.orange)
-							}
-							(small ? nil : ExtendedView(play: play ?? .fixture()))
-								.frame(
-									minWidth: 200,
-									idealWidth: 200,
-									maxWidth: 340,
-									minHeight: 100,
-									idealHeight: 200,
-									maxHeight: 400,
-									alignment: .center
-								)
-								.clipped()
-								.padding(.bottom, 5).padding(.vertical)
-//								.border(Color.yellow)
-						}
-					})
-            .foregroundStyle(.primary)
-            .padding(8)
-            .onAppear(perform: {
-                //				let logger = Logger(#function)
-                //				logger.debug("Displaying Combined view for \(play?.description ?? "Default Play", privacy: .public)")
-            })
         }
     }
 }

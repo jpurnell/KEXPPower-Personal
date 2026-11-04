@@ -14,7 +14,9 @@
 		17AFFC0C3BFFCF684D8D581A /* MusicLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */; };
 		20004903B9393F0D972973B8 /* AudioPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8242BEBBD860079B78E /* AudioPlayerView.swift */; };
 		271E9E6733697073AD357D31 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7244DDE32B7E73DB00375023 /* Logger.swift */; };
+		3005B030BCBDD7FAF7ABF7AB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EF30CA8E2C1E77C41691552 /* Cocoa.framework */; };
 		31A8C4694B25BA0E2B1F4303 /* CombinedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8192BEA66C70079B78E /* CombinedView.swift */; };
+		32D357DF765716F16D55A566 /* OverlayScrollers.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49CD0710D2AF055A317BEDA /* OverlayScrollers.swift */; };
 		39338D5CA9FE86D92E9CF1E4 /* StreamQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA518B0C7861569CC6A87A7E /* StreamQuality.swift */; };
 		3A466AB51A21129A4322E07B /* PlayerControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3585BE6827B310B19AEADD6 /* PlayerControllerTests.swift */; };
 		3BA956736E6DE724B118062C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */; };
@@ -24,11 +26,13 @@
 		49A0D8BAE3BA3AED7652341A /* CompactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81D2BEAA8B80079B78E /* CompactView.swift */; };
 		4BFC6CE38F9372B5EFD76F5A /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1E1AE6BCC0646A0E8C4526E6 /* StationKit */; };
 		4C511420FAF041C41D91F90E /* VolumeBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499A6F19108336D3581B180E /* VolumeBar.swift */; };
+		4D3CF0CA6CB93383796CC8CF /* StreamQualityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */; };
 		55BA219965B9320FA7A7DFD2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */; };
 		5966A2D1C20DC8C4EC4F8F71 /* Extended View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81B2BEAA8710079B78E /* Extended View.swift */; };
 		5AF32C48AC4B703E44649273 /* AudioPlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8222BEBBBFB0079B78E /* AudioPlayerViewModel.swift */; };
 		5C8856D425FA331DD91B6BE8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F478354AB15736CA0D325E03 /* Foundation.framework */; };
 		62BB7D5584DCDCC4AAB0FEB0 /* Spinner Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F91060B80CB56756A0E46BFC /* Spinner Watch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		6371A882F52F666A4473EEBA /* PlayerControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3585BE6827B310B19AEADD6 /* PlayerControllerTests.swift */; };
 		6637D63621745475499BEA32 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C895B019C2EAD90B83BC21BB /* WatchContentView.swift */; };
 		6F456C42163C1707453D401B /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D82A2BEBD1FF0079B78E /* PlayerView.swift */; };
 		7219D81A2BEA66C70079B78E /* CombinedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8192BEA66C70079B78E /* CombinedView.swift */; };
@@ -62,6 +66,7 @@
 		B19648898476BD9E82290A84 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 708FECEEE21F1BE9070C2690 /* Foundation.framework */; };
 		B352E1BD84D3DBB71D4C27FE /* ProgramView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836827B2BF5E00021CD4 /* ProgramView.swift */; };
 		BABDEDCDCD0FDF32D062986A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 72873BF227A8D3C200132B62 /* Assets.xcassets */; };
+		BBEC82158A10335252485908 /* KEXPPower in Frameworks */ = {isa = PBXBuildFile; productRef = 902DF54D4BE413E3101E9D41 /* KEXPPower */; };
 		BDA9CEA79B92B4E4E4B7ED9C /* AVPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8262BEBCA200079B78E /* AVPlayer.swift */; };
 		C1011BC886E933FBF05CB940 /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = BBAB57C5E9B7981118104FC1 /* StationKitAdapterKEXP */; };
 		CE83D3943B7CFAA6125DE961 /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E5C39D633A905CCAC41BF1 /* StationKit */; };
@@ -74,9 +79,17 @@
 		F05853C3218C278B66BD42A0 /* WatchPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820CD5465D780A78350BCECB /* WatchPlayer.swift */; };
 		F662F0BB86EF034D6A462B6B /* StreamQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA518B0C7861569CC6A87A7E /* StreamQuality.swift */; };
 		F7986FAF4417DD58534B919C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72873BF127A8D3C100132B62 /* ContentView.swift */; };
+		F9C2D5DDB22B2A89A620E65A /* MusicLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		507FB7711FBA8D8687A5D0DD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1AD99C912C970CE8EC60F8D1;
+			remoteInfo = "Spinner Mac";
+		};
 		D5290FEE84E9DAFE9696730B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
@@ -149,7 +162,9 @@
 		8BFFECB522C95E6100E3378C /* KEXPPower.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KEXPPower.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BFFECBE22C95E6100E3378C /* KEXPPowerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KEXPPowerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BFFECD322C95FB300E3378C /* KEXPPowerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KEXPPowerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		90F16E86D05BD9A7DBE75C47 /* Spinner Mac Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Spinner Mac Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AB02E9335D79398B148ACE1 /* KEXPPowerAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KEXPPowerAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B49CD0710D2AF055A317BEDA /* OverlayScrollers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OverlayScrollers.swift; sourceTree = "<group>"; };
 		BA518B0C7861569CC6A87A7E /* StreamQuality.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQuality.swift; sourceTree = "<group>"; };
 		C895B019C2EAD90B83BC21BB /* WatchContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		DBB9519A3E3C59652BC44B48 /* SpinnerWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpinnerWatchApp.swift; sourceTree = "<group>"; };
@@ -160,6 +175,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		47BFFB80C2FA9D243145FF5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3005B030BCBDD7FAF7ABF7AB /* Cocoa.framework in Frameworks */,
+				BBEC82158A10335252485908 /* KEXPPower in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		486C53A12C91711722272A30 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -202,6 +226,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		15AB9CFDC1F4CA24C011FD89 /* Mac */ = {
+			isa = PBXGroup;
+			children = (
+				B49CD0710D2AF055A317BEDA /* OverlayScrollers.swift */,
+			);
+			name = Mac;
+			path = Mac;
+			sourceTree = "<group>";
+		};
 		3000EFE5CE9B0CE7CF963846 /* OS X */ = {
 			isa = PBXGroup;
 			children = (
@@ -293,6 +326,7 @@
 				BA518B0C7861569CC6A87A7E /* StreamQuality.swift */,
 				51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */,
 				6451106690A5AA44BE387834 /* MusicLinks.swift */,
+				15AB9CFDC1F4CA24C011FD89 /* Mac */,
 			);
 			path = "KEXPPower SwiftUI";
 			sourceTree = "<group>";
@@ -347,6 +381,7 @@
 				9AB02E9335D79398B148ACE1 /* KEXPPowerAppTests.xctest */,
 				F91060B80CB56756A0E46BFC /* Spinner Watch.app */,
 				82F4BB02D7E49916BBE7C986 /* Spinner.app */,
+				90F16E86D05BD9A7DBE75C47 /* Spinner Mac Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -457,6 +492,27 @@
 			productReference = 72873BF727A8D3C200132B62 /* KEXPPowerExampleSwiftUI.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A121B0E85E2A990FE2CE1735 /* Spinner Mac Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C872BCC38EE9BD34ED4854A9 /* Build configuration list for PBXNativeTarget "Spinner Mac Tests" */;
+			buildPhases = (
+				C01758BB8FD0B73166318EFE /* Sources */,
+				47BFFB80C2FA9D243145FF5A /* Frameworks */,
+				2BB9507180D76BF023EA8477 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D6F1890D252D1A2522A9B10F /* PBXTargetDependency */,
+			);
+			name = "Spinner Mac Tests";
+			packageProductDependencies = (
+				902DF54D4BE413E3101E9D41 /* KEXPPower */,
+			);
+			productName = "Spinner Mac Tests";
+			productReference = 90F16E86D05BD9A7DBE75C47 /* Spinner Mac Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -495,11 +551,19 @@
 				0B988C4C7A1AF47EEBD8F9A6 /* KEXPPowerAppTests */,
 				277CF9D58DFAE7DD5EF566A7 /* Spinner Watch */,
 				1AD99C912C970CE8EC60F8D1 /* Spinner Mac */,
+				A121B0E85E2A990FE2CE1735 /* Spinner Mac Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2BB9507180D76BF023EA8477 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2F9B776373B472EBEDB6F593 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -601,6 +665,17 @@
 				39338D5CA9FE86D92E9CF1E4 /* StreamQuality.swift in Sources */,
 				05217AF714C4F2F4700EFCED /* SettingsView.swift in Sources */,
 				EC0C1BBC22ED2A2A3E675F58 /* MusicLinks.swift in Sources */,
+				32D357DF765716F16D55A566 /* OverlayScrollers.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C01758BB8FD0B73166318EFE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D3CF0CA6CB93383796CC8CF /* StreamQualityTests.swift in Sources */,
+				F9C2D5DDB22B2A89A620E65A /* MusicLinksTests.swift in Sources */,
+				6371A882F52F666A4473EEBA /* PlayerControllerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -617,6 +692,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		D6F1890D252D1A2522A9B10F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Spinner Mac";
+			target = 1AD99C912C970CE8EC60F8D1 /* Spinner Mac */;
+			targetProxy = 507FB7711FBA8D8687A5D0DD /* PBXContainerItemProxy */;
+		};
 		F25EBD3C2C644A627065921E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "KEXPPowerExampleSwiftUI (iOS)";
@@ -657,6 +738,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
+				PRODUCT_MODULE_NAME = KEXPPowerExampleSwiftUI;
 				PRODUCT_NAME = Spinner;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
@@ -809,6 +891,23 @@
 			};
 			name = Release;
 		};
+		7D0D08584DB99A2B2C52EBA4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.MacTests;
+				PRODUCT_NAME = "Spinner Mac Tests";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Spinner.app/Contents/MacOS/Spinner";
+			};
+			name = Release;
+		};
 		8BFFECC722C95E6200E3378C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -952,6 +1051,23 @@
 			};
 			name = Release;
 		};
+		A062246B7243D6A57D39A348 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.MacTests;
+				PRODUCT_NAME = "Spinner Mac Tests";
+				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Spinner.app/Contents/MacOS/Spinner";
+			};
+			name = Debug;
+		};
 		CCB197F80761608C7BC8691C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1005,6 +1121,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
+				PRODUCT_MODULE_NAME = KEXPPowerExampleSwiftUI;
 				PRODUCT_NAME = Spinner;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
@@ -1057,6 +1174,15 @@
 			buildConfigurations = (
 				14E0D95BEC9A2A8175F22A87 /* Release */,
 				D802AD3A1DD44408C20BA8CF /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C872BCC38EE9BD34ED4854A9 /* Build configuration list for PBXNativeTarget "Spinner Mac Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7D0D08584DB99A2B2C52EBA4 /* Release */,
+				A062246B7243D6A57D39A348 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1115,6 +1241,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AB6DF3C2B3BF307D38068231 /* XCRemoteSwiftPackageReference "StationKitAdapterKEXP" */;
 			productName = StationKitAdapterKEXP;
+		};
+		902DF54D4BE413E3101E9D41 /* KEXPPower */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 15838809A2B3C0A208FE8634 /* XCRemoteSwiftPackageReference "KEXPPowerKit" */;
+			productName = KEXPPower;
 		};
 		B9E5C39D633A905CCAC41BF1 /* StationKit */ = {
 			isa = XCSwiftPackageProductDependency;

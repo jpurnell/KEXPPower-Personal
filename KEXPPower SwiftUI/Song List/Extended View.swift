@@ -45,11 +45,6 @@ struct ExtendedView: View {
 
             }
             ScrollView(.vertical, showsIndicators: true) {
-                #if os(macOS)
-                    Text(MusicLinks.linkedComment(play?.comment ?? ""))
-                        .lineLimit(15)
-                        .multilineTextAlignment(.leading)
-                #endif
 				Text(MusicLinks.linkedComment(play?.comment ?? ""))
 					.lineLimit(nil)
                     .multilineTextAlignment(.leading)

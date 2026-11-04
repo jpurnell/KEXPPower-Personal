@@ -20,6 +20,11 @@ struct ContentView: View {
     let logger = Logger(#function)
     @State var press: Bool = false
 
+    /// Everything but the play on the air, newest first.
+    private var previousPlays: [Play] {
+        Array(resultsRetriever.plays.compactMap({ $0 }).dropFirst())
+    }
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -28,17 +33,18 @@ struct ContentView: View {
             }
             #if os(macOS)
                 VStack(alignment: .leading) {
-                    Text("Now Playing").fontWeight(.semibold)
-                    HStack(alignment: .center) {
-                        CombinedView(play: resultsRetriever.play)
-                        //						Button(action: resultsRetriever.playerController.playOrPause) {
-                        //							Image(systemName: resultsRetriever.playerController.isPlaying ? "pause.circle" : "play.circle")
-                        //								.resizable()
-                        //								.foregroundStyle(.primary)
-                        ////								.opacity(small ? 0.9 : 0).animation(.easeInOut(duration: 1.0), value: 1.0)
-                        //								.frame(minWidth: 64, idealWidth: 64, maxWidth: 64, minHeight: 64, idealHeight: 64, maxHeight: 64, alignment: .center)
-                        //						}
+                    HStack {
+                        Text("Now Playing").fontWeight(.semibold)
+                        Spacer()
+                        Button(action: resultsRetriever.playerController.playOrPause) {
+                            Image(systemName: resultsRetriever.playerController.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                                .resizable()
+                                .frame(width: 32, height: 32)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(resultsRetriever.playerController.isPlaying ? "Pause" : "Play")
                     }
+                    CombinedView(play: resultsRetriever.play)
                 }.padding(.horizontal)
             #endif
             #if os(iOS) || os(visionOS)
@@ -50,19 +56,31 @@ struct ContentView: View {
                 }.padding(.horizontal)
             #endif
             Text("Previously").fontWeight(.semibold).padding([.horizontal])
-            List(resultsRetriever.plays.compactMap({ $0 }).dropFirst()) { play in
-                CombinedView(play: play)
-                    .listRowSeparator(.hidden)
-                    .listSectionSeparator(.hidden)
-            }
-
-            .refreshable {
-                press.toggle()
-                let _ = await resultsRetriever.getResults()
-                logger.debug(
-                    "Manual Refresh\rActive Play:\r\((resultsRetriever.play).description, privacy: .public)"
-                )
-            }
+            #if os(macOS)
+                // A scroll view, not a List: a Mac List adds its own insets and gutters, so the rows would not line up with Now Playing.
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(previousPlays) { play in
+                            CombinedView(play: play)
+                        }
+                    }
+                    .padding([.horizontal, .bottom])
+                }
+                .background(OverlayScrollers())
+            #else
+                List(previousPlays) { play in
+                    CombinedView(play: play)
+                        .listRowSeparator(.hidden)
+                        .listSectionSeparator(.hidden)
+                }
+                .refreshable {
+                    press.toggle()
+                    let _ = await resultsRetriever.getResults()
+                    logger.debug(
+                        "Manual Refresh\rActive Play:\r\((resultsRetriever.play).description, privacy: .public)"
+                    )
+                }
+            #endif
         }
         .task {
             let _ = await resultsRetriever.getResults()

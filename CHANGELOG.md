@@ -20,6 +20,9 @@
 - Controls honor Reduce Transparency; icons carry accessibility labels.
 
 ### Fixed
+- macOS: the app now plays the stream (`PlayerController` is no longer iOS/visionOS-only; Now Playing, media keys and the play/pause button work; artwork is encoded with ImageIO instead of UIKit). A refresh no longer replaces the player, which would have cut off playback.
+- macOS: the show header and "Now Playing" label were hidden and the edges were rough, because a play row's blurred backdrop was not clipped and spilled over its neighbours. The backdrop is now the row's clipped background, list rows have no alternating bands, rows fill the window width, and the expanded details use up to 720 pt of it (340 pt on iOS and visionOS). The DJ comment was drawn twice on macOS; it is drawn once.
+- macOS: the play/pause button sits on the "Now Playing" label line instead of beside the row, so the row keeps the full width. The playlist is a scroll view with the same margins as Now Playing (a Mac `List` added its own insets), and scrollers are overlay-style, so a permanent scrollbar no longer takes a gutter.
 - iOS: the play/pause button did not follow the player. `PlayerController` was an `ObservableObject` held by an `@Observable` `ResultRetriever`, so a change to `isPlaying` never reached the view; it is `@Observable` now, with a test that a view reading `isPlaying` is notified.
 - Playback resumes after an interruption (a phone call) when the system says it may, and pauses when headphones are unplugged.
 - Artwork loading no longer crashes on an unreachable or malformed URL (`try!`), and only contacts

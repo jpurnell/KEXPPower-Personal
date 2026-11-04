@@ -7,15 +7,15 @@
 //
 
 
-#if os(iOS) || os(visionOS)
 import AVFoundation
 import AVKit
 import Combine
 import Foundation
+import ImageIO
 import Observation
 import OSLog
 import StationKit
-import UIKit
+import UniformTypeIdentifiers
 
     /// Owns the live-stream `AVPlayer` and reports it to the system through a single publisher.
     ///
@@ -30,7 +30,9 @@ import UIKit
         private(set) var isPlaying = false
 
         @ObservationIgnored private(set) var player: AVPlayer?
+        #if !os(macOS)
         let avPlayerViewController = AVPlayerViewController()
+        #endif
 
         private let stationName: String
         private let fallbackArtworkURL: URL?
@@ -77,10 +79,12 @@ import UIKit
             player.currentItem?.preferredForwardBufferDuration = 300
             self.player = player
 
+            #if !os(macOS)
             avPlayerViewController.player = player
             avPlayerViewController.showsPlaybackControls = true
             // The publisher is the only writer of Now Playing state.
             avPlayerViewController.updatesNowPlayingInfoCenter = false
+            #endif
 
             statusObservation = player.publisher(for: \.timeControlStatus)
                 .receive(on: DispatchQueue.main)
@@ -127,10 +131,13 @@ import UIKit
             guard snapshot.artworkURL == next.artworkURL, snapshot.title == next.title else { return }
 
             currentArtwork = artwork
+            #if !os(macOS)
             player?.currentItem?.externalMetadata = externalMetadata(for: snapshot, artwork: artwork)
+            #endif
             publisher.publish(snapshot, artwork: artwork)
         }
 
+        #if !os(macOS)
         private func externalMetadata(for snapshot: NowPlayingSnapshot, artwork: CGImage?) -> [AVMetadataItem] {
             func item(_ identifier: AVMetadataIdentifier, _ value: NSCopying & NSObjectProtocol) -> AVMetadataItem {
                 let item = AVMutableMetadataItem()
@@ -144,7 +151,7 @@ import UIKit
                 item(.commonIdentifierAlbumName, snapshot.album as NSString),
                 item(.commonIdentifierArtist, snapshot.artist as NSString),
             ]
-            if let artwork, let data = UIImage(cgImage: artwork).jpegData(compressionQuality: 0.8) {
+            if let artwork, let data = Self.jpegData(from: artwork) {
                 let artworkItem = AVMutableMetadataItem()
                 artworkItem.identifier = .commonIdentifierArtwork
                 artworkItem.value = data as NSData
@@ -152,6 +159,19 @@ import UIKit
                 items.append(artworkItem)
             }
             return items
+        }
+        #endif
+
+        /// Encodes artwork as JPEG, the form AVFoundation metadata expects, without going through UIKit or AppKit.
+        /// - Returns: The JPEG bytes, or `nil` if the image cannot be encoded.
+        static func jpegData(from image: CGImage, quality: Double = 0.8) -> Data? {
+            let data = NSMutableData()
+            guard let destination = CGImageDestinationCreateWithData(data, UTType.jpeg.identifier as CFString, 1, nil) else {
+                return nil
+            }
+            CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: quality] as CFDictionary)
+            guard CGImageDestinationFinalize(destination) else { return nil }
+            return data as Data
         }
 
         // MARK: - Playback Control
@@ -169,4 +189,3 @@ import UIKit
             isPlaying ? pausePlayer() : playPlayer()
         }
     }
-#endif

@@ -24,22 +24,21 @@ public class ResultRetriever {
 	var play: Play = .fixture()
 	var show: Show = Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"], tagline: "", imageURI: "")
 
-#if os(iOS) || os(visionOS)
 	var playerController = PlayerController()
-#endif
 
 	private let polling = PollingTask()
 
 	/// Starts refreshing the playlist and show every five seconds, replacing any earlier loop.
 	func getResults() async {
 		polling.task?.cancel()
-		#if os(iOS) || os(visionOS)
-		let quality = StreamQuality.resolve(stored: UserDefaults.standard.string(forKey: StreamQuality.storageKey))
-		let streams = KEXPStation().streams
-		if let stream = streams.first(where: { $0.id == quality.rawValue }) ?? streams.first {
-			playerController.initPlayer(link: stream.url)
+		// A refresh must not replace the player: that would cut off what is playing.
+		if playerController.player == nil {
+			let quality = StreamQuality.resolve(stored: UserDefaults.standard.string(forKey: StreamQuality.storageKey))
+			let streams = KEXPStation().streams
+			if let stream = streams.first(where: { $0.id == quality.rawValue }) ?? streams.first {
+				playerController.initPlayer(link: stream.url)
+			}
 		}
-		#endif
 		polling.task = Task { [weak self] in
 			while !Task.isCancelled {
 				await self?.refresh()
@@ -57,9 +56,7 @@ public class ResultRetriever {
 			let showResult = try await networkManager.getShow(limit: 1)
 			show = showResult.shows?.first ?? Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"])
 
-			#if os(iOS) || os(visionOS)
 			await playerController.updateNowPlaying(KEXPMapping.nowPlaying(from: plays.first))
-			#endif
 		} catch {
 			logger.error("Refresh failed: \(error.localizedDescription, privacy: .public)")
 		}

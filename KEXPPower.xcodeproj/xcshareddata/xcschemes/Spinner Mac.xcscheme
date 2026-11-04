@@ -37,6 +37,16 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A121B0E85E2A990FE2CE1735"
+               BuildableName = "Spinner Mac Tests.xctest"
+               BlueprintName = "Spinner Mac Tests"
+               ReferencedContainer = "container:KEXPPower.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

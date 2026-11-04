@@ -358,7 +358,7 @@ N/A.
 
 ### 16. Open Questions
 
-1. ~~One target or two?~~ Resolved: separate targets. Still open: Mac layout — sidebar (Live / Archive / Playlists), or a single window with a menu-bar extra as the primary surface?
+1. ~~One target or two?~~ Resolved: separate targets. Mac layout resolved (owner, 2026-11-04): a native sidebar app (Live / Archive / Playlists) in a `NavigationSplitView`, with the sidebar showable and hideable (toolbar toggle and View menu via `SidebarCommands`). A menu-bar extra stays a possible later addition, not the primary surface.
    Resolved: the generic package is **StationKit**; adapters are `StationKitAdapter<STATION>`. Resolved: HomeView is Apple's smart-home display (see the note above); licensing is MIT, so reuse is permitted. Resolved (owner, 2026-11-03): repos stay **private until something works**; the iOS, visionOS and macOS apps share **a single bundle ID** (universal purchase); the relay model is adopted; TuneIn was researched and is not a data source (see above).
 2. ~~Confirm every add?~~ Resolved: ISRC-resolved songs add immediately with undo; fallback matches ask first. Still open: does the undo suit you, or should the ISRC path also confirm until you trust it?
 3. Dedicated playlist name — "KEXP"? One per user, created on first use?
