@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 3.2.0 - 2026-11-04
+
+First tagged version of the app (the number continues this repository's tag history, which ends at 3.1.1 from the library it was forked from; `0.1.0` was already taken by an old upstream tag): live KEXP playlist and stream on iPhone, iPad, Mac, Vision Pro and Apple Watch, built on `StationKit`, `StationKitAdapterKEXP` and `KEXPPowerKit`. Private until it has been used for a while; the Apple Music playlist, widget and archive features are not built yet.
+
 ### Added
 - A standalone watchOS app, `Spinner Watch` (`com.JPEnterprises.Spinner.watchkitapp`, watchOS 10): live KEXP stream on the 64 kbps option, now-playing and play/pause, lock-screen and remote-command integration through `StationKit`, long-form audio session. A fresh launch can take 35–40 s to reach a working connection on a cold watch network, so the app shows "Connecting…" until the stream is ready (a tap then means "play when ready"), retries track info after 3, 6, 9 s and so on up to 15 s, and offers "Tap to retry" if the stream fails. Embedded in the iOS app (iOS builds only; the macOS and visionOS builds of the same target leave it out). The button shows a spinner while the stream buffers and a tap then cancels; album art is shown. Background audio is declared with `WKBackgroundModes` (a build setting for the key is silently dropped on watchOS, which made audio fade out when the app left the foreground). The audio mode is also declared with `UIBackgroundModes`, which is what made background playback work on the Ultra. Player status, waiting reason, item errors and the audio route are logged (category `WatchPlayer` / the iOS player's category). Volume changes are logged. The Digital Crown sets the volume through an invisible system volume control, and a slim level bar shows along the right edge only while the volume is changing.
 

@@ -30,10 +30,10 @@ quicker and more pleasant to use than the existing KEXP app.
 ### Technology Stack
 - **Language:** Swift 6.x, strict concurrency, Swift 6 language mode
 - **UI:** SwiftUI
-- **Build System:** Xcode project (app); the library is the `jpurnell/KEXPPowerKit` package (a fork of KEXPPower), pinned `from: 4.0.0`; see ADR-001/002
+- **Build System:** Xcode project (app); the library is the `jpurnell/KEXPPowerKit` package (a fork of KEXPPower), pinned `from: 4.0.1`, with `StationKit` (0.3.0) and `StationKitAdapterKEXP` (0.2.0); see ADR-001/002
 - **Testing:** Swift Testing for new tests; the existing XCTest suite stays until migrated
 - **Concurrency:** Swift 6 strict concurrency throughout
-- **Platforms:** iOS (primary, deployment target 17), macOS, visionOS, CarPlay. tvOS and watchOS are kept *ready* (the generic `StationKit` package compiles for them) but not built yet.
+- **Platforms:** iOS (primary, deployment target 17), macOS (own target, `Spinner Mac`), visionOS (shares the iOS target), watchOS (`Spinner Watch`, embedded in the iOS app), CarPlay later. tvOS is kept *ready* (the generic `StationKit` package compiles for it) but not built.
 - **System integration:** `MediaPlayer` (`MPNowPlayingInfoCenter`, `MPRemoteCommandCenter`) today; the iOS 27 `NowPlaying` framework behind `#available` later.
 - **Dependencies:** none external. KEXP public API (`api.kexp.org/v2`), StreamGuys streams, Apple Music (MusicKit / links).
 
@@ -94,14 +94,19 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 - [x] Live stream playback (64 and 160 kbps AAC)
 - [x] Lock-screen / Control Center Now Playing (with known defects, see Proposal 1)
 - [x] Apple Music search link (partial)
+- [x] macOS: plays the stream, Playback menu (Space), media keys and Now Playing; layout lines up (the show header, the rows and the scroll bars) and every Previously row is clickable (3.2.0)
+- [x] watchOS: standalone app with background audio, album art, Digital Crown volume, a connection state (3.2.0)
+- [x] The app owns one player and playlist, shared by every window and the menus (3.2.0)
 
 ### Known Problems
-- `try!` crash on artwork fetch; artwork never reaches the system (Proposal 1, G1–G3)
-- Five independent writers to Now Playing state; `isPlaying` can drift (G4–G7)
+- ~~`try!` crash on artwork fetch; artwork never reaches the system (Proposal 1, G1–G3)~~ fixed (`ArtworkLoader` in StationKit)
+- ~~Five independent writers to Now Playing state; `isPlaying` can drift (G4–G7)~~ fixed (one publisher; `isPlaying` mirrors `timeControlStatus`). It shipped without a view-level check: the iOS button did not follow `isPlaying` until `PlayerController` was made `@Observable` (see the changelog), and a `PlayerControllerTests` test now covers that path
+- The Mac UI is a port of the iPhone layout: no sidebar yet, and a row is no longer a keyboard-focusable button (a VoiceOver action stands in)
+- The watch needs 35–40 s on a cold network to reach the stream; the app shows "Connecting…" meanwhile
 - Library fork vs upstream 4.1.0: missing `Show.programImageURI` and the 14-day archive lookback (fork uses 13); `ArchiveManager`'s async conversion is commented out (`//TODO: - ASYNC`), so archive loading does not work in the fork today
 - Library endpoints: `get_streaming_url` now redirects and `get_show_start` requires a timestamp, so those are suspect
 - Library models import SwiftUI/Combine and `Play` is a class; acceptable for now, but a portability cost for macOS
-- Project still in Swift 5 language mode
+- ~~Project still in Swift 5 language mode~~ now Swift 6 with strict concurrency on every target
 
 ### What's Next
 - [x] Playback hardening: `project/plans/completed/PlaybackHardening.md` (complete: interruption/route handling, session coordinator, Swift 6, ADR-003)
@@ -109,8 +114,9 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 - [x] App switched to the package (`jpurnell/KEXPPowerKit` 4.0.0, by URL; verified running on a physical iPhone); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Committed in 53f58e6.
 - [x] Library: `Play.playType` decoding fixed, placeholder defaults removed, `Sendable` structs (no app `PlayItem` needed: the app only uses `Play` as a value), KEXPPowerKit `f1c7fc0`
 - [ ] Finish async `ArchiveManager` (iOS 27.2 follow-up)
-- [x] Phase 0 (in progress): `StationKit` 0.2.0 (core types, `MusicLinks`, player glue; 45 tests; builds for iOS/macOS/visionOS/tvOS/watchOS) and `StationKitAdapterKEXP` 0.2.0 (KEXP as a Station; 9 offline + 2 live tests; all five platforms), both private. The iOS app now consumes both (14 app tests; running on Brawn 2026-11-03). A first standalone watchOS app (`Spinner Watch`) runs on a physical watch. Next: adapt the retrievers fully to `Station`, ~~split iOS/visionOS/macOS targets~~ (macOS split out 2026-11-04 as `Spinner Mac`; visionOS still shares the iOS target), ~~embed the watch app in the iOS app~~ (done, iOS-only).
-- [ ] Navigation shell, Mac playback/layout, Apple Music playlists, widget + App Intents, archive UI: `project/plans/upcoming/PlatformExperience.md` (proposed; revised 2026-11-03: separate iOS/visionOS/macOS targets, generic `StationKit` repo + `StationKitAdapterKEXP` adapter repo, ISRC-based song matching)
+- [x] Phase 0 (in progress): `StationKit` 0.3.0 (core types, `MusicLinks`, player glue; 46 tests; builds for iOS/macOS/visionOS/tvOS/watchOS) and `StationKitAdapterKEXP` 0.2.0 (KEXP as a Station; 9 offline + 2 live tests; all five platforms), both private. The iOS app now consumes both (14 app tests; running on Brawn 2026-11-03). A first standalone watchOS app (`Spinner Watch`) runs on a physical watch. Next: adapt the retrievers fully to `Station`, ~~split iOS/visionOS/macOS targets~~ (macOS split out 2026-11-04 as `Spinner Mac`; visionOS still shares the iOS target), ~~embed the watch app in the iOS app~~ (done, iOS-only).
+- [ ] Next, in order (agreed 2026-11-04): ~~app-level player and Playback menu~~ (done), a Mac mini-player window (now-playing only), the sidebar shell (`NavigationSplitView`, showable and hideable), then the widget (small: art with title and artist; medium: the now-playing row; large: the expanded view; cross-platform from the start; needs an App Group, flagged for the Developer portal)
+- [ ] Navigation shell, ~~Mac playback~~, Mac layout, Apple Music playlists, widget + App Intents, archive UI: `project/plans/upcoming/PlatformExperience.md` (proposed; revised 2026-11-03: separate iOS/visionOS/macOS targets, generic `StationKit` repo + `StationKitAdapterKEXP` adapter repo, ISRC-based song matching)
 - [ ] iOS 27 `NowPlaying` adoption: `project/plans/proposals/NowPlayingFramework.md` (on hold)
 
 ---
@@ -170,4 +176,4 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 
 ---
 
-**Last Updated:** 2026-11-04 (macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)
+**Last Updated:** 2026-11-04 (3.2.0: reconciled status with shipped code — Mac playback, watch app, app-owned player, fixed problems struck through; macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)
