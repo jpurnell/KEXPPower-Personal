@@ -171,7 +171,9 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 - [ ] iOS 27 `NowPlaying` adoption behind `#available`
 - [ ] Native macOS target (fork's UIKit-only helper needs a guard)
 - [ ] visionOS polish
-- [ ] CarPlay (requires an Apple audio-app entitlement; confirm eligibility first)
+- [ ] CarPlay Audio: Apple approved the entitlement 2026-11-05 (eligibility confirmed); proposal `project/plans/proposals/CarPlayAudio.md` awaiting owner decisions and the portal step
+- [ ] Watch widget (Smart Stack, complications): `project/plans/proposals/WatchWidget.md` (proposed 2026-11-05)
+- [ ] Control Center play/pause control: `project/plans/proposals/ControlCenterControl.md` (proposed 2026-11-05)
 
 ### Future
 - Track history by song and by DJ ("what usually follows this song")
@@ -180,4 +182,4 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 
 ---
 
-**Last Updated:** 2026-11-05 (Mac clean-up: keyboard access, Open in Music, UI test target; 3.3.0: reconciled widget, playlist, mini player and sidebar from proposed to shipped; next-up order recorded; earlier: 3.2.0: reconciled status with shipped code — Mac playback, watch app, app-owned player, fixed problems struck through; macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)
+**Last Updated:** 2026-11-05 (proposals added for the watch widget, Control Center control and CarPlay Audio; Mac clean-up: keyboard access, Open in Music, UI test target; 3.3.0: reconciled widget, playlist, mini player and sidebar from proposed to shipped; next-up order recorded; earlier: 3.2.0: reconciled status with shipped code — Mac playback, watch app, app-owned player, fixed problems struck through; macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)
