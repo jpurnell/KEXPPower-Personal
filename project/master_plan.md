@@ -97,6 +97,8 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 - [x] macOS: plays the stream, Playback menu (Space), media keys and Now Playing; layout lines up (the show header, the rows and the scroll bars) and every Previously row is clickable (3.2.0)
 - [x] watchOS: standalone app with background audio, album art, Digital Crown volume, a connection state (3.2.0)
 - [x] The app owns one player and playlist, shared by every window and the menus (3.2.0)
+- [x] Now Playing widget, small / medium / large, on iPhone, iPad, Mac and Vision Pro; play/pause from the widget, published within milliseconds of a player change (3.3.0)
+- [x] Add to Apple Music playlist (iPhone, iPad, Vision Pro), Mac sidebar shell and translucent mini player (3.3.0)
 
 ### Known Problems
 - ~~`try!` crash on artwork fetch; artwork never reaches the system (Proposal 1, G1–G3)~~ fixed (`ArtworkLoader` in StationKit)
@@ -116,8 +118,8 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 - [ ] Finish async `ArchiveManager` (iOS 27.2 follow-up)
 - [x] Phase 0 (in progress): `StationKit` 0.3.0 (core types, `MusicLinks`, player glue; 46 tests; builds for iOS/macOS/visionOS/tvOS/watchOS) and `StationKitAdapterKEXP` 0.2.0 (KEXP as a Station; 9 offline + 2 live tests; all five platforms), both private. The iOS app now consumes both (14 app tests; running on Brawn 2026-11-03). A first standalone watchOS app (`Spinner Watch`) runs on a physical watch. Next: adapt the retrievers fully to `Station`, ~~split iOS/visionOS/macOS targets~~ (macOS split out 2026-11-04 as `Spinner Mac`; visionOS still shares the iOS target), ~~embed the watch app in the iOS app~~ (done, iOS-only).
 - [x] Add to Apple Music playlist on iPhone, iPad and Vision Pro (song matching by ISRC, default KEXP playlist, long-press for another or a new one; built 2026-11-04, awaiting a real-device test). **Not possible on macOS**: MusicKit's library writes are unavailable there; the Mac's options are listed in the plan.
-- [x] Widget first version built (2026-11-04): `Spinner Widget` extension, three sizes, shared views, `WidgetPublisher`, play/pause intent; layouts rendered and tested, signed for iPhone and Mac; **awaiting a check on a device**.
-- [ ] Next, in order (agreed 2026-11-04): ~~app-level player and Playback menu~~ (done), ~~a Mac mini-player window (now-playing only)~~ (done, translucent), ~~the sidebar shell (`NavigationSplitView`, showable and hideable)~~ (done; Archive and Playlists are placeholders), then the widget (design proposal written 2026-11-04: `project/plans/proposals/NowPlayingWidget.md`, awaiting approval; small: art with title and artist; medium: the now-playing row; large: the expanded view; cross-platform from the start; needs an App Group, flagged for the Developer portal)
+- [x] Widget built and released in 3.3.0 (2026-11-05): `Spinner Widget` extension, three sizes, shared views, `WidgetPublisher`, play/pause intent; layouts rendered and tested, signed for iPhone and Mac; working on Brawn; not yet checked on the Mac desktop.
+- [ ] Next, in order (agreed 2026-11-04): ~~app-level player and Playback menu~~ (done), ~~a Mac mini-player window (now-playing only)~~ (done, translucent), ~~the sidebar shell (`NavigationSplitView`, showable and hideable)~~ (done; Archive and Playlists are placeholders), ~~then the widget~~ (done; proposal `project/plans/proposals/NowPlayingWidget.md`, approved 2026-11-04; shipped in 3.3.0 despite the plan's "awaiting approval" wording above it having been written first). Agreed 2026-11-05, in order: Mac clean-up, then a watch widget, then a Control Center play/pause control
 - [ ] Navigation shell, ~~Mac playback~~, Mac layout, Apple Music playlists, widget + App Intents, archive UI: `project/plans/upcoming/PlatformExperience.md` (proposed; revised 2026-11-03: separate iOS/visionOS/macOS targets, generic `StationKit` repo + `StationKitAdapterKEXP` adapter repo, ISRC-based song matching)
 - [ ] iOS 27 `NowPlaying` adoption: `project/plans/proposals/NowPlayingFramework.md` (on hold)
 
@@ -178,4 +180,4 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 
 ---
 
-**Last Updated:** 2026-11-04 (3.2.0: reconciled status with shipped code — Mac playback, watch app, app-owned player, fixed problems struck through; macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)
+**Last Updated:** 2026-11-05 (3.3.0: reconciled widget, playlist, mini player and sidebar from proposed to shipped; next-up order recorded; earlier: 3.2.0: reconciled status with shipped code — Mac playback, watch app, app-owned player, fixed problems struck through; macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)
