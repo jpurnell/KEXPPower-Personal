@@ -1,6 +1,6 @@
 # Design Proposal: Control Center play/pause control (iPhone, and the Mac menu bar and Apple Watch where the SDK allows)
 
-**Status:** PROPOSED 2026-11-05 (owner order: Mac clean-up, watch widget, then this). Owner asked on 2026-11-05 for Vision Pro to get controls too; the SDK does not allow it (see §3c), so the answer is recorded there and the owner's call is whether to proceed without it.
+**Status:** APPROVED 2026-11-05 (owner: "build the control proposal and skip visionOS for now"; the SDK does not allow controls on visionOS in any case, see §3c)
 **Date:** 2026-11-05
 **Master Plan Reference:** `NowPlayingWidget.md` §14 ("A Control Center control… a good follow-up") and §15.
 **Facts marked (SDK) were read from the Xcode 27.2 SDK interfaces; anything not confirmed is marked *unverified*.**
