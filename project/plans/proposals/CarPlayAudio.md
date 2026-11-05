@@ -65,7 +65,7 @@ No extra network traffic and no extra process: the scene runs in the app. The ph
 **Portal and signing (owner):**
 1. Confirm the approved CarPlay Audio entitlement on the account, then add the **CarPlay Audio App** capability to the `com.JPEnterprises.Spinner` App ID in the Developer portal.
 2. Regenerate the provisioning profile (Xcode does this with `-allowProvisioningUpdates` once the capability is on the App ID); a profile cannot grant a capability the App ID lacks.
-3. I add `com.apple.developer.carplay-audio` to `KEXPPowerExampleSwiftUI (iOS).entitlements` and the CarPlay scene to Info.plist. *The entitlement key name is from my knowledge, not read in this session; I will check it against the approval email's instructions and Xcode's capability UI.*
+3. I add `com.apple.developer.carplay-audio` to `KEXPPowerExampleSwiftUI (iOS).entitlements` and the CarPlay scene to Info.plist. **Done 2026-11-05:** with the capability enabled on the App ID, the key `com.apple.developer.carplay-audio` was added to the entitlements and a signed device build was made with `-allowProvisioningUpdates`; `codesign` shows the key in the signed app and the embedded profile grants it (`com.apple.developer.carplay-audio => true`), so the key name is confirmed by a working build.
 **Testing:** the Xcode CarPlay simulator (a separate window; `I/O → External Displays → CarPlay`), then a real car or a CarPlay head unit, which only you have.
 **Internal:** none beyond the existing packages.
 
