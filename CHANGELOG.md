@@ -14,6 +14,9 @@
 - A Mac UI test target, `Spinner Mac UITests`, that drives the real app against fixed songs (launch argument `-uitest-fixtures`, `UITestFixtures`: no network and no audio): a click at the top, middle and bottom of a Previously row expands it (the earlier top-half-only defect), Tab then Return expands the focused row, and every song has the Open in Music button. Running it needs UI automation enabled on the Mac (a one-time authentication).
 - `scripts/bootstrap.sh`: enables the git hooks after a fresh clone (`core.hooksPath` is per-clone config and cannot be committed) and checks that `swift` and `quality-gate` are installed. `CLAUDE.md` already described it; the script did not exist, so a fresh clone silently ran no hooks. Safe to run twice (checked in a fresh clone).
 
+### Changed
+- Requires `StationKit` 0.7.0. The widget's publishing logic (save on change, heartbeat the playing flag, reload only when something changed) and the play-state expectation window moved into StationKit as `WidgetFeed` and `PlayStateExpectation`, so the watch app can share them; `WidgetPublisher` now only turns KEXP's plays and shows into a snapshot and delegates. Behaviour is unchanged: its tests pass as before, and the tests of the moved logic now live in StationKit.
+
 ## 3.3.0 - 2026-11-05
 
 The widget, add to playlist, the Mac mini player and sidebar, and a fix for the widget's play/pause icon. Still private.

@@ -21,7 +21,6 @@
 		15C39B3CCBDD239C919AAD6B /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = D57BF9D21786FB032B915526 /* StationKitAdapterKEXP */; };
 		15DD72059EBF3447A31EF7C6 /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = AC061C38238C0B30FC95E99F /* StationKitAdapterKEXP */; };
 		16F6E0D2DD7685C13960A8CD /* ControlPlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E01502A6DA15679C398864C /* ControlPlayState.swift */; };
-		174BC3581CB8F801A9E4E727 /* PlayStateExpectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE5B48FCB80A34FA00D2C0 /* PlayStateExpectation.swift */; };
 		17AFFC0C3BFFCF684D8D581A /* MusicLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604B5DBA7D2F7FF5C92F5C2E /* MusicLinksTests.swift */; };
 		192C2A54A8056CFF4BD688EF /* TranslucentWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F4B6250D0471D69DE8986C /* TranslucentWindow.swift */; };
 		1B16A649145F5679F8BE2133 /* UserDefaultsSaveLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A7C000E4863272F64BF390 /* UserDefaultsSaveLedger.swift */; };
@@ -75,7 +74,6 @@
 		636AC1D7FF37629093026AC2 /* UITestFixturesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A843B77A467A699D55C8581F /* UITestFixturesTests.swift */; };
 		6371A882F52F666A4473EEBA /* PlayerControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3585BE6827B310B19AEADD6 /* PlayerControllerTests.swift */; };
 		6637D63621745475499BEA32 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C895B019C2EAD90B83BC21BB /* WatchContentView.swift */; };
-		6F0D402C2DF93DEDBEC12974 /* PlayStateExpectation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4DE5B48FCB80A34FA00D2C0 /* PlayStateExpectation.swift */; };
 		6F456C42163C1707453D401B /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D82A2BEBD1FF0079B78E /* PlayerView.swift */; };
 		7219D81A2BEA66C70079B78E /* CombinedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8192BEA66C70079B78E /* CombinedView.swift */; };
 		7219D81C2BEAA8710079B78E /* Extended View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81B2BEAA8710079B78E /* Extended View.swift */; };
@@ -145,14 +143,12 @@
 		C93E4690292EFCEA372CFD3A /* WidgetConstantsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B581D086F4D834217B4F630 /* WidgetConstantsTests.swift */; };
 		CC6B1625F8C107A1ECFDA81D /* MusicKitCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AF82B259DB7031739958A9 /* MusicKitCatalog.swift */; };
 		CE83D3943B7CFAA6125DE961 /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = B9E5C39D633A905CCAC41BF1 /* StationKit */; };
-		D143DC3F1DEBF53C57C32FA1 /* PlayStateExpectationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FF7140C8E2124EF21E4E3DB /* PlayStateExpectationTests.swift */; };
 		D17C87BCA75816FABECB60B8 /* WidgetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE396F6ECCCA376541188EA /* WidgetConstants.swift */; };
 		D84901AFB88F5F6F18720F4C /* ShowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7272836B27B2C4D100021CD4 /* ShowView.swift */; };
 		D8841E696471E5F23834E092 /* OpenInMusicModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3A6915519CE485E93236F9 /* OpenInMusicModel.swift */; };
 		D89EFD31CB085F66D7A3BFFB /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8282BEBD1270079B78E /* VideoPlayer.swift */; };
 		D9140E46E6276F414CD4DF56 /* OpenInMusicButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFA25193ACE5863A851807F1 /* OpenInMusicButton.swift */; };
 		DA626A804D30559327D9D84C /* AppSongSaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AAD9C771211029F3467F3F /* AppSongSaver.swift */; };
-		E0591A18622A441DF9090EDC /* PlayStateExpectationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FF7140C8E2124EF21E4E3DB /* PlayStateExpectationTests.swift */; };
 		E1AAA36856347B521CE9D917 /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = 52A744DED996BE16C7D0BC4E /* StationKit */; };
 		E1FD7442F54965FFB38C6D80 /* ArtworkThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B2EE0F4C7B6C9FFA3C9E82 /* ArtworkThumbnail.swift */; };
 		E34ECE7D60E0A07EBFFBB82D /* WidgetArtworkResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F198EB0F7925DC8A03086E6 /* WidgetArtworkResolver.swift */; };
@@ -265,7 +261,6 @@
 		03CF3E4F82982FFC8025772C /* OpenInMusicModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OpenInMusicModelTests.swift; sourceTree = "<group>"; };
 		0A827B74B3EC0CD13F071668 /* AppSectionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppSectionTests.swift; sourceTree = "<group>"; };
 		0B581D086F4D834217B4F630 /* WidgetConstantsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetConstantsTests.swift; sourceTree = "<group>"; };
-		0FF7140C8E2124EF21E4E3DB /* PlayStateExpectationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayStateExpectationTests.swift; sourceTree = "<group>"; };
 		128FD3045AB9DCA0AFE0D2F2 /* WidgetContent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetContent.swift; sourceTree = "<group>"; };
 		12E1B8A2E3028D5783D9ACCE /* VolumeControlView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VolumeControlView.swift; sourceTree = "<group>"; };
 		18A1F2EA674772D621307418 /* SpinnerWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpinnerWidgetBundle.swift; sourceTree = "<group>"; };
@@ -354,7 +349,6 @@
 		E1F3A0A25B67B4420DFAF25E /* Spinner Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = "Spinner Widget.appex"; path = "Spinner Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3585BE6827B310B19AEADD6 /* PlayerControllerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerControllerTests.swift; sourceTree = "<group>"; };
 		E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQualityTests.swift; sourceTree = "<group>"; };
-		E4DE5B48FCB80A34FA00D2C0 /* PlayStateExpectation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayStateExpectation.swift; sourceTree = "<group>"; };
 		E7C2F39956AFF7B54CCA1107 /* MiniPlayerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MiniPlayerView.swift; sourceTree = "<group>"; };
 		E7E3CE8242017EB914AB9365 /* SongSavingModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SongSavingModel.swift; sourceTree = "<group>"; };
 		F478354AB15736CA0D325E03 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -640,7 +634,6 @@
 				26F7394CE7817FAC472C635D /* NowPlayingWidgetViews.swift */,
 				41E566CF41C97EAB3E3BBEC7 /* PlayPauseIntent.swift */,
 				D83C963EFEC4E9CFEC269C64 /* AppModelRegistry.swift */,
-				E4DE5B48FCB80A34FA00D2C0 /* PlayStateExpectation.swift */,
 				6F198EB0F7925DC8A03086E6 /* WidgetArtworkResolver.swift */,
 				4E01502A6DA15679C398864C /* ControlPlayState.swift */,
 				777110BBCF2098176DC35E0A /* SetPlayingIntent.swift */,
@@ -678,7 +671,6 @@
 				AF2385347778A1131F1F0B5D /* ArtworkThumbnailTests.swift */,
 				A86EC5D409F1E6CF1B5786F9 /* WidgetLayoutRenderTests.swift */,
 				0B581D086F4D834217B4F630 /* WidgetConstantsTests.swift */,
-				0FF7140C8E2124EF21E4E3DB /* PlayStateExpectationTests.swift */,
 				03CF3E4F82982FFC8025772C /* OpenInMusicModelTests.swift */,
 				A843B77A467A699D55C8581F /* UITestFixturesTests.swift */,
 				8AB84995C00E517CAB4A0C79 /* WidgetArtworkResolverTests.swift */,
@@ -1012,7 +1004,6 @@
 				F0A98E45DA3B83B8E10A62E9 /* NowPlayingWidgetViews.swift in Sources */,
 				EF47C5E22F298B2EE2C35F26 /* PlayPauseIntent.swift in Sources */,
 				009E54D1B6359B9A32CF4B22 /* AppModelRegistry.swift in Sources */,
-				6F0D402C2DF93DEDBEC12974 /* PlayStateExpectation.swift in Sources */,
 				8AF4042F75EFB1918FB02258 /* OpenInMusicModel.swift in Sources */,
 				5C3F1E6870F678CC975AD2C7 /* OpenInMusicButton.swift in Sources */,
 				7CA9AF926047DF6FF0038A76 /* UITestFixtures.swift in Sources */,
@@ -1067,7 +1058,6 @@
 				9BF47B097F3B9BBD552EC16D /* NowPlayingWidgetViews.swift in Sources */,
 				C7B96B15AAF8D1241F410897 /* PlayPauseIntent.swift in Sources */,
 				801B56FBE65822FE7EF3C98B /* AppModelRegistry.swift in Sources */,
-				174BC3581CB8F801A9E4E727 /* PlayStateExpectation.swift in Sources */,
 				D8841E696471E5F23834E092 /* OpenInMusicModel.swift in Sources */,
 				D9140E46E6276F414CD4DF56 /* OpenInMusicButton.swift in Sources */,
 				EC9C7FB37B3F687CF1B15A73 /* UITestFixtures.swift in Sources */,
@@ -1093,7 +1083,6 @@
 				8D6A074C33349FFF5CD947A4 /* ArtworkThumbnailTests.swift in Sources */,
 				5480A2DAAEAD1947A072FFDC /* WidgetLayoutRenderTests.swift in Sources */,
 				46C52C054103626AA114A458 /* WidgetConstantsTests.swift in Sources */,
-				D143DC3F1DEBF53C57C32FA1 /* PlayStateExpectationTests.swift in Sources */,
 				8E40D8E72CA86A030502A0CC /* OpenInMusicModelTests.swift in Sources */,
 				636AC1D7FF37629093026AC2 /* UITestFixturesTests.swift in Sources */,
 				BF86E06669495BE08B20D0FD /* WidgetArtworkResolverTests.swift in Sources */,
@@ -1136,7 +1125,6 @@
 				3E6CB2E4B5552C5116749B8C /* ArtworkThumbnailTests.swift in Sources */,
 				0D309F425C5FD651313A5862 /* WidgetLayoutRenderTests.swift in Sources */,
 				C93E4690292EFCEA372CFD3A /* WidgetConstantsTests.swift in Sources */,
-				E0591A18622A441DF9090EDC /* PlayStateExpectationTests.swift in Sources */,
 				77D58C85340C15403846D5A3 /* OpenInMusicModelTests.swift in Sources */,
 				37F9C02B00EBF26AC2BF4CCE /* UITestFixturesTests.swift in Sources */,
 				E59CD55DC6927C0E29884067 /* WidgetArtworkResolverTests.swift in Sources */,
@@ -1819,7 +1807,7 @@
 			repositoryURL = "git@github.com:jpurnell/StationKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.6.0;
+				minimumVersion = 0.7.0;
 			};
 		};
 		AB6DF3C2B3BF307D38068231 /* XCRemoteSwiftPackageReference "StationKitAdapterKEXP" */ = {

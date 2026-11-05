@@ -22,10 +22,9 @@ final class WidgetPublisher {
     private static let stationName = "KEXP"
     private static let logoURL = URL(string: "https://kexp.org/static/assets/img/kexp_logo.jpg")
 
-    private let store: any NowPlayingStore
-    private let reload: @MainActor () -> Void
-    private var lastPublished: WidgetSnapshot?
-    private var lastPlaying: Bool?
+    /// The shared logic (save on change, heartbeat, reload only when something changed) lives in StationKit, so the
+    /// watch app uses the same implementation; this type only turns KEXP's plays and shows into a snapshot.
+    private let feed: WidgetFeed
 
     /// - Parameters:
     ///   - store: Where the widget reads from; the App Group by default.
@@ -34,8 +33,7 @@ final class WidgetPublisher {
         store: any NowPlayingStore = AppGroupNowPlayingStore(groupID: WidgetConstants.groupID),
         reload: @escaping @MainActor () -> Void = WidgetPublisher.reloadWidgets
     ) {
-        self.store = store
-        self.reload = reload
+        feed = WidgetFeed(store: store, reload: reload)
     }
 
     /// Records the latest play and show, and whether playback is running.
@@ -52,14 +50,8 @@ final class WidgetPublisher {
             stationName: Self.stationName,
             fallbackArtworkURL: Self.logoURL,
             fetchedAt: date)
-
-        let contentChanged = !Self.sameContent(snapshot, lastPublished)
-        if contentChanged {
-            await store.save(snapshot)
-            lastPublished = snapshot
-        }
-        let playStateChanged = await publishPlayState(isPlaying, at: date)
-        if contentChanged || playStateChanged { reload() }
+        let playStateChanged = await feed.publish(snapshot, isPlaying: isPlaying)
+        logIfChanged(playStateChanged, isPlaying)
     }
 
     /// Publishes whether playback is running, on its own, as soon as it is known.
@@ -70,28 +62,16 @@ final class WidgetPublisher {
     ///   - isPlaying: Whether the stream is playing.
     ///   - date: The time of this update.
     func updatePlayState(isPlaying: Bool, at date: Date = Date()) async {
-        if await publishPlayState(isPlaying, at: date) { reload() }
+        let playStateChanged = await feed.publishPlayState(isPlaying, at: date)
+        logIfChanged(playStateChanged, isPlaying)
     }
 
-    /// Sets the playing flag, every time so it stays fresh, and reports whether it differs from the last one set.
-    private func publishPlayState(_ isPlaying: Bool, at date: Date) async -> Bool {
-        await store.setPlaying(isPlaying, at: date)
-        let changed = lastPlaying != isPlaying
-        lastPlaying = isPlaying
-        if changed {
-            // Only changes are logged: the heartbeat repeats every poll and would drown them.
-            let message = "Published play state \(isPlaying ? "playing" : "paused") for the widget"
-            let logger = Logger()
-            logger.info("\(message, privacy: .public)")
-        }
-        return changed
-    }
-
-    /// Whether two snapshots show the same thing, ignoring when they were made.
-    private static func sameContent(_ new: WidgetSnapshot, _ old: WidgetSnapshot?) -> Bool {
-        guard var old else { return false }
-        old.fetchedAt = new.fetchedAt
-        return old == new
+    /// Only changes are logged: the heartbeat repeats every poll and would drown them.
+    private func logIfChanged(_ changed: Bool, _ isPlaying: Bool) {
+        guard changed else { return }
+        let message = "Published play state \(isPlaying ? "playing" : "paused") for the widget"
+        let logger = Logger()
+        logger.info("\(message, privacy: .public)")
     }
 
     /// Asks WidgetKit to reload the app's widgets. Widgets on visionOS need visionOS 26.
