@@ -25,7 +25,7 @@ struct NowPlayingProvider: AppIntentTimelineProvider {
 
     private let store = AppGroupNowPlayingStore(groupID: WidgetConstants.groupID)
     private let policy = WidgetRefreshPolicy.standard
-    private let artworkLoader = ArtworkLoader(allowedDomains: WidgetConstants.artworkDomains)
+    private let artworkResolver = WidgetArtworkResolver(allowedDomains: WidgetConstants.artworkDomains)
 
     func placeholder(in context: Context) -> NowPlayingEntry {
         NowPlayingEntry(date: Date(), content: .sample)
@@ -68,7 +68,7 @@ struct NowPlayingProvider: AppIntentTimelineProvider {
         let shown = snapshot ?? NowPlayingWidgetContent.sample.snapshot
         let content = NowPlayingWidgetContent(
             snapshot: shown,
-            artwork: await artwork(for: shown.artworkURL),
+            artwork: await artworkResolver.artwork(from: [shown.artworkURL, WidgetConstants.logoURL]),
             isPlaying: await store.isPlaying(),
             isStale: policy.isStale(fetchedAt: shown.fetchedAt, asOf: now))
         let built = "Widget entry made: \(content.isPlaying ? "playing" : "paused"), \(succeeded ? "fresh from KEXP" : "from the saved snapshot")"
@@ -82,20 +82,6 @@ struct NowPlayingProvider: AppIntentTimelineProvider {
             return try await station.currentProgram()
         } catch {
             let message = "Widget could not fetch the current show: \(error.localizedDescription)"
-            let logger = Logger(subsystem: "com.JPEnterprises.Spinner.widget", category: "NowPlayingProvider")
-            logger.error("\(message, privacy: .public)")
-            return nil
-        }
-    }
-
-    /// The artwork scaled for a widget, or `nil` if the host is not allowed or the download fails.
-    private func artwork(for url: URL?) async -> Data? {
-        guard let url, artworkLoader.isAllowed(url) else { return nil }
-        do {
-            let data = try await ArtworkLoader.fetchOverNetwork(url)
-            return ArtworkThumbnail.make(from: data, maxPixel: 400)
-        } catch {
-            let message = "Widget could not download artwork: \(error.localizedDescription)"
             let logger = Logger(subsystem: "com.JPEnterprises.Spinner.widget", category: "NowPlayingProvider")
             logger.error("\(message, privacy: .public)")
             return nil

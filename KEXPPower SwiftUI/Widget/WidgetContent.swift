@@ -53,8 +53,7 @@ struct WidgetArtwork: View {
         if let data, let source = CGImageSourceCreateWithData(data as CFData, nil),
            let image = CGImageSourceCreateImageAtIndex(source, 0, nil) {
             // The artwork is decoration: the title and artist beside it carry the meaning for VoiceOver.
-            Image(decorative: image, scale: 1)
-                .resizable()
+            Self.keepingColor(Image(decorative: image, scale: 1).resizable())
                 .scaledToFill()
                 .accessibilityHidden(true)
         } else {
@@ -65,6 +64,18 @@ struct WidgetArtwork: View {
                     .foregroundStyle(.secondary)
             }
             .accessibilityHidden(true)
+        }
+    }
+
+    /// Keeps the cover in colour when the system tints the widget (a Mac desktop widget behind other windows, or an
+    /// iPhone widget in accented mode). Without this a cover is flattened and a light logo turns into a blank square.
+    /// The setting arrived with iOS 18, macOS 15 and visionOS 26; earlier systems tint as they always did.
+    @ViewBuilder
+    private static func keepingColor(_ image: Image) -> some View {
+        if #available(iOS 18.0, macOS 15.0, visionOS 26.0, *) {
+            image.widgetAccentedRenderingMode(.fullColor)
+        } else {
+            image
         }
     }
 }

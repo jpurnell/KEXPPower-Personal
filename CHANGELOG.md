@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fixed
+- The widget showed a blank grey square when a song had no cover (KEXP gives none for some plays) and a placeholder note when the cover could not be downloaded (archive.org answers some albums with an HTTP 500 error page). It now tries the cover, then the KEXP logo, and only then the note (`WidgetArtworkResolver`, tested: download failure, an error page that is not an image, a host off the allow-list, nothing usable). A downloaded error page is no longer mistaken for artwork.
+- The widget's artwork keeps its colour when the system tints the widget (a Mac desktop widget behind other windows, an iPhone widget in accented mode); before, the logo was flattened to a blank light square. This is iOS 18 and macOS 15 behaviour (`widgetAccentedRenderingMode`), so it is not covered by an automated test: please check it on the desktop.
+
 ### Added
 - macOS: an "Open in Music" button on each song (MusicKit cannot add to a playlist on the Mac, so this opens the song in Music, where you add it). The song is looked up when you click, not for every row, and a miss shows a "not found" state and can be tried again. `OpenInMusicModel` has unit tests.
 - macOS: rows take keyboard focus: Tab reaches a row and Return expands or collapses it. Space stays the Playback menu's play/pause. A row had been a click-only gesture since the click-area fix.
