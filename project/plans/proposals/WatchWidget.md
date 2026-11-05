@@ -1,6 +1,6 @@
 # Design Proposal: Apple Watch widget (Smart Stack and watch-face complications)
 
-**Status:** PROPOSED 2026-11-05 (owner order: Mac clean-up, then this, then Control Center)
+**Status:** APPROVED 2026-11-05 (owner: "1 approved"; order: Mac clean-up, then this, then Control Center)
 **Date:** 2026-11-05
 **Master Plan Reference:** `NowPlayingWidget.md` §3i and §15 ("Watch Smart Stack and complications"), deferred from the first widget.
 **Facts marked (SDK) were read from the Xcode 27.2 SDK interfaces; anything not confirmed is marked *unverified*.**

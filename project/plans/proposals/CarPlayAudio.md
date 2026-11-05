@@ -1,6 +1,6 @@
 # Design Proposal: CarPlay Audio app
 
-**Status:** PROPOSED 2026-11-05 (Apple approved the CarPlay Audio entitlement for this app on 2026-11-05; the portal and signing steps are the owner's, listed in §10)
+**Status:** REVISED 2026-11-05 after owner feedback (add to playlist in the car; root screen shows the show and host; an Archive tab like the KEXP website, which is its own proposal: `ArchiveBrowser.md`) (Apple approved the CarPlay Audio entitlement for this app on 2026-11-05; the portal and signing steps are the owner's, listed in §10)
 **Date:** 2026-11-05
 **Master Plan Reference:** "CarPlay (requires an Apple audio-app entitlement; confirm eligibility first)" — eligibility is now confirmed. `PlatformExperience.md` (CarPlay note).
 **Facts marked (SDK) were read from the Xcode 27.2 SDK headers; anything not confirmed is marked *unverified*. Apple's CarPlay audio-app rules (template choices, what is allowed on screen) are from my knowledge of the CarPlay App Programming Guide, not read in this session, and are marked *unverified* where a decision depends on them.**
@@ -22,13 +22,20 @@ KEXP in the car: a CarPlay screen that starts the live stream and shows what is 
 #### 3a. A CarPlay scene beside the app's scene
 The iPhone target gains a scene configuration for the CarPlay role and a `CPTemplateApplicationSceneDelegate` (SDK: CarPlay framework, iOS 14; `CPTemplateApplicationScene.h`). The delegate receives the interface controller when the car connects and sets the root template. It shares the app's one player and model (the `AppModelRegistry.model` the widget intents already use), so the car and the phone are the same session.
 
-#### 3b. Templates
-A deliberately small screen set, because a driver should not be browsing:
-- **Root:** a list template with one item, "KEXP 90.3 FM — Live" (subtitle: the song on now, updated as it changes). Selecting it starts the stream and pushes the system Now Playing template.
-- **Now Playing:** `CPNowPlayingTemplate.sharedTemplate` (SDK: iOS 14). It shows the artwork, title and artist from `MPNowPlayingInfoCenter` and the play/pause control, with no code of ours beyond configuring it. `allowsMiniPlayer` exists in this SDK (iOS 27); *whether it applies to a radio app is unverified*.
-- **Second tab, "Recently played" (read-only list of the last songs):** optional and last; a `CPTabBarTemplate` (SDK: `maximumTabCount` is given by the class) would host Live and Recent. *Unverified: whether Apple's review expects a tab bar or lets a single list stand as the root; I will build the single list first and add the tab only if needed.*
+#### 3b. Templates (revised on the owner's direction)
+Root is a **tab bar** (`CPTabBarTemplate`; SDK: the class exposes `maximumTabCount`), which also settles the earlier open question about a tab bar:
+- **Live tab:** a list whose first item is the current show and its host, as the website and the phone show them: "The Midday Show" with "Cheryl Waters" beneath it, refreshed as the show changes (from `NetworkManager.getShow`, the same call the phone's show header uses; a hand-over between shows updates the item). Selecting it starts the stream and pushes the system Now Playing template. A second item shows the song on the air now.
+- **Archive tab:** the archive browser (below and in `ArchiveBrowser.md`), reached from the root in one tap.
+- **Now Playing:** `CPNowPlayingTemplate.sharedTemplate` (SDK: iOS 14) reads the artwork, title and artist from `MPNowPlayingInfoCenter`; the buttons below it are configured by us (3b-2). `allowsMiniPlayer` exists in this SDK (iOS 27); *whether it applies to a radio app is unverified*.
 
-No add-to-playlist in the car: it is a tap-heavy action and playlist writes are the phone's job.
+#### 3b-2. Add to playlist in the car (reversed from the first draft)
+My first draft left this out as "tap-heavy"; the owner is right that a driver cannot open the phone and that this is where the feature is most useful. The SDK has a button made for it: `CPNowPlayingAddToLibraryButton` (SDK: a `CPNowPlayingButton` subclass, set with `updateNowPlayingButtons:`). Its handler runs the app's existing `SongSavingModel.save(_:)`, so the car and the phone add to the same "KEXP" playlist, with the same ledger (a song is never added twice).
+
+Two things differ in a car and are decisions, not details:
+1. **The "Is this the song?" prompt.** Today a text-search match (no ISRC) asks the listener to confirm. In the car that prompt must be glanceable or absent. Proposal: an ISRC match adds immediately and the button shows added; a text-search match is **not guessed at**: it is kept as "needs review" and the phone shows it when the driver is parked (a small change to `SongSavingModel`'s state, with tests). If Apple's rules allow a two-button alert template (`CPAlertTemplate`; *unverified*), the prompt could appear there instead; I would build "review later" first because it is safe at speed.
+2. **Feedback.** Without looking, the driver needs to know it worked: the button changes state (added / not found), and the system's own confirmation sound or banner is used where the templates allow (*unverified which*). No custom audio over a live stream.
+
+The Mac cannot add to a playlist (MusicKit) and has no CarPlay, so this is the iPhone's feature. It needs the Apple Music permission and subscription the phone already requires; if permission was never granted, the first press in the car cannot show a permission dialog there, so the app asks for it on the phone before the first drive (a setup step I will make visible in Settings).
 
 #### 3c. Data and refresh
 The now-playing text on the list item and the Now Playing screen come from the same `ResultRetriever` the phone uses, so a track change updates both. The 5-second poll is already running while the app is.
@@ -63,6 +70,7 @@ No extra network traffic and no extra process: the scene runs in the app. The ph
 **Internal:** none beyond the existing packages.
 
 ### 11. Test Strategy
+- **Add in the car (red first):** an ISRC match adds and reports added; a text-search match is held as needs-review and is not added; a repeat press does not add twice; permission missing reports needs-permission without a prompt. These extend `SongSavingModelTests` and need no car.
 - **Unit (red first):** the list item's title and subtitle from a snapshot (a song; an airbreak, which reads "Airbreak" as everywhere else; nothing yet, which reads "KEXP"), and that long titles are cut at a limit instead of overflowing (the limit comes from Apple's rules, to be confirmed).
 - **Wiring:** the scene delegate sets a root template when the interface controller connects, and removes references when it disconnects — testable with a fake `CPInterfaceController` seam if the types allow; *unverified: CarPlay's classes may not be constructible in a test host, in which case this is checked in the CarPlay simulator and stated as manual*.
 - **Not automatable:** the real head unit. Manual, on your car.
@@ -73,18 +81,19 @@ No extra network traffic and no extra process: the scene runs in the app. The ph
 ### 13. Adversarial Review
 1. **"App Review rejects the screen set."** Mitigated by keeping to Apple's templates and a minimal list; the tab bar is added only if review wants it.
 2. **"The car and phone disagree about state."** They share the one player, and the system Now Playing state comes from the one publisher.
-3. **"I cannot test it without a car."** The CarPlay simulator covers the screens; a real head unit is the owner's final check, flagged for the release notes.
-4. **"The entitlement and profile are not in place."** The first build step is to confirm the signed build carries the entitlement before writing any UI (the same lesson the App Group taught).
+3. **"The archive is a whole feature, not a screen."** Correct; it is `ArchiveBrowser.md`, and the CarPlay Archive tab ships after the phone's.
+4. **"I cannot test it without a car."** The CarPlay simulator covers the screens; a real head unit is the owner's final check, flagged for the release notes.
+5. **"The entitlement and profile are not in place."** The first build step is to confirm the signed build carries the entitlement before writing any UI (the same lesson the App Group taught).
 
 ### 14. Alternatives Considered
 - **Widgets in CarPlay** (SDK has `WidgetLocation.carPlay`, iOS 26): complementary and separate; the now-playing widget could appear in CarPlay without this work, but a widget cannot start audio reliably in a car and is not an audio app. *Unverified whether a widget in CarPlay needs an entitlement.*
 - **Only the system Now Playing screen:** it appears while audio plays, but an audio app with no root template does not show up in CarPlay to start anything. Rejected.
 
 ### 15. Future Directions
-The archive (shows by date) as a second list once the archive exists; Siri "play KEXP" through an App Intent; a station picker if other stations adopt `StationKit`.
+Siri "play KEXP" through an App Intent; a station picker if other stations adopt `StationKit`.
 
 ### 16. Open Questions
-Root template choice and tab bar (3b); the entitlement key and review rules (6, 10); `allowsMiniPlayer` (3b). The first three need the Apple documentation read before code is written, and I will quote what I read.
+Answered by the owner 2026-11-05: add to playlist is in; root is the show and host plus an Archive link. Still open: the entitlement key and review rules (6, 10); whether a two-button alert is allowed for the unconfirmed-match prompt (3b-2); how deep Apple lets a template stack go, which limits the Archive browse (`ArchiveBrowser.md` §3c); `allowsMiniPlayer`. All need Apple's CarPlay documentation read before code is written, and I will quote what I read.
 
 ### 17. Documentation Strategy
 README (platform table), CHANGELOG, master plan (move CarPlay from "later" to the roadmap), ADR-008, `PlatformExperience.md` CarPlay note updated.

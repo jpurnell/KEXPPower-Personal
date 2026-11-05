@@ -1,0 +1,106 @@
+# Design Proposal: Archive browser (by Date, Host or Show) on iPhone, iPad, Mac, Vision Pro and CarPlay
+
+**Status:** PROPOSED 2026-11-05 (from the owner's CarPlay feedback: an Archive page that resembles the KEXP website, selectable by Date / Host / Show; screenshots of kexp.org/archive supplied)
+**Date:** 2026-11-05
+**Master Plan Reference:** the "Archive" sidebar section (currently a placeholder), "Finish async `ArchiveManager`", and `CarPlayAudio.md` (the Archive tab).
+**Facts marked (live) were checked against `api.kexp.org` on 2026-11-05; (SDK) against the Xcode 27.2 SDK; (repo) in this repository or `KEXPPowerKit`. Anything not confirmed is marked *unverified*.**
+
+---
+
+### 1. Objective
+Browse and play KEXP's archived shows the way kexp.org/archive does, in the app's Archive section and in CarPlay, with three ways in, as on the website:
+
+| Mode | The website (from the owner's screenshots) | Here |
+|---|---|---|
+| **Date** | "Select a date": a grid of day tiles (month, day number, weekday), the current day highlighted, 15 days shown, newest first | the same tiles; a day opens that day's shows |
+| **Host** | "Select a host": cards with photo, name, their program(s) in the accent colour, and a show count (e.g. "Cheryl Waters — THE MIDDAY SHOW — 9 SHOWS") | an alphabetical list/grid of hosts with photo, program names and count; a host opens their shows |
+| **Show** | "Select a show": cards with the program's picture, name, its hosts, genre tags and a count (e.g. "The Midday Show — CHERYL WATERS — Rock, Eclectic, Variety Mix — 9 SHOWS") | the same, one card per program; a program opens its archived shows |
+
+Choosing a show plays it.
+
+### 2. Motivation
+**Current situation:**
+- The sidebar has an Archive section that says "coming soon" (repo: `AppSection`).
+- `KEXPPowerKit` has an `ArchiveManager` and `ArchiveShow` models, but the master plan records that its async conversion is commented out (`//TODO: - ASYNC`), so archive loading does not work in the app's fork today (repo).
+- KEXP's API serves everything the three modes need (live): `/v2/hosts` (106 hosts: `id`, `name`, `image_uri`, `thumbnail_uri`, `is_active`, `location`), `/v2/programs` (41 programs: `id`, `name`, `description`, `tags`, `image_uri`, `is_active`), and `/v2/shows` (68,087 shows in all: `id`, `program`, `hosts`, `host_names`, `program_name`, `program_tags`, `tagline`, `image_uri`, `start_time`). *The query parameters for "shows on a date", "by host" and "by program" are unverified: my one filtered call returned the unfiltered total, so either the name I used was wrong or it was ignored. Finding the right ones is the first experiment.*
+- Archived audio is available (live): `GET /get_streaming_url/?bitrate=128&timestamp=<ISO>&stream_time=<ISO>` returned `{"sg-url": "https://kexp-archive.streamguys1.com/content/kexp/20261104095007-5-1935-the-midday-show.mp3", "sg-url-next": "...", "sg-offset": 593}`: a file URL for the show that was on at that time, the next show's file, and an offset in seconds into the file. `/get_show_start/` answered HTTP 500 for the call I tried, so I will not depend on it. The master plan already flagged both endpoints as suspect; this is the first live check of them.
+
+**Drawback of not having it:** the app is live-only. Most of what makes KEXP worth owning (a show you missed) is unreachable.
+
+### 3. Proposed Architecture
+#### 3a. Logic in `StationKit`, KEXP wiring in the adapter
+Station-agnostic types in StationKit, KEXP's mapping in `StationKitAdapterKEXP` (ADR-006/007):
+```
+StationKit
+  ArchiveShow            id, program name, host names, tagline, image URL, start and end time, tags
+  ArchiveHost            id, name, image URL, program names, show count
+  ArchiveProgram         id, name, hosts, tags, image URL, show count
+  ArchiveCatalog         protocol: days(), hosts(), programs(), shows(on:), shows(by host:), shows(of program:),
+                         playback(for show:) -> ArchivePlayback { url, offset, nextURL }
+  (default)              a station that has no archive reports it, and the app hides the section
+StationKitAdapterKEXP
+  KEXPArchiveCatalog     the mapping above onto /v2/hosts, /v2/programs, /v2/shows and get_streaming_url
+```
+Reasons: the logic is testable in seconds without a simulator, and another public station can implement the protocol with no app change.
+
+#### 3b. App layers
+- **Date:** the 15-day tile grid (the website shows 15 and highlights today; *whether the archive really holds only about 14 days is unverified: the library's lookback is 14 days (master plan) and I will confirm against the API before fixing the number in code*).
+- **Host / Show:** lists built from `hosts()` and `programs()`, fetched once and cached, because they change rarely. The show count per host and program on the website is derived (a `count` query), not stored by KEXP in those records (*unverified for `/v2/hosts`; to be checked*).
+- **Playback:** an archived show is a file with an offset, so it uses the app's one `PlayerController`, with a different item and with seeking, a scrubber and "back to live". Now Playing shows the show, not a song. Remote commands and the lock screen stay as they are. This is the largest unknown: *how well the offset and the "next" file give continuous playback across show boundaries is unverified.*
+- **Add to playlist from an archive:** a show is a list of plays; the add button applies to a play, so archived-show playlists (the song list for that show) come from `/v2/plays?show=<id>`, *unverified: confirm the filter name*.
+- **Look:** resembles the website, as the owner asked, in the app's own visual language (the tiles' typography and spacing from the screenshots; the dark host/show cards; the yellow accent used for program names). It is not a copy of the website's CSS or its images; photos come from KEXP's own API URLs, from the allow-listed hosts the artwork loader already uses.
+
+#### 3c. CarPlay
+CarPlay shows the same three modes, trimmed to what a template allows: the Archive tab lists "By date", "By host", "By show" (`CPListTemplate`); By date is a short list (or `CPGridTemplate`, SDK: `CPGridTemplateMaximumItems` caps the item count) of recent days; By host and By show are lists, and a list shows only its first `maximumItemCount` items (SDK: `CPListTemplate.maximumItemCount`), so 106 hosts will need sections or a short alphabet index (*unverified: sections count against the same limit*). Apple limits how deep a template stack can go (*unverified: the figure; to be read from the CarPlay guide*); Tab → mode → host → show → play is four levels, which may fit. Photos in CarPlay lists are small; names and counts carry the meaning. This ships after the phone's browser.
+
+### 4. API Surface (StationKit, public and documented)
+The protocol and value types above; `ArchivePlayback`; no breaking change (new minor version).
+
+### 5. MCP Schema
+Not applicable.
+
+### 6. Constraints & Compliance
+Swift 6 strict concurrency; no force unwraps; gate at 0/0. **Pacing:** the API is a community service; requests go through the existing `RequestPacer`, lists are fetched once and cached, and no polling. **Privacy:** requests carry no listener identifier. **Rights:** the audio and images are KEXP's; the app streams from KEXP's own archive host, which the website itself does, and stores nothing. The README's note that KEXP and its logo belong to KEXP stands. **Accessibility:** tiles and cards are buttons with labels that read "November 5, Thursday" and "Cheryl Waters, The Midday Show, 9 shows"; Dynamic Type; Reduce Transparency.
+
+### 7. Source & API Compatibility
+Additive. The `ArchiveManager` in `KEXPPowerKit` is left alone (it is the library's and its own TODO); the new code replaces its use in the app rather than finishing it, and I will say so in the library's changelog before removing anything.
+
+### 8. Backend Abstraction
+This is the reason for the protocol: nothing KEXP-specific is in StationKit.
+
+### 9. Resource Budget
+Host and program lists are a few hundred KB at most, cached for the session. A day's shows are one request. Artwork is loaded lazily and thumbnailed. An archived stream is one HTTP audio stream, as the live one is.
+
+### 10. Dependencies
+**Internal:** StationKit (new minor), StationKitAdapterKEXP (new minor), the app. **External:** KEXP's API, as today. **Portal:** none.
+
+### 11. Test Strategy (test first, in StationKit and the adapter)
+- **Mapping (adapter, offline with recorded JSON):** a `/v2/shows` record becomes an `ArchiveShow` (hosts, program, times, tags, blank image); a host and a program likewise; the month/day/weekday labels for a date; the tile for "today" is marked.
+- **Catalog behaviour:** shows for a date, for a host, for a program; empty days; paging; the playback lookup parses `sg-url`, `sg-url-next` and `sg-offset`, and treats a `null` url (what the API returns when no show matches) as "not available" rather than crashing.
+- **App:** view-model tests for mode switching, selection, and the "not available" state; render tests for the tile and card layouts; a UI test (the Mac UI target now exists) that the three modes switch and a tile opens a list.
+- **Live (a small, separate, opt-in suite, as the adapter already has):** one real call to each endpoint, to catch the API changing.
+- **Playback across shows and on CarPlay:** manual, stated as such.
+
+### 12. Architecture Decision Review
+**New ADR-009:** *Archive access is a `StationKit` protocol with a KEXP adapter; the app does not call KEXP's archive endpoints directly.* Extends ADR-006.
+
+### 13. Adversarial Review
+1. **"The archive window is not what the website shows."** Hence the unverified marker on the 15 days; the number comes from the API, not from the screenshot.
+2. **"Archive playback has gaps at show boundaries."** Possible (3b); found by playing across one before shipping, and the "next" file URL is there to bridge it.
+3. **"KEXP changes the endpoints."** The opt-in live suite catches it; the protocol keeps the app insulated.
+4. **"This is too big."** It is, which is why it is its own proposal, phased: (a) StationKit types and adapter with tests, (b) Date mode and playback on the phone, (c) Host and Show modes, (d) the Mac and iPad layouts, (e) CarPlay. Each phase ships and is useful alone.
+5. **"Copying the website's look."** The layout idea is followed; the code, fonts and images are not copied.
+
+### 14. Alternatives Considered
+- **Open the website's archive in a web view:** no playback integration, no Now Playing, no CarPlay. Rejected.
+- **Finish the library's `ArchiveManager`:** it is built around start-time steps from the nearest hour and a callback API; the API now serves a file and an offset directly, so the better path is the protocol above. Rejected as the base, kept as a reference.
+- **Date mode only:** the quickest, and phase (b); Host and Show follow because the owner asked for all three.
+
+### 15. Future Directions
+Search across shows; favourite hosts and programs; downloading a show for offline listening (rights to be considered first); "add every song from this show to a playlist".
+
+### 16. Open Questions
+The archive's real depth in days; whether the host/program count comes from the API or is derived; the plays-by-show filter name; archive playback across a show boundary; CarPlay's template depth. Each is an experiment I can run against the live API except the last two, which need a device and Apple's documentation.
+
+### 17. Documentation Strategy
+README (Archive row), CHANGELOG (app, StationKit, adapter), master plan (Archive moves from "placeholder" to the roadmap with phases), ADR-009, `PlatformExperience.md` archive note updated, and `CarPlayAudio.md` links here.

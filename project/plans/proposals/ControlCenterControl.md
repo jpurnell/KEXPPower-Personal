@@ -1,6 +1,6 @@
 # Design Proposal: Control Center play/pause control (iPhone, and the Mac menu bar and Apple Watch where the SDK allows)
 
-**Status:** PROPOSED 2026-11-05 (owner order: Mac clean-up, watch widget, then this)
+**Status:** PROPOSED 2026-11-05 (owner order: Mac clean-up, watch widget, then this). Owner asked on 2026-11-05 for Vision Pro to get controls too; the SDK does not allow it (see §3c), so the answer is recorded there and the owner's call is whether to proceed without it.
 **Date:** 2026-11-05
 **Master Plan Reference:** `NowPlayingWidget.md` §14 ("A Control Center control… a good follow-up") and §15.
 **Facts marked (SDK) were read from the Xcode 27.2 SDK interfaces; anything not confirmed is marked *unverified*.**
@@ -29,7 +29,7 @@ A control's value comes from a `ControlValueProvider` that reads the same `NowPl
 - **iPhone / iPad:** Control Center, lock screen, Action button.
 - **Mac (macOS 26):** the SDK lists controls on macOS 26, which would put it in the menu bar; this app's Mac deployment target is 14, so the control needs `@available` and the Mac behaviour is *unverified until tried on a macOS 26 machine*.
 - **Apple Watch (watchOS 26):** the SDK lists controls there too; it belongs with the watch widget extension, not this one, and waits on it.
-- **Vision Pro:** unavailable (SDK).
+- **Vision Pro: not possible today.** The owner's view (2026-11-05) is that it should have controls and there is no good reason it should not. The reason is Apple's: `@available(visionOS, unavailable)` is on `StaticControlConfiguration`, `ControlWidgetToggle` and `ControlWidgetButton`, and I read that in the visionOS SDK's own WidgetKit interface (not only the iOS one), so a control target cannot be built for visionOS in this SDK. Vision Pro keeps the Now Playing widget, which has a play/pause button (visionOS 26). When a later SDK removes the restriction, adding visionOS here is a platform filter and an `@available` change, and I will check each SDK release for it.
 
 #### 3d. Limits stated plainly
 A control cannot show artwork or the song title; it shows a symbol, a label ("KEXP") and a value ("Playing"/"Paused"). A control that shows the wrong state until reloaded has the same cause as the widget's earlier lag, so the same remedy applies: reload on change, and an expected state stands for a few seconds after the tap.
