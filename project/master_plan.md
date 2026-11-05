@@ -171,7 +171,7 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 - [ ] iOS 27 `NowPlaying` adoption behind `#available`
 - [ ] Native macOS target (fork's UIKit-only helper needs a guard)
 - [ ] visionOS polish
-- [ ] CarPlay Audio: Apple approved the entitlement 2026-11-05 (eligibility confirmed); proposal `project/plans/proposals/CarPlayAudio.md` revised 2026-11-05 (add to playlist in the car, show and host on the root screen, an Archive tab) awaiting the portal step; the Archive tab depends on `ArchiveBrowser.md`
+- [x] CarPlay Audio first pass built 2026-11-05 (`project/plans/proposals/CarPlayAudio.md`, approved): Live tab (show and host, song on now), Now Playing with an add-to-playlist button, Archive tab as a disabled placeholder; the entitlement is verified in a signed build; awaiting a look in a CarPlay simulator or car. Next: the Archive tab (depends on `ArchiveBrowser.md`) and a look into the CarPlay widget (owner request 2026-11-05)
 - [x] Watch widget built 2026-11-05 (`project/plans/proposals/WatchWidget.md`; StationKit 0.7.0 `WidgetFeed`; same App Group as the phone, auto-registered); awaiting a check on a watch
 - [ ] Archive browser by Date / Host / Show, like kexp.org/archive, on every platform and in CarPlay: `project/plans/proposals/ArchiveBrowser.md` (proposed 2026-11-05; replaces the "Finish async `ArchiveManager`" item as the route)
 - [x] Control Center play/pause control built 2026-11-05 (`project/plans/proposals/ControlCenterControl.md`; iOS 18 and macOS 26; visionOS cannot get controls in this SDK); awaiting a check in Control Center on a device

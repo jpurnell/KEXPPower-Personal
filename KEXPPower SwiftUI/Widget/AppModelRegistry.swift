@@ -8,6 +8,8 @@
 enum AppModelRegistry {
     /// The model the app created at launch.
     static var model: ResultRetriever?
+    /// The saving model the app created at launch, so CarPlay adds songs to the same playlists as the phone.
+    static var saving: SongSavingModel?
 
     /// Starts playback if it is stopped and pauses it if it is playing.
     ///

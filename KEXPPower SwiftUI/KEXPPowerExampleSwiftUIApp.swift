@@ -19,13 +19,20 @@ struct KEXPPowerExampleSwiftUIApp: App {
     /// The one player and playlist, shared by every window and by the menus.
     @State private var model: ResultRetriever
     /// Saves songs to the listener's playlists; the add buttons read it from the environment.
-    @State private var saving = AppSongSaver.makeModel()
+    @State private var saving: SongSavingModel
+    #if os(iOS)
+    /// Lets CarPlay connect: the system asks the app delegate for the car's scene configuration.
+    @UIApplicationDelegateAdaptor(CarPlayAppDelegate.self) private var appDelegate
+    #endif
 
     init() {
         let model = ResultRetriever()
+        let saving = AppSongSaver.makeModel()
         _model = State(initialValue: model)
-        // An App Intent from the widget reaches the player through this, even if no window has opened yet.
+        _saving = State(initialValue: saving)
+        // An App Intent from the widget, and CarPlay, reach the player through this, even if no window has opened yet.
         AppModelRegistry.model = model
+        AppModelRegistry.saving = saving
     }
 
     var body: some Scene {
