@@ -65,6 +65,12 @@ struct CombinedView: View {
             if AppSongSaver.canSaveToPlaylists, let play, SongSavingModel.canSave(play) {
                 SaveButton(play: play).padding(4)
             }
+            #if os(macOS)
+            // MusicKit cannot add to a playlist on the Mac, so the button opens the song in Music instead.
+            if let play, OpenInMusicModel.canOpen(artist: play.artist, track: play.song) {
+                OpenInMusicButton(play: play).padding(4)
+            }
+            #endif
         }
         .foregroundStyle(.primary)
         .background { backdrop }
@@ -74,6 +80,18 @@ struct CombinedView: View {
         // and deeper did not); here it answers anywhere in the row. Links and buttons inside still take their own clicks.
         .contentShape(Rectangle())
         .onTapGesture { small.toggle() }
+        #if os(macOS)
+        // A gesture is not a control, so the row asks for keyboard focus itself: Tab reaches it and Return expands it.
+        // Space stays the Playback menu's play/pause.
+        .focusable(interactions: .activate)
+        .onKeyPress(.return) {
+            small.toggle()
+            return .handled
+        }
+        #endif
+        // One element that contains the row's parts, so the identifier names the row without overwriting its children's.
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("song-row")
         .accessibilityAction(named: small ? "Show details" : "Hide details") { small.toggle() }
     }
 

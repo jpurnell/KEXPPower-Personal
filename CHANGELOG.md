@@ -3,6 +3,9 @@
 ## Unreleased
 
 ### Added
+- macOS: an "Open in Music" button on each song (MusicKit cannot add to a playlist on the Mac, so this opens the song in Music, where you add it). The song is looked up when you click, not for every row, and a miss shows a "not found" state and can be tried again. `OpenInMusicModel` has unit tests.
+- macOS: rows take keyboard focus: Tab reaches a row and Return expands or collapses it. Space stays the Playback menu's play/pause. A row had been a click-only gesture since the click-area fix.
+- A Mac UI test target, `Spinner Mac UITests`, that drives the real app against fixed songs (launch argument `-uitest-fixtures`, `UITestFixtures`: no network and no audio): a click at the top, middle and bottom of a Previously row expands it (the earlier top-half-only defect), Tab then Return expands the focused row, and every song has the Open in Music button. Running it needs UI automation enabled on the Mac (a one-time authentication).
 - `scripts/bootstrap.sh`: enables the git hooks after a fresh clone (`core.hooksPath` is per-clone config and cannot be committed) and checks that `swift` and `quality-gate` are installed. `CLAUDE.md` already described it; the script did not exist, so a fresh clone silently ran no hooks. Safe to run twice (checked in a fresh clone).
 
 ## 3.3.0 - 2026-11-05

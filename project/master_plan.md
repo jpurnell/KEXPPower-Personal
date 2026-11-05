@@ -103,7 +103,7 @@ streamguys1 AAC stream ──> AVPlayer (PlayerController) ──> NowPlayingPub
 ### Known Problems
 - ~~`try!` crash on artwork fetch; artwork never reaches the system (Proposal 1, G1–G3)~~ fixed (`ArtworkLoader` in StationKit)
 - ~~Five independent writers to Now Playing state; `isPlaying` can drift (G4–G7)~~ fixed (one publisher; `isPlaying` mirrors `timeControlStatus`). It shipped without a view-level check: the iOS button did not follow `isPlaying` until `PlayerController` was made `@Observable` (see the changelog), and a `PlayerControllerTests` test now covers that path
-- The Mac UI is a port of the iPhone layout: no sidebar yet, and a row is no longer a keyboard-focusable button (a VoiceOver action stands in)
+- ~~The Mac UI is a port of the iPhone layout: no sidebar yet, and a row is no longer a keyboard-focusable button (a VoiceOver action stands in)~~ the sidebar shipped in 3.3.0; rows take keyboard focus again (Tab, Return), checked by a UI test; the Mac has no add-to-playlist (MusicKit), so it has an Open in Music button
 - The watch needs 35–40 s on a cold network to reach the stream; the app shows "Connecting…" meanwhile
 - Library fork vs upstream 4.1.0: missing `Show.programImageURI` and the 14-day archive lookback (fork uses 13); `ArchiveManager`'s async conversion is commented out (`//TODO: - ASYNC`), so archive loading does not work in the fork today
 - Library endpoints: `get_streaming_url` now redirects and `get_show_start` requires a timestamp, so those are suspect
@@ -180,4 +180,4 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 
 ---
 
-**Last Updated:** 2026-11-05 (3.3.0: reconciled widget, playlist, mini player and sidebar from proposed to shipped; next-up order recorded; earlier: 3.2.0: reconciled status with shipped code — Mac playback, watch app, app-owned player, fixed problems struck through; macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)
+**Last Updated:** 2026-11-05 (Mac clean-up: keyboard access, Open in Music, UI test target; 3.3.0: reconciled widget, playlist, mini player and sidebar from proposed to shipped; next-up order recorded; earlier: 3.2.0: reconciled status with shipped code — Mac playback, watch app, app-owned player, fixed problems struck through; macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17)

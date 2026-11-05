@@ -7,7 +7,7 @@ A fast, native Apple-platform listener for KEXP 90.3 FM (Seattle): the live play
 | Platform | Target | Notes |
 |---|---|---|
 | iOS / iPadOS 17 | `KEXPPowerExampleSwiftUI (iOS)` | lock-screen Now Playing, background audio; embeds the watch app |
-| macOS 14 | `Spinner Mac` | own target and entitlements; plays the stream; Playback menu (Space) |
+| macOS 14 | `Spinner Mac` | own target and entitlements; plays the stream; Playback menu (Space); keyboard access to rows; Open in Music; UI tests (`Spinner Mac UITests`) |
 | visionOS 1 | shares the iOS target | |
 | watchOS 10 | `Spinner Watch` | standalone; Digital Crown volume; background audio |
 | Widget | `Spinner Widget` | small, medium and large on iPhone, iPad, Mac and Vision Pro (visionOS 26); play/pause from the widget |

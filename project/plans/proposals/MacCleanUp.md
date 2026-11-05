@@ -1,6 +1,6 @@
 # Design Proposal: Mac clean-up (keyboard access, add-to-playlist fallback, widget check, loose ends)
 
-**Status:** APPROVED 2026-11-05 (owner: "Open in Music, and absolutely with the UI Test targets"; so §3b is option A and the UI test target is part of this change)
+**Status:** APPROVED 2026-11-05, built 2026-11-05 (keyboard, Open in Music, UI tests, bootstrap; the widget check and DerivedData clean-up remain, both needing the owner) (owner: "Open in Music, and absolutely with the UI Test targets"; so §3b is option A and the UI test target is part of this change)
 **Date:** 2026-11-05
 **Master Plan Reference:** Known Problems ("a row is no longer a keyboard-focusable button"), `PlatformExperience.md` (Mac playlist options), CLAUDE.md (`scripts/bootstrap.sh`).
 **Facts marked (verified) were read from this repo; anything not confirmed is marked *unverified*.**
@@ -24,7 +24,7 @@ Make the row focusable and give it a default action, without touching the click 
 #### 3b. Add to a playlist on the Mac: decision needed
 | Option | What it does | Cost |
 |---|---|---|
-| **A. Open in Music (recommended)** | A visible "Open in Music" button on each song (collapsed and expanded), using the lookup that already exists. Add to a playlist there. | Small; no new entitlement; honest about the platform limit. One tap more than the phone. |
+| **A. Open in Music (recommended)** | A visible "Open in Music" button on each song (collapsed and expanded), using the lookup that already exists. Built so the lookup runs on the click, not per row (a request per visible row would have been the cost of showing the button only when a song is found). Add to a playlist there. | Small; no new entitlement; honest about the platform limit. One tap more than the phone. |
 | B. Script the Music app | Add to the "KEXP" playlist by AppleScript. | Needs the sandbox Apple Events entitlement and an Automation permission prompt; App Store review is likely to reject a temporary-exception entitlement. Not recommended. |
 | C. Hand off to the phone | Write the song to iCloud (a shared store) and have the phone add it. | Needs CloudKit or iCloud key-value storage and a portal change; a new sync surface to test. Possibly later. |
 

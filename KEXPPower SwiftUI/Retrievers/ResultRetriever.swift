@@ -61,6 +61,12 @@ public class ResultRetriever {
 	/// Starts refreshing the playlist and show every five seconds, replacing any earlier loop.
 	func getResults() async {
 		polling.task?.cancel()
+		// A UI test gets fixed songs and no stream, so it neither needs the network nor starts audio.
+		if UITestFixtures.isActive() {
+			plays = UITestFixtures.plays
+			play = plays.first ?? .fixture()
+			return
+		}
 		// A refresh must not replace the player: that would cut off what is playing.
 		if playerController.player == nil {
 			let quality = StreamQuality.resolve(stored: UserDefaults.standard.string(forKey: StreamQuality.storageKey))

@@ -47,6 +47,16 @@
                ReferencedContainer = "container:KEXPPower.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5A20566905E70B9B2557C9AD"
+               BuildableName = "Spinner Mac UITests.xctest"
+               BlueprintName = "Spinner Mac UITests"
+               ReferencedContainer = "container:KEXPPower.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
