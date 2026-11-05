@@ -9,6 +9,7 @@ import Observation
 import OSLog
 import StationKit
 import StationKitAdapterKEXP
+import WidgetKit
 
 /// Plays the live stream on the watch and tells the system what is on the air.
 ///
@@ -49,6 +50,11 @@ final class WatchPlayer {
     @ObservationIgnored private var itemObservation: AnyCancellable?
     @ObservationIgnored private var volumeObservation: AnyCancellable?
     @ObservationIgnored private let polling = PollingTask()
+    /// Keeps the watch widget current: the shared logic from StationKit, with WidgetKit as its reload.
+    @ObservationIgnored private let feed = WidgetFeed(
+        store: AppGroupNowPlayingStore(groupID: WatchWidgetConstants.groupID),
+        reload: { WidgetCenter.shared.reloadTimelines(ofKind: WatchWidgetConstants.kind) })
+    @ObservationIgnored private var playExpectation = PlayStateExpectation()
 
     init() {
         snapshot = NowPlayingSnapshot(.nothing, stationName: "KEXP", fallbackArtworkURL: logoURL, state: .paused)
@@ -90,6 +96,20 @@ final class WatchPlayer {
                 try? await Task.sleep(for: .seconds(succeeded ? 15 : min(3 * failures, 15)))
             }
         }
+    }
+
+    /// Whether to tell the widget the stream is playing: the state just asked for while it is current, else the real one.
+    private var publishedPlaying: Bool {
+        playExpectation.effective(actual: isPlaying, at: Date())
+    }
+
+    /// Plays or pauses for the watch widget's button, telling the widget the state to expect before the stream has
+    /// started so its reload shows the right icon, and so the next poll does not undo it.
+    func toggleFromIntent() async {
+        let willPlay = !(isPlaying || isBuffering)
+        playExpectation.expect(playing: willPlay, until: Date().addingTimeInterval(6))
+        await feed.publishPlayState(willPlay)
+        toggle()
     }
 
     private func volumeChanged(to value: Float) {
@@ -191,6 +211,7 @@ final class WatchPlayer {
     private func timeControlStatusChanged(_ status: AVPlayer.TimeControlStatus) {
         isPlaying = status == .playing
         if isPlaying { isBuffering = false }
+        Task { await feed.publishPlayState(publishedPlaying) }
         let waitingReason = player?.reasonForWaitingToPlay?.rawValue ?? "none"
         let message = "timeControlStatus \(status.rawValue); waiting reason \(waitingReason)"
         logger.info("\(message, privacy: .public)")
@@ -209,6 +230,13 @@ final class WatchPlayer {
             title = next.title
             artist = next.artist
             snapshot = next
+            // The show is a nicety: its failing must not stop the song from reaching the widget.
+            let program = try? await station.currentProgram()
+            await feed.publish(
+                WidgetSnapshot(
+                    nowPlaying: nowPlaying, program: program, stationName: "KEXP",
+                    fallbackArtworkURL: logoURL, fetchedAt: Date()),
+                isPlaying: publishedPlaying)
 
             var artwork: CGImage?
             if let url = next.artworkURL { artwork = await artworkLoader.image(for: url) }
@@ -220,6 +248,8 @@ final class WatchPlayer {
         } catch {
             let message = "Refresh failed: \(error.localizedDescription)"
             logger.error("\(message, privacy: .public)")
+            // A failed poll must not let the widget's playing flag go stale while the stream is still playing.
+            await feed.publishPlayState(publishedPlaying)
             return false
         }
     }

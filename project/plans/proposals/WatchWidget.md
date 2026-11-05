@@ -1,6 +1,6 @@
 # Design Proposal: Apple Watch widget (Smart Stack and watch-face complications)
 
-**Status:** APPROVED 2026-11-05 (owner: "1 approved"; order: Mac clean-up, then this, then Control Center)
+**Status:** APPROVED 2026-11-05, built 2026-11-05 (StationKit 0.7.0; the plain `group.com.JPEnterprises.Spinner` worked on the watch App IDs and Xcode registered them itself; awaiting a check on a watch) (owner: "1 approved"; order: Mac clean-up, then this, then Control Center)
 **Date:** 2026-11-05
 **Master Plan Reference:** `NowPlayingWidget.md` §3i and §15 ("Watch Smart Stack and complications"), deferred from the first widget.
 **Facts marked (SDK) were read from the Xcode 27.2 SDK interfaces; anything not confirmed is marked *unverified*.**
@@ -29,7 +29,7 @@ A watch widget that shows what KEXP is playing and starts or pauses the stream, 
 A new target `Spinner Watch Widget` (watchOS widget extension) embedded in `Spinner Watch`. It reuses `WidgetSnapshot`, `NowPlayingStore`/`AppGroupNowPlayingStore`, and `WidgetRefreshPolicy` from `StationKit` unchanged, and the watch-specific views are new. The accessory families exist on watchOS (SDK: `accessoryCorner`, `accessoryCircular`, `accessoryRectangular`, `accessoryInline` in the watchOS WidgetKit interface).
 
 #### 3b. App Group
-The watch app and its extension need their own App Group: `group.com.JPEnterprises.Spinner` is the iOS one, and a watch app's group is separate from the phone's unless declared on both. **Portal step for you:** register (or reuse) the group for the `.watchkitapp` and `.watchkitapp.widget` App IDs. I expect the same wildcard-profile trap the iPhone hit (a group is refused unless the entitlement forces an explicit profile), so the entitlements file must declare it. *Whether the watch needs the plain `group.` identifier or the Team-ID-prefixed one the Mac needed is unverified; I will try `group.` first, check the write, and say what happened.*
+The watch app and its extension need their own App Group: `group.com.JPEnterprises.Spinner` is the iOS one, and a watch app's group is separate from the phone's unless declared on both. **Portal step for you:** register (or reuse) the group for the `.watchkitapp` and `.watchkitapp.widget` App IDs. I expect the same wildcard-profile trap the iPhone hit (a group is refused unless the entitlement forces an explicit profile), so the entitlements file must declare it. **Answered:** the plain `group.` identifier works on the watch: both watch App IDs were registered by Xcode with `-allowProvisioningUpdates` and the group is in the signed apps and profiles. A read-back from a running watch is still to do.
 
 #### 3c. Publishing from the watch app
 `WatchPlayer` calls a publisher when the track, show or playing state changes: the same shape as the iPhone's `WidgetPublisher`, which needs to move from the app target into something the watch can share (the cleanest place is `StationKit`, since it has no iPhone-specific code; its reload step takes a closure, so the watch passes `WidgetCenter` while tests pass a recorder). That move is a StationKit minor version, with tests; the iPhone app switches to it in the same change. This also answers the lesson of the play-state bug: publish the moment the player changes, not on a poll, and let an expected state stand for a few seconds after a tap.

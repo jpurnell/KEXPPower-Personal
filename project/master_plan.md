@@ -172,7 +172,7 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 - [ ] Native macOS target (fork's UIKit-only helper needs a guard)
 - [ ] visionOS polish
 - [ ] CarPlay Audio: Apple approved the entitlement 2026-11-05 (eligibility confirmed); proposal `project/plans/proposals/CarPlayAudio.md` revised 2026-11-05 (add to playlist in the car, show and host on the root screen, an Archive tab) awaiting the portal step; the Archive tab depends on `ArchiveBrowser.md`
-- [ ] Watch widget (Smart Stack, complications): `project/plans/proposals/WatchWidget.md` (approved 2026-11-05; next after the Mac clean-up)
+- [x] Watch widget built 2026-11-05 (`project/plans/proposals/WatchWidget.md`; StationKit 0.7.0 `WidgetFeed`; same App Group as the phone, auto-registered); awaiting a check on a watch
 - [ ] Archive browser by Date / Host / Show, like kexp.org/archive, on every platform and in CarPlay: `project/plans/proposals/ArchiveBrowser.md` (proposed 2026-11-05; replaces the "Finish async `ArchiveManager`" item as the route)
 - [x] Control Center play/pause control built 2026-11-05 (`project/plans/proposals/ControlCenterControl.md`; iOS 18 and macOS 26; visionOS cannot get controls in this SDK); awaiting a check in Control Center on a device
 
