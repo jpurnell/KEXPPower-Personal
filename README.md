@@ -22,6 +22,6 @@ All targets use the bundle ID `com.JPEnterprises.Spinner` (the watch app adds `.
 
 ## Working on it
 
-Design-first, test-first, with the quality gate at zero errors and zero warnings; see `CLAUDE.md` and `development-guidelines/`. After cloning, run `git config core.hooksPath .githooks` so the commit hooks run (`CLAUDE.md` mentions a `scripts/bootstrap.sh` that does not exist yet).
+Design-first, test-first, with the quality gate at zero errors and zero warnings; see `CLAUDE.md` and `development-guidelines/`. After cloning, run `./scripts/bootstrap.sh` so the commit hooks run (it sets `core.hooksPath` and checks that `swift` and `quality-gate` are installed).
 
 MIT licensed. KEXP and its logo belong to KEXP; the app icon is an abstract wave, not the station's mark.

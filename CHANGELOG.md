@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- `scripts/bootstrap.sh`: enables the git hooks after a fresh clone (`core.hooksPath` is per-clone config and cannot be committed) and checks that `swift` and `quality-gate` are installed. `CLAUDE.md` already described it; the script did not exist, so a fresh clone silently ran no hooks. Safe to run twice (checked in a fresh clone).
+
 ## 3.3.0 - 2026-11-05
 
 The widget, add to playlist, the Mac mini player and sidebar, and a fix for the widget's play/pause icon. Still private.
