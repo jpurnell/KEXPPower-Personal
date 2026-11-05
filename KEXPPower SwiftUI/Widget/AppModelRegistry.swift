@@ -20,4 +20,11 @@ enum AppModelRegistry {
         await model.startIfNeeded()
         model.playerController.playOrPause()
     }
+
+    /// Starts or pauses playback to match what a control asked for; a request for the current state does nothing.
+    /// - Parameter playing: Whether the listener wants the stream playing.
+    static func setPlayback(_ playing: Bool) async {
+        guard let model, ControlPlayState.shouldToggle(wanted: playing, isPlaying: model.playerController.isPlaying) else { return }
+        await togglePlayback()
+    }
 }

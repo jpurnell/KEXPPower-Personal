@@ -10,5 +10,10 @@ import WidgetKit
 struct SpinnerWidgetBundle: WidgetBundle {
     var body: some Widget {
         NowPlayingWidget()
+        #if !os(visionOS)
+        if #available(iOS 18.0, macOS 26.0, *) {
+            NowPlayingControl()
+        }
+        #endif
     }
 }

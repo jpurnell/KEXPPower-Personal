@@ -101,6 +101,8 @@ final class WidgetPublisher {
         if #available(visionOS 26.0, *) { WidgetCenter.shared.reloadAllTimelines() }
         #else
         WidgetCenter.shared.reloadAllTimelines()
+        // The Control Center control reads the same play state, so it is told at the same moment.
+        if #available(iOS 18.0, macOS 26.0, *) { ControlCenter.shared.reloadControls(ofKind: WidgetConstants.controlKind) }
         #endif
         #endif
     }

@@ -174,7 +174,7 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 - [ ] CarPlay Audio: Apple approved the entitlement 2026-11-05 (eligibility confirmed); proposal `project/plans/proposals/CarPlayAudio.md` revised 2026-11-05 (add to playlist in the car, show and host on the root screen, an Archive tab) awaiting the portal step; the Archive tab depends on `ArchiveBrowser.md`
 - [ ] Watch widget (Smart Stack, complications): `project/plans/proposals/WatchWidget.md` (approved 2026-11-05; next after the Mac clean-up)
 - [ ] Archive browser by Date / Host / Show, like kexp.org/archive, on every platform and in CarPlay: `project/plans/proposals/ArchiveBrowser.md` (proposed 2026-11-05; replaces the "Finish async `ArchiveManager`" item as the route)
-- [ ] Control Center play/pause control: `project/plans/proposals/ControlCenterControl.md` (proposed 2026-11-05; visionOS cannot get controls in this SDK, recorded in the proposal)
+- [x] Control Center play/pause control built 2026-11-05 (`project/plans/proposals/ControlCenterControl.md`; iOS 18 and macOS 26; visionOS cannot get controls in this SDK); awaiting a check in Control Center on a device
 
 ### Future
 - Track history by song and by DJ ("what usually follows this song")

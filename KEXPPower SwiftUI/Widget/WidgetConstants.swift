@@ -22,6 +22,8 @@ enum WidgetConstants {
     }
     /// The widget's identifier, used to ask WidgetKit to reload it.
     static let kind = "NowPlayingWidget"
+    /// The identifier of the Control Center control.
+    static let controlKind = "NowPlayingControl"
     /// The station's logo, shown when a play has no artwork of its own.
     static let logoURL = URL(string: "https://kexp.org/static/assets/img/kexp_logo.jpg")
     /// The hosts artwork may be fetched from.
