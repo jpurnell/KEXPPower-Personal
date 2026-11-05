@@ -110,6 +110,12 @@ final class WatchPlayer {
         playExpectation.expect(playing: willPlay, until: Date().addingTimeInterval(6))
         await feed.publishPlayState(willPlay)
         toggle()
+        // When the expectation runs out, publish what the player is really doing, so a stream that never started is
+        // corrected on the widget without waiting for the next poll.
+        Task {
+            try? await Task.sleep(for: .seconds(7))
+            await feed.publishPlayState(publishedPlaying)
+        }
     }
 
     private func volumeChanged(to value: Float) {
@@ -174,6 +180,10 @@ final class WatchPlayer {
         guard activated else {
             isBuffering = false
             notice = "Choose an audio output to listen"
+            // Without an output nothing will play: stop expecting it, and tell the widget at once rather than leave
+            // it showing "playing" until the next poll.
+            playExpectation = PlayStateExpectation()
+            await feed.publishPlayState(false)
             return
         }
         notice = nil
