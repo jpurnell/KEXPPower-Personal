@@ -18,9 +18,21 @@ protocol ArchivePlayer: AnyObject {
     func updateNowPlaying(_ nowPlaying: NowPlaying) async
     /// Puts the live stream back.
     func returnToLive()
+    /// Arms (or, with `nil`, disarms) the hand-off at the end of an archived file.
+    ///
+    /// The player calls `provide` shortly before the file ends to learn what to roll into, and `advanced` once it has.
+    func setContinuation(
+        _ provide: (@MainActor () async -> ArchiveContinuation)?,
+        advanced: (@MainActor (ArchiveContinuation) async -> Void)?)
 }
 
-extension PlayerController: ArchivePlayer {}
+/// What to play when an archived file runs out.
+enum ArchiveContinuation: Equatable {
+    /// Roll into the show that follows, whose audio is at this address.
+    case show(ArchiveShow, URL)
+    /// Nothing follows that can be played: go back to the live stream.
+    case live
+}
 
 /// One day in the archive's date picker, as the website draws it: month, day number and weekday.
 struct ArchiveDayTile: Identifiable, Hashable {
@@ -91,6 +103,9 @@ final class ArchiveBrowserModel {
         case failed(String)
     }
 
+    /// The longest a show runs, so a show that began more recently than this may not have ended.
+    static let longestShow: TimeInterval = 4 * 3_600
+
     /// The days to offer: KEXP keeps about two weeks of audio, and the website shows fifteen days.
     static let dayCount = 15
 
@@ -154,20 +169,71 @@ final class ArchiveBrowserModel {
                 return
             }
             await player.playArchive(url: playback.url, at: playback.offset)
-            await player.updateNowPlaying(.program(ProgramInfo(
-                title: show.programName,
-                host: show.hostNames.isEmpty ? nil : ListFormatter.localizedString(byJoining: show.hostNames),
-                artworkURL: show.imageURL)))
+            await announce(show)
             playing = show
             notice = nil
+            armContinuation()
         } catch {
             notice = "That show could not be started. Check your connection and try again."
         }
     }
 
+    /// The show that began next after this one, among those loaded.
+    /// - Parameter show: The show that is ending.
+    func nextShow(after show: ArchiveShow) -> ArchiveShow? {
+        tiles.flatMap(\.shows)
+            .filter { $0.startTime > show.startTime }
+            .min { $0.startTime < $1.startTime }
+    }
+
+    /// What to play when this show's file ends: the following show if it has ended and has audio, otherwise the live stream.
+    ///
+    /// A failed lookup also means live, because silence is the worse outcome.
+    /// - Parameter show: The show that is ending.
+    func continuation(after show: ArchiveShow) async -> ArchiveContinuation {
+        guard let next = nextShow(after: show) else { return .live }
+        // The newest show may still be on the air, and its file is still being written: go live instead.
+        if nextShow(after: next) == nil, next.startTime > now().addingTimeInterval(-Self.longestShow) { return .live }
+        do {
+            guard let playback = try await catalog.playback(for: next) else { return .live }
+            return .show(next, playback.url)
+        } catch {
+            return .live
+        }
+    }
+
     /// Stops the archived show and goes back to the live stream.
     func returnToLive() {
+        player.setContinuation(nil, advanced: nil)
         player.returnToLive()
         playing = nil
+    }
+
+    private func announce(_ show: ArchiveShow) async {
+        await player.updateNowPlaying(.program(ProgramInfo(
+            title: show.programName,
+            host: show.hostNames.isEmpty ? nil : ListFormatter.localizedString(byJoining: show.hostNames),
+            artworkURL: show.imageURL)))
+    }
+
+    /// Lets the player ask what follows the show being heard, and tell us when it has rolled into it.
+    private func armContinuation() {
+        player.setContinuation(
+            { [weak self] in
+                guard let self, let current = self.playing else { return .live }
+                return await self.continuation(after: current)
+            },
+            advanced: { [weak self] plan in await self?.advanced(to: plan) })
+    }
+
+    /// The player has rolled over: into the next show, or onto the live stream.
+    private func advanced(to plan: ArchiveContinuation) async {
+        switch plan {
+        case .show(let next, _):
+            playing = next
+            await announce(next)
+        case .live:
+            playing = nil
+        }
     }
 }

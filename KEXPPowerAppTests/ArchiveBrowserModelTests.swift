@@ -33,6 +33,16 @@ private final class FakePlayer: ArchivePlayer {
     private(set) var played: [(URL, TimeInterval)] = []
     private(set) var announced: [NowPlaying] = []
     private(set) var returnedToLive = 0
+    private(set) var provider: (@MainActor () async -> ArchiveContinuation)?
+    private(set) var advanced: (@MainActor (ArchiveContinuation) async -> Void)?
+
+    func setContinuation(
+        _ provide: (@MainActor () async -> ArchiveContinuation)?,
+        advanced: (@MainActor (ArchiveContinuation) async -> Void)?
+    ) {
+        provider = provide
+        self.advanced = advanced
+    }
 
     func playArchive(url: URL, at offset: TimeInterval) async {
         played.append((url, offset))
@@ -247,5 +257,142 @@ struct ArchiveBrowserModelTests {
         var changed = false
         for await _ in changes { changed = true }
         #expect(changed)
+    }
+
+    // MARK: Continuing
+
+    @Test("The next show is the earliest one that began after this one, across days")
+    func nextShow() async throws {
+        let catalog = FakeCatalog()
+        let a = try show("1", "2026-11-04T22:00:00-08:00")
+        let b = try show("2", "2026-11-05T01:00:00-08:00")
+        let c = try show("3", "2026-11-05T07:00:00-08:00")
+        catalog.shows = [c, a, b]
+        let model = try model(catalog)
+        await model.load()
+        #expect(model.nextShow(after: a)?.id == "2")
+        #expect(model.nextShow(after: b)?.id == "3")
+        #expect(model.nextShow(after: c) == nil)
+    }
+
+    @Test("After a show with a following show that has audio, the plan is to roll into it")
+    func continuationShow() async throws {
+        let catalog = FakeCatalog()
+        let a = try show("1", "2026-11-05T07:00:00-08:00")
+        let b = try show("2", "2026-11-05T10:00:00-08:00")
+        catalog.shows = [a, b]
+        let file = try #require(URL(string: "https://kexp-archive.streamguys1.com/content/kexp/20261105100000-b.mp3"))
+        catalog.playback = ArchivePlayback(url: file, offset: 700, nextURL: nil)
+        let model = try model(catalog)
+        await model.load()
+        #expect(await model.continuation(after: a) == .show(b, file))
+    }
+
+    @Test("With no following show, the plan is to go live")
+    func continuationLive() async throws {
+        let catalog = FakeCatalog()
+        let a = try show("1", "2026-11-05T07:00:00-08:00")
+        catalog.shows = [a]
+        let model = try model(catalog)
+        await model.load()
+        #expect(await model.continuation(after: a) == .live)
+    }
+
+    @Test("A following show whose audio is gone, or a failed lookup, means going live rather than silence")
+    func continuationFallsBackToLive() async throws {
+        let catalog = FakeCatalog()
+        let a = try show("1", "2026-11-05T07:00:00-08:00")
+        let b = try show("2", "2026-11-05T10:00:00-08:00")
+        catalog.shows = [a, b]
+        let model = try model(catalog)
+        await model.load()
+        catalog.playback = nil
+        #expect(await model.continuation(after: a) == .live)
+        catalog.failure = Boom()
+        #expect(await model.continuation(after: a) == .live)
+    }
+
+    @Test("Playing a show arms the player to ask what comes next when the file nears its end")
+    func playArmsContinuation() async throws {
+        let catalog = FakeCatalog()
+        let a = try show("1", "2026-11-05T07:00:00-08:00")
+        let b = try show("2", "2026-11-05T10:00:00-08:00")
+        catalog.shows = [a, b]
+        let file = try #require(URL(string: "https://kexp-archive.streamguys1.com/content/kexp/20261105100000-b.mp3"))
+        catalog.playback = ArchivePlayback(url: file, offset: 700, nextURL: nil)
+        let player = FakePlayer()
+        let model = try model(catalog, player)
+        await model.load()
+        await model.play(a)
+        let plan = await player.provider?()
+        #expect(plan == .show(b, file))
+    }
+
+    @Test("When the player rolls into the next show, it becomes the show playing and is announced")
+    func advanceToNextShow() async throws {
+        let catalog = FakeCatalog()
+        let a = try show("1", "2026-11-05T07:00:00-08:00")
+        let b = try show("2", "2026-11-05T10:00:00-08:00", program: "The Midday Show", hosts: ["Kevin Sur"])
+        catalog.shows = [a, b]
+        let file = try #require(URL(string: "https://kexp-archive.streamguys1.com/content/kexp/20261105100000-b.mp3"))
+        catalog.playback = ArchivePlayback(url: file, offset: 700, nextURL: nil)
+        let player = FakePlayer()
+        let model = try model(catalog, player)
+        await model.load()
+        await model.play(a)
+        await player.advanced?(.show(b, file))
+        #expect(model.nowPlayingShow == b)
+        #expect(player.announced.last == .program(ProgramInfo(title: "The Midday Show", host: "Kevin Sur", artworkURL: b.imageURL)))
+    }
+
+    @Test("When the player rolls into the live stream, no archived show is playing any more")
+    func advanceToLive() async throws {
+        let catalog = FakeCatalog()
+        catalog.playback = ArchivePlayback(url: try #require(URL(string: "https://example.com/a.mp3")), offset: 0, nextURL: nil)
+        let player = FakePlayer()
+        let model = try model(catalog, player)
+        await model.play(try show("1", "2026-11-05T07:00:00-08:00"))
+        player.isPlayingArchive = false
+        await player.advanced?(.live)
+        #expect(model.nowPlayingShow == nil)
+    }
+
+    @Test("Going back to live disarms the hand-off")
+    func backToLiveDisarms() async throws {
+        let catalog = FakeCatalog()
+        catalog.playback = ArchivePlayback(url: try #require(URL(string: "https://example.com/a.mp3")), offset: 0, nextURL: nil)
+        let player = FakePlayer()
+        let model = try model(catalog, player)
+        await model.play(try show("1", "2026-11-05T07:00:00-08:00"))
+        #expect(player.provider != nil)
+        model.returnToLive()
+        #expect(player.provider == nil)
+        #expect(player.advanced == nil)
+    }
+
+    @Test("A following show that is the newest and began within four hours may still be on the air, so the plan is live")
+    func continuationStillAiring() async throws {
+        let catalog = FakeCatalog()
+        let a = try show("1", "2026-11-06T07:00:00-08:00")
+        let airing = try show("2", "2026-11-06T10:03:00-08:00")
+        catalog.shows = [a, airing]
+        catalog.playback = ArchivePlayback(url: try #require(URL(string: "https://example.com/b.mp3")), offset: 0, nextURL: nil)
+        // now is 11:00, an hour after the airing show began.
+        let model = try model(catalog, now: "2026-11-06T11:00:00-08:00")
+        await model.load()
+        #expect(await model.continuation(after: a) == .live)
+    }
+
+    @Test("A newest following show that began more than four hours ago has ended, so it is rolled into")
+    func continuationNewestButEnded() async throws {
+        let catalog = FakeCatalog()
+        let a = try show("1", "2026-11-06T01:00:00-08:00")
+        let late = try show("2", "2026-11-06T04:00:00-08:00")
+        catalog.shows = [a, late]
+        let file = try #require(URL(string: "https://example.com/b.mp3"))
+        catalog.playback = ArchivePlayback(url: file, offset: 0, nextURL: nil)
+        let model = try model(catalog, now: "2026-11-06T14:00:00-08:00")
+        await model.load()
+        #expect(await model.continuation(after: a) == .show(late, file))
     }
 }

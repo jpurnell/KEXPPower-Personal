@@ -23,7 +23,7 @@ import UniformTypeIdentifiers
     /// remote command, an interruption, or a route change cannot leave it out of step.
     @MainActor
     @Observable
-    final class PlayerController {
+    final class PlayerController: ArchivePlayer {
 
         // MARK: - State
 
@@ -39,6 +39,13 @@ import UniformTypeIdentifiers
         private(set) var isPlayingArchive = false
         /// Watches how long going back to live takes; replaced each time, so only the latest request is measured.
         @ObservationIgnored private let liveTimer = TaskHolder()
+        /// How far from the end of an archived file the next item is lined up, so it is loaded before it is needed.
+        static let handoffLead: TimeInterval = 30
+        @ObservationIgnored private var continuation: (@MainActor () async -> ArchiveContinuation)?
+        @ObservationIgnored private var onAdvanced: (@MainActor (ArchiveContinuation) async -> Void)?
+        @ObservationIgnored private var queued: (item: AVPlayerItem, plan: ArchiveContinuation)?
+        @ObservationIgnored private let endWatch = TaskHolder()
+        @ObservationIgnored private var itemObservation: AnyCancellable?
         #if !os(macOS)
         let avPlayerViewController = AVPlayerViewController()
         #endif
@@ -82,7 +89,8 @@ import UniformTypeIdentifiers
 
             sessionCoordinator.configure()
             liveLink = link
-            let player = AVPlayer(url: link)
+            // A queue player, so the next item can be loaded while the current one is still playing.
+            let player = AVQueuePlayer(playerItem: AVPlayerItem(url: link))
             #if !os(visionOS)
             player.allowsExternalPlayback = true
             #endif
@@ -100,6 +108,12 @@ import UniformTypeIdentifiers
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] status in
                     MainActor.assumeIsolated { self?.timeControlStatusChanged(status) }
+                }
+
+            itemObservation = player.publisher(for: \.currentItem)
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] item in
+                    MainActor.assumeIsolated { self?.currentItemChanged(item) }
                 }
 
             sessionCoordinator.observe { [weak self] action in
@@ -234,10 +248,12 @@ import UniformTypeIdentifiers
         func playArchive(url: URL, at offset: TimeInterval) async {
             guard let player else { return }
             sessionCoordinator.activate()
-            player.replaceCurrentItem(with: AVPlayerItem(url: url))
+            let item = AVPlayerItem(url: url)
+            replaceItems(with: item)
             isPlayingArchive = true
             await seekArchive(to: offset)
             player.play()
+            armEndWatch(for: item)
         }
 
         /// Moves within the archived file being played.
@@ -250,13 +266,105 @@ import UniformTypeIdentifiers
 
         /// Puts the live stream back and plays it.
         func returnToLive() {
-            guard let player, let liveLink else { return }
+            guard player != nil, let liveLink else { return }
+            endWatch.task?.cancel()
+            continuation = nil
+            onAdvanced = nil
             let item = AVPlayerItem(url: liveLink)
             item.preferredForwardBufferDuration = 300
-            player.replaceCurrentItem(with: item)
+            replaceItems(with: item)
             isPlayingArchive = false
             playPlayer()
             measureLiveStart(of: item)
+        }
+
+        // MARK: - Hand-off at the end of an archived file
+
+        /// Arms (or, with `nil`, disarms) the hand-off at the end of an archived file.
+        ///
+        /// About `handoffLead` seconds before the file ends, `provide` is asked what comes next and that is lined up
+        /// behind the current item, so the player rolls into it without a gap. `advanced` is called once it has.
+        func setContinuation(
+            _ provide: (@MainActor () async -> ArchiveContinuation)?,
+            advanced: (@MainActor (ArchiveContinuation) async -> Void)?
+        ) {
+            continuation = provide
+            onAdvanced = advanced
+            if provide == nil { endWatch.task?.cancel() }
+        }
+
+        /// Replaces everything the player holds with one item.
+        private func replaceItems(with item: AVPlayerItem) {
+            guard let queue = player as? AVQueuePlayer else { return }
+            queued = nil
+            queue.removeAllItems()
+            queue.insert(item, after: nil)
+        }
+
+        private func armEndWatch(for item: AVPlayerItem) {
+            endWatch.task?.cancel()
+            endWatch.task = Task { [weak self] in await self?.watchForEnd(of: item) }
+        }
+
+        /// Checks each second whether the archived file is within `handoffLead` of its end, and lines up what is next.
+        private func watchForEnd(of item: AVPlayerItem) async {
+            // Bounded: six hours of one-second checks is longer than any archived file.
+            for _ in 0..<21_600 {
+                try? await Task.sleep(for: .seconds(1))
+                guard !Task.isCancelled, let player, player.currentItem === item, isPlayingArchive else { return }
+                let duration = item.duration.seconds
+                let position = player.currentTime().seconds
+                guard duration.isFinite, position.isFinite, duration - position <= Self.handoffLead else { continue }
+                guard continuation != nil else { continue }
+                await queueHandoff(after: item, duration: duration)
+                return
+            }
+        }
+
+        private func queueHandoff(after item: AVPlayerItem, duration: TimeInterval) async {
+            guard let queue = player as? AVQueuePlayer, let provide = continuation else { return }
+            let plan = await provide()
+            guard queue.currentItem === item, queued == nil else { return }
+            let next: AVPlayerItem
+            switch plan {
+            case .show(_, let url):
+                next = AVPlayerItem(url: url)
+            case .live:
+                guard let liveLink else { return }
+                next = AVPlayerItem(url: liveLink)
+                next.preferredForwardBufferDuration = 300
+            }
+            queued = (next, plan)
+            queue.insert(next, after: item)
+            guard
+                case .show(_, let url) = plan,
+                let previous = (item.asset as? AVURLAsset)?.url,
+                let join = ArchiveTiming.joinOffset(previousFile: previous, previousDuration: duration, nextFile: url)
+            else {
+                DiagnosticLog.app.record("Player", "hand-off: queued \(plan == .live ? "live" : "the next show") with no join offset")
+                return
+            }
+            let sought = await next.seek(to: CMTime(seconds: join, preferredTimescale: 600))
+            DiagnosticLog.app.record("Player", "hand-off: queued the next show, joining at \(Int(join)) s, seek \(sought)")
+        }
+
+        /// The player moved to its next item: if that is the one lined up, the show has rolled over.
+        private func currentItemChanged(_ item: AVPlayerItem?) {
+            guard let item, let lined = queued, item === lined.item else { return }
+            queued = nil
+            switch lined.plan {
+            case .show:
+                isPlayingArchive = true
+                armEndWatch(for: item)
+            case .live:
+                isPlayingArchive = false
+            }
+            DiagnosticLog.app.record("Player", "hand-off: rolled into \(lined.plan == .live ? "live" : "the next show")")
+            Task { [weak self] in await self?.finishAdvance(lined.plan) }
+        }
+
+        private func finishAdvance(_ plan: ArchiveContinuation) async {
+            await onAdvanced?(plan)
         }
     }
 

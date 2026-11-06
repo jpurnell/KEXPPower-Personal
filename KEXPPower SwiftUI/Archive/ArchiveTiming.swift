@@ -51,6 +51,25 @@ enum ArchiveTiming {
         return abs(playback.offset - show.startTime.timeIntervalSince(start))
     }
 
+    /// Where to begin the next file so it picks up exactly where the previous one ended.
+    ///
+    /// Archive files overlap (observed: one ran to 10:00:29 and the next began at 09:50:08), so playing the next file
+    /// from its start would repeat the overlap.
+    /// - Parameters:
+    ///   - previousFile: The file that is ending.
+    ///   - previousDuration: How long that file runs, in seconds.
+    ///   - nextFile: The file to roll into.
+    /// - Returns: Seconds into the next file; `0` if it begins after the previous one ended; `nil` if either name
+    ///   carries no start time or the duration is not a finite number.
+    static func joinOffset(previousFile: URL, previousDuration: TimeInterval, nextFile: URL) -> TimeInterval? {
+        guard
+            previousDuration.isFinite, previousDuration >= 0,
+            let previousStart = fileStart(of: previousFile),
+            let nextStart = fileStart(of: nextFile)
+        else { return nil }
+        return max(0, previousStart.addingTimeInterval(previousDuration).timeIntervalSince(nextStart))
+    }
+
     /// A moment as a clock reading in the station's time zone, such as "5:01:32 AM PST".
     ///
     /// The zone is fixed because the archive's files and shows are named in it; the phone's own zone would disagree

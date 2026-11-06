@@ -110,4 +110,27 @@ struct ArchiveTimingTests {
         #expect(ArchiveTiming.positionText(.infinity) == "0:00")
         #expect(ArchiveTiming.positionText(1e300) == "0:00")
     }
+
+    @Test("The next file is joined where the previous one ended, because archive files overlap")
+    func joinOffset() throws {
+        // Observed 2026-11-06: the Morning Show's file began 06:50:08 and ran 11,421 s, to 10:00:29; the next file began 09:50:08.
+        let join = ArchiveTiming.joinOffset(
+            previousFile: try url("20261106065008-4-1952-the-morning-show.mp3"),
+            previousDuration: 11_421,
+            nextFile: try url("20261106095008-5-1937-the-midday-show.mp3"))
+        #expect(join == 621)
+    }
+
+    @Test("A next file that begins after the previous one ended is played from its start, with nothing to skip")
+    func joinOffsetWithGap() throws {
+        let join = ArchiveTiming.joinOffset(
+            previousFile: try url("20261106065008-a.mp3"), previousDuration: 100, nextFile: try url("20261106075008-b.mp3"))
+        #expect(join == 0)
+    }
+
+    @Test("Without timestamps in both names there is no join point to compute")
+    func joinOffsetUnknown() throws {
+        #expect(ArchiveTiming.joinOffset(previousFile: try url("a.mp3"), previousDuration: 100, nextFile: try url("20261106075008-b.mp3")) == nil)
+        #expect(ArchiveTiming.joinOffset(previousFile: try url("20261106075008-a.mp3"), previousDuration: .nan, nextFile: try url("20261106075008-b.mp3")) == nil)
+    }
 }
