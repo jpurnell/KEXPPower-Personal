@@ -50,4 +50,35 @@ enum ArchiveTiming {
         guard let start = fileStart(of: playback.url) else { return nil }
         return abs(playback.offset - show.startTime.timeIntervalSince(start))
     }
+
+    /// A moment as a clock reading in the station's time zone, such as "5:01:32 AM PST".
+    ///
+    /// The zone is fixed because the archive's files and shows are named in it; the phone's own zone would disagree
+    /// with them.
+    /// - Parameters:
+    ///   - date: The moment.
+    ///   - zone: The time zone to read it in.
+    static func clock(_ date: Date, zone: TimeZone = stationTimeZone) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = zone
+        formatter.dateFormat = "h:mm:ss a z"
+        return formatter.string(from: date)
+    }
+
+    /// A position in a file as "11:25", or "1:02:05" once it passes an hour; a negative position reads as the start.
+    /// - Parameter seconds: Seconds from the start of the file.
+    static func positionText(_ seconds: TimeInterval) -> String {
+        // Beyond a week is not a position in a show's file; it reads as the start, as NaN and infinity do.
+        guard seconds.isFinite, seconds < 604_800 else { return "0:00" }
+        let total = Int(max(0, seconds))
+        let (hours, minutes, secs) = (total / 3_600, total % 3_600 / 60, total % 60)
+        return hours > 0
+            ? "\(hours):\(twoDigits(minutes)):\(twoDigits(secs))"
+            : "\(minutes):\(twoDigits(secs))"
+    }
+
+    private static func twoDigits(_ number: Int) -> String {
+        number < 10 ? "0\(number)" : "\(number)"
+    }
 }

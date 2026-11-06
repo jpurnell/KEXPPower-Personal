@@ -81,4 +81,33 @@ struct ArchiveTimingTests {
         let plain = ArchivePlayback(url: try url("show.mp3"), offset: 778, nextURL: nil)
         #expect(ArchiveTiming.offsetDisagreement(show: try afternoonShow(), playback: plain) == nil)
     }
+
+    @Test("The clock reading pads minutes and seconds, so five past reads 5:01:32 and not 5:1:32")
+    func clockPads() throws {
+        let aired = try date("2026-11-06T05:01:32-08:00")
+        #expect(ArchiveTiming.clock(aired) == "5:01:32 AM PST")
+    }
+
+    @Test("The clock is read in the station's time zone, whatever the phone's is")
+    func clockInStationZone() throws {
+        // The same instant, written in Eastern, is still 5:01:32 in Seattle.
+        let aired = try date("2026-11-06T08:01:32-05:00")
+        #expect(ArchiveTiming.clock(aired) == "5:01:32 AM PST")
+        #expect(ArchiveTiming.clock(try date("2026-07-15T14:09:05-07:00")) == "2:09:05 PM PDT")
+    }
+
+    @Test("A position reads minutes and seconds, with hours once it passes an hour")
+    func positionText() {
+        #expect(ArchiveTiming.positionText(685) == "11:25")
+        #expect(ArchiveTiming.positionText(5) == "0:05")
+        #expect(ArchiveTiming.positionText(3_725) == "1:02:05")
+        #expect(ArchiveTiming.positionText(-3) == "0:00")
+    }
+
+    @Test("A position that is not a finite number reads as the start instead of crashing")
+    func positionTextNotFinite() {
+        #expect(ArchiveTiming.positionText(.nan) == "0:00")
+        #expect(ArchiveTiming.positionText(.infinity) == "0:00")
+        #expect(ArchiveTiming.positionText(1e300) == "0:00")
+    }
 }

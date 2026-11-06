@@ -40,21 +40,47 @@ final class ArchiveProbeModel {
             let ended = shows.filter { $0.startTime < now.addingTimeInterval(-4 * 3_600) }
                 .sorted { $0.startTime > $1.startTime }
             note("\(shows.count) shows in three days, \(ended.count) ended")
-            for candidate in ended.prefix(5) {
+            // Prefer a show whose next file is known, so the boundary between shows can be tried; keep the first
+            // show with audio as the fallback.
+            var fallback: (ArchiveShow, ArchivePlayback)?
+            for candidate in ended.prefix(8) {
                 guard let found = try await catalog.playback(for: candidate) else {
                     note("no audio kept for \(candidate.programName) \(candidate.startTime)")
                     continue
                 }
-                show = candidate
-                playback = found
-                tracks = try await catalog.tracks(of: candidate)
-                describe(candidate, found)
+                fallback = fallback ?? (candidate, found)
+                if found.nextURL != nil {
+                    await choose(candidate, found)
+                    return
+                }
+            }
+            if let (candidate, found) = fallback {
+                note("no show with a next file among the newest; using the newest with audio")
+                await choose(candidate, found)
                 return
             }
             note("no ended show with audio found")
         } catch {
             note("find failed: \(error.localizedDescription)")
         }
+    }
+
+    private func choose(_ candidate: ArchiveShow, _ found: ArchivePlayback) async {
+        show = candidate
+        playback = found
+        do {
+            tracks = try await catalog.tracks(of: candidate)
+        } catch {
+            note("songs failed: \(error.localizedDescription)")
+        }
+        describe(candidate, found)
+    }
+
+    /// When a song aired and where it is in the file, so the list's order can be seen.
+    func caption(for track: Track) -> String {
+        guard let show, let playback, let airDate = track.airDate else { return track.displayArtist }
+        let position = ArchiveTiming.songPosition(airedAt: airDate, in: show, playback: playback)
+        return "\(track.displayArtist) · aired \(ArchiveTiming.clock(airDate)) · \(ArchiveTiming.positionText(position)) in file"
     }
 
     /// Plays the show's file from where the show begins.
@@ -165,7 +191,7 @@ struct ArchiveProbeView: View {
                         } label: {
                             VStack(alignment: .leading) {
                                 Text(track.title)
-                                Text(track.displayArtist).font(.caption).foregroundStyle(.secondary)
+                                Text(probe.caption(for: track)).font(.caption).foregroundStyle(.secondary)
                             }
                         }
                     }
