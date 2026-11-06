@@ -86,7 +86,11 @@ No extra network traffic and no extra process: the scene runs in the app. The ph
 5. **"The entitlement and profile are not in place."** The first build step is to confirm the signed build carries the entitlement before writing any UI (the same lesson the App Group taught).
 
 ### 14. Alternatives Considered
-- **Widgets in CarPlay** (SDK has `WidgetLocation.carPlay`, iOS 26): complementary and separate; the now-playing widget could appear in CarPlay without this work, but a widget cannot start audio reliably in a car and is not an audio app. *Unverified whether a widget in CarPlay needs an entitlement.*
+- **Widgets in CarPlay** (SDK has `WidgetLocation.carPlay`, iOS 26): complementary and separate; a widget cannot start audio reliably in a car and is not an audio app. **Looked into 2026-11-06:**
+  - *(SDK, read in the iOS 27.2 interface)* `WidgetLocation.carPlay` is iOS 26 only (unavailable on macOS, watchOS, tvOS, visionOS). `WidgetConfiguration.disfavoredLocations(_:for:)` (iOS 17) lets a widget *decline* a location per family; **this app's widget does not use it, so it is eligible by default.** There is no public way to read the location from inside the widget's view: `isCarPlayDisplay` and a hide-in-CarPlay modifier exist only as exported symbols in the framework's `.tbd`, not in its public interface, so they are not to be used.
+  - *(reported by 9to5Mac, 2025-10-30; third-party, not Apple documentation)* any iPhone widget can be added to CarPlay, the app need not be a CarPlay app, and no developer step or entitlement is mentioned. The listener chooses them in **Settings → General → CarPlay → (the car)**; one or two stacks depending on the car's screen, up to five widgets each. A developer-skills page lists `.systemSmall` as the CarPlay family, also third-party.
+  - *Checked by the owner 2026-11-06:* the existing Now Playing widget is already offered in CarPlay with no change to the app. *Still unrecorded:* which size is used, how it looks, and whether its play button does anything in the car.
+  - **Consequence:** nothing needed building. The first step was to look, not to code. If the small layout reads badly in the car, the only public lever is `disfavoredLocations` (opt out) or a layout that is good everywhere.
 - **Only the system Now Playing screen:** it appears while audio plays, but an audio app with no root template does not show up in CarPlay to start anything. Rejected.
 
 ### 15. Future Directions
