@@ -65,7 +65,13 @@ struct SectionDestination: View {
             ContentView(resultsRetriever: model)
         case .review:
             ReviewView(model: model)
-        case .archive, .playlists:
+        case .archive:
+            #if os(iOS) && DEBUG
+            ArchiveProbeView(model: model)
+            #else
+            ComingSoonView(section: section)
+            #endif
+        case .playlists:
             ComingSoonView(section: section)
         }
     }

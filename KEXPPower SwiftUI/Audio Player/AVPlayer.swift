@@ -33,6 +33,10 @@ import UniformTypeIdentifiers
         @ObservationIgnored var onPlayingChange: (@MainActor (Bool) -> Void)?
 
         @ObservationIgnored private(set) var player: AVPlayer?
+        /// The live stream's address, kept so the player can return to it after an archived show.
+        @ObservationIgnored private var liveLink: URL?
+        /// Whether the player holds an archived show's file instead of the live stream.
+        private(set) var isPlayingArchive = false
         #if !os(macOS)
         let avPlayerViewController = AVPlayerViewController()
         #endif
@@ -75,6 +79,7 @@ import UniformTypeIdentifiers
             logger.debug("Initiating PlayerController")
 
             sessionCoordinator.configure()
+            liveLink = link
             let player = AVPlayer(url: link)
             #if !os(visionOS)
             player.allowsExternalPlayback = true
@@ -186,5 +191,40 @@ import UniformTypeIdentifiers
 
         func playOrPause() {
             isPlaying ? pausePlayer() : playPlayer()
+        }
+
+        // MARK: - Archive
+
+        /// Plays an archived show's file in place of the live stream, starting at an offset into it.
+        ///
+        /// The live stream is replaced, not paused beside it: there is one player, as there is one Now Playing state.
+        /// - Parameters:
+        ///   - url: The archived audio file.
+        ///   - offset: Seconds into the file at which to begin.
+        func playArchive(url: URL, at offset: TimeInterval) async {
+            guard let player else { return }
+            sessionCoordinator.activate()
+            player.replaceCurrentItem(with: AVPlayerItem(url: url))
+            isPlayingArchive = true
+            await seekArchive(to: offset)
+            player.play()
+        }
+
+        /// Moves within the archived file being played.
+        /// - Parameter seconds: Seconds from the start of the file.
+        func seekArchive(to seconds: TimeInterval) async {
+            guard let player, isPlayingArchive else { return }
+            let target = CMTime(seconds: max(0, seconds), preferredTimescale: 600)
+            await player.seek(to: target, toleranceBefore: .zero, toleranceAfter: .zero)
+        }
+
+        /// Puts the live stream back and plays it.
+        func returnToLive() {
+            guard let player, let liveLink else { return }
+            let item = AVPlayerItem(url: liveLink)
+            item.preferredForwardBufferDuration = 300
+            player.replaceCurrentItem(with: item)
+            isPlayingArchive = false
+            playPlayer()
         }
     }
