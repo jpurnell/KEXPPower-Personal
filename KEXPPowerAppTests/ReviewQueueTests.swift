@@ -37,8 +37,10 @@ private func held(
     ReviewQueue.Held(
         playID: id, playedTitle: "Fly Like an Eagle", playedArtist: "Steve Miller Band", playedAlbum: "Fly Like an Eagle",
         playedArtworkURL: playedArt,
-        candidate: CatalogSong(id: "c\(id)", title: "Fly Like an Eagle", artist: "Steve Miller Band", album: "Greatest Hits 1974-78"),
-        candidateArtworkURL: candidateArt, extraPlaylist: nil)
+        candidate: CatalogSong(
+            id: "c\(id)", title: "Fly Like an Eagle", artist: "Steve Miller Band", album: "Greatest Hits 1974-78",
+            artworkURL: candidateArt),
+        extraPlaylist: nil)
 }
 
 @MainActor

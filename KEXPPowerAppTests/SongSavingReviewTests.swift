@@ -9,6 +9,11 @@ private let road = PlaylistSummary(id: "p-road", name: "Road Trip")
 private let guess = CatalogSong(id: "cat-1", title: "Bleeding Blue", artist: "Cults", album: "Static")
 private let play = Play(id: 42, song: "Bleeding Blue", artist: "Cults", playType: .trackplay)
 
+private actor FetchLog {
+    private(set) var urls: [URL] = []
+    func record(_ url: URL) { urls.append(url) }
+}
+
 @MainActor
 private final class MemoryStore: ReviewStore {
     var entries: [ReviewEntry] = []
@@ -102,6 +107,22 @@ struct SongSavingReviewTests {
         await model.save(play, holdingGuesses: true)
         model.releaseHeld(queue.entries[0])
         #expect(model.state(for: play) == .idle)
+    }
+
+    @Test("The Apple Music suggestion's cover link is the one fetched and saved with the held song")
+    func candidateCoverIsFetched() async {
+        let cover = URL(fileURLWithPath: "/covers/greatest-hits.jpg")
+        let withCover = CatalogSong(id: "cat-2", title: "Bleeding Blue", artist: "Cults", album: "Greatest Hits", artworkURL: cover)
+        let fetched = FetchLog()
+        let model = SongSavingModel(
+            save: { _, _ in .needsConfirmation(withCover) }, confirm: { _, _ in .notFound }, loadPlaylists: { [] })
+        model.reviewQueue = ReviewQueue(
+            store: MemoryStore(),
+            artwork: ReviewArtworkStore(
+                directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString),
+                fetch: { url in await fetched.record(url); return nil }))
+        await model.save(play, holdingGuesses: true)
+        #expect(await fetched.urls.contains(cover))
     }
 
     @Test("Holding without a queue falls back to asking, so nothing is lost")

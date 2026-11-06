@@ -24,6 +24,8 @@ struct MusicKitCatalog: CatalogLookup {
 
 private extension CatalogSong {
     init(_ song: Song) {
-        self.init(id: song.id.rawValue, title: song.title, artist: song.artistName, album: song.albumTitle)
+        self.init(
+            id: song.id.rawValue, title: song.title, artist: song.artistName, album: song.albumTitle,
+            artworkURL: song.artwork?.url(width: 400, height: 400))
     }
 }

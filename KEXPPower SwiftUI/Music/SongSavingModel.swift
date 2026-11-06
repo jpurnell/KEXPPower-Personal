@@ -153,7 +153,7 @@ final class SongSavingModel {
         guard let id = play.id, let queue = reviewQueue, let track = KEXPMapping.track(from: play) else { return }
         let held = ReviewQueue.Held(
             playID: id, playedTitle: track.title, playedArtist: track.displayArtist, playedAlbum: track.album,
-            playedArtworkURL: track.artworkURL, candidate: song, candidateArtworkURL: nil,
+            playedArtworkURL: track.artworkURL, candidate: song,
             extraPlaylist: pendingExtras[id])
         await queue.enqueue(held)
         states[id] = .heldForReview

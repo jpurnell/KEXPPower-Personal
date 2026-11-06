@@ -13,7 +13,7 @@ import StationKit
 @MainActor
 @Observable
 final class ReviewQueue {
-    /// A song to hold, with the links to the two covers to save.
+    /// A song to hold. The two covers saved with it are KEXP's (`playedArtworkURL`) and the suggestion's own.
     struct Held {
         let playID: Int
         let playedTitle: String
@@ -21,7 +21,6 @@ final class ReviewQueue {
         let playedAlbum: String?
         let playedArtworkURL: URL?
         let candidate: CatalogSong
-        let candidateArtworkURL: URL?
         let extraPlaylist: PlaylistSummary?
     }
 
@@ -73,7 +72,7 @@ final class ReviewQueue {
         store.save(entries)
 
         async let played = artwork.save(from: song.playedArtworkURL, as: "\(song.playID)-played.jpg")
-        async let candidate = artwork.save(from: song.candidateArtworkURL, as: "\(song.playID)-candidate.jpg")
+        async let candidate = artwork.save(from: song.candidate.artworkURL, as: "\(song.playID)-candidate.jpg")
         let files = await (played, candidate)
         // Removed while the covers were downloading (rejected, or pushed out by newer entries): keep nothing.
         guard let index = entries.firstIndex(where: { $0.id == song.playID }) else {
