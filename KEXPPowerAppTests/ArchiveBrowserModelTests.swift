@@ -395,4 +395,73 @@ struct ArchiveBrowserModelTests {
         await model.load()
         #expect(await model.continuation(after: a) == .show(late, file))
     }
+
+    // MARK: Browsing by host, show and genre
+
+    private func browsable() throws -> FakeCatalog {
+        let catalog = FakeCatalog()
+        catalog.shows = [
+            ArchiveShow(id: "1", programName: "The Morning Show", hostNames: ["John Richards"], tagline: nil, imageURL: nil,
+                        startTime: try date("2026-11-05T07:00:00-08:00"), tags: ["Rock", "Eclectic"]),
+            ArchiveShow(id: "2", programName: "The Midday Show", hostNames: ["Cheryl Waters"], tagline: nil, imageURL: nil,
+                        startTime: try date("2026-11-05T10:00:00-08:00"), tags: ["Rock", "Variety Mix"]),
+            ArchiveShow(id: "3", programName: "The Midday Show", hostNames: ["Cheryl Waters"], tagline: nil, imageURL: nil,
+                        startTime: try date("2026-11-04T10:00:00-08:00"), tags: ["Rock", "Variety Mix"]),
+        ]
+        return catalog
+    }
+
+    @Test("The four ways in, in the order the website offers them")
+    func modes() {
+        #expect(ArchiveMode.allCases == [.date, .host, .show, .genre])
+        #expect(ArchiveMode.allCases.map(\.title) == ["Date", "Host", "Show", "Genre"])
+    }
+
+    @Test("The browser opens in Date mode")
+    func opensInDate() throws {
+        #expect(try model(FakeCatalog()).mode == .date)
+    }
+
+    @Test("After loading, hosts, programs and genres are listed with their counts")
+    func pickers() async throws {
+        let model = try model(try browsable())
+        await model.load()
+        #expect(model.hosts.map(\.name) == ["Cheryl Waters", "John Richards"])
+        #expect(model.hosts.first?.showCount == 2)
+        #expect(model.programs.map(\.name) == ["The Midday Show", "The Morning Show"])
+        #expect(model.genres.map(\.name) == ["Eclectic", "Rock", "Variety Mix"])
+        #expect(model.genres.first { $0.name == "Rock" }?.showCount == 3)
+    }
+
+    @Test("A selection means the shows of that host, program, genre or day")
+    func selections() async throws {
+        let model = try model(try browsable())
+        await model.load()
+        #expect(model.shows(for: .host("Cheryl Waters")).map(\.id) == ["2", "3"])
+        #expect(model.shows(for: .program("The Morning Show")).map(\.id) == ["1"])
+        #expect(model.shows(for: .genre("variety mix")).map(\.id) == ["2", "3"])
+        let thursday = try #require(model.tiles.first { $0.dayNumber == "5" })
+        #expect(model.shows(for: .day(thursday.id)).map(\.id) == ["1", "2"])
+        #expect(model.shows(for: .host("Nobody")).isEmpty)
+        #expect(model.shows(for: .day(Date(timeIntervalSince1970: 0))).isEmpty)
+    }
+
+    @Test("A selection has a title to put at the top of its list")
+    func selectionTitles() async throws {
+        let model = try model(try browsable())
+        await model.load()
+        let thursday = try #require(model.tiles.first { $0.dayNumber == "5" })
+        #expect(model.title(for: .day(thursday.id)) == "November 5, Thursday")
+        #expect(model.title(for: .host("Cheryl Waters")) == "Cheryl Waters")
+        #expect(model.title(for: .program("The Midday Show")) == "The Midday Show")
+        #expect(model.title(for: .genre("variety mix")) == "Variety Mix")
+    }
+
+    @Test("Reloading replaces the pickers rather than adding to them")
+    func reloadReplaces() async throws {
+        let model = try model(try browsable())
+        await model.load()
+        await model.load()
+        #expect(model.hosts.count == 2)
+    }
 }

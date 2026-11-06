@@ -133,4 +133,10 @@ struct ArchiveTimingTests {
         #expect(ArchiveTiming.joinOffset(previousFile: try url("a.mp3"), previousDuration: 100, nextFile: try url("20261106075008-b.mp3")) == nil)
         #expect(ArchiveTiming.joinOffset(previousFile: try url("20261106075008-a.mp3"), previousDuration: .nan, nextFile: try url("20261106075008-b.mp3")) == nil)
     }
+
+    @Test("A list that spans days shows the day with the time: Thu Nov 5, 7:02 AM PST, in the station's zone")
+    func dayAndClock() throws {
+        #expect(ArchiveTiming.dayAndClock(try date("2026-11-05T07:02:50-08:00")) == "Thu Nov 5, 7:02 AM PST")
+        #expect(ArchiveTiming.dayAndClock(try date("2026-11-05T10:15:00-05:00")) == "Thu Nov 5, 7:15 AM PST")
+    }
 }

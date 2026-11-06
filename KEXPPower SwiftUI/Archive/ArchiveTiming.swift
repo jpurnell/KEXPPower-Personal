@@ -85,6 +85,19 @@ enum ArchiveTiming {
         return formatter.string(from: date)
     }
 
+    /// A moment as the day and clock reading in the station's zone, such as "Thu Nov 5, 7:02 AM PST", for lists that
+    /// span several days.
+    /// - Parameters:
+    ///   - date: The moment.
+    ///   - zone: The time zone to read it in.
+    static func dayAndClock(_ date: Date, zone: TimeZone = stationTimeZone) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = zone
+        formatter.dateFormat = "EEE MMM d, h:mm a z"
+        return formatter.string(from: date)
+    }
+
     /// A position in a file as "11:25", or "1:02:05" once it passes an hour; a negative position reads as the start.
     /// - Parameter seconds: Seconds from the start of the file.
     static func positionText(_ seconds: TimeInterval) -> String {

@@ -10,11 +10,11 @@ import SwiftUI
 /// Where archive pictures may come from: KEXP's own media host, as for the live artwork.
 private let archiveImageHosts = ArtworkLoader(allowedDomains: ["kexp.org"])
 
-/// The Archive section's Date mode: pick one of the last fifteen days, then a show to hear.
+/// The Archive section: browse the last two weeks by date, host, show or genre, then pick a show to hear.
 struct ArchiveView: View {
     let model: ResultRetriever
     @State private var browser: ArchiveBrowserModel
-    @State private var selectedDay: ArchiveDayTile.ID?
+    @State private var selection: ArchiveSelection?
     #if os(iOS) && DEBUG
     @State private var showingProbe = false
     #endif
@@ -31,8 +31,9 @@ struct ArchiveView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-            if let tile = selectedTile {
-                DayShowsView(tile: tile, browser: browser)
+            if let selection {
+                ShowListView(
+                    shows: browser.shows(for: selection), showsDay: browser.mode != .date, browser: browser)
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
@@ -44,6 +45,10 @@ struct ArchiveView: View {
                                 .font(.callout)
                                 .foregroundStyle(.secondary)
                         }
+                        Picker("Browse by", selection: Bindable(browser).mode) {
+                            ForEach(ArchiveMode.allCases) { Text($0.title).tag($0) }
+                        }
+                        .pickerStyle(.segmented)
                         content
                     }
                     .padding()
@@ -58,21 +63,16 @@ struct ArchiveView: View {
         #endif
     }
 
-    /// The day being looked at, kept current as the list reloads.
-    private var selectedTile: ArchiveDayTile? {
-        browser.tiles.first { $0.id == selectedDay }
-    }
-
     private var header: some View {
         HStack {
-            if selectedTile != nil {
+            if selection != nil {
                 Button {
-                    selectedDay = nil
+                    selection = nil
                 } label: {
-                    Label("Dates", systemImage: "chevron.backward")
+                    Label("\(browser.mode.title)s", systemImage: "chevron.backward")
                 }
             }
-            Text(selectedTile?.accessibilityLabel ?? "Archive").font(.title2.weight(.bold))
+            Text(selection.map { browser.title(for: $0) } ?? "Archive").font(.title2.weight(.bold))
             Spacer()
             #if os(iOS) && DEBUG
             Button("Probe") { showingProbe = true }
@@ -96,18 +96,109 @@ struct ArchiveView: View {
                 Button("Try again") { Task { await browser.load() } }
             }
         case .loaded:
-            Text("Select a date").font(.headline)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 84), spacing: 12)], spacing: 12) {
-                ForEach(browser.tiles) { tile in
-                    Button {
-                        selectedDay = tile.id
-                    } label: {
-                        DayTileView(tile: tile)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(tile.shows.isEmpty)
-                }
+            switch browser.mode {
+            case .date: dateTiles
+            case .host: hostList
+            case .show: programList
+            case .genre: genreList
             }
+        }
+    }
+
+    private var dateTiles: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 84), spacing: 12)], spacing: 12) {
+            ForEach(browser.tiles) { tile in
+                Button {
+                    selection = .day(tile.id)
+                } label: {
+                    DayTileView(tile: tile)
+                }
+                .buttonStyle(.plain)
+                .disabled(tile.shows.isEmpty)
+            }
+        }
+    }
+
+    private var hostList: some View {
+        LazyVStack(spacing: 8) {
+            ForEach(browser.hosts) { host in
+                CardButton(
+                    title: host.name,
+                    subtitle: ListFormatter.localizedString(byJoining: host.programNames),
+                    count: host.showCount
+                ) { selection = .host(host.name) }
+            }
+        }
+    }
+
+    private var programList: some View {
+        LazyVStack(spacing: 8) {
+            ForEach(browser.programs) { program in
+                CardButton(
+                    title: program.name,
+                    subtitle: [ListFormatter.localizedString(byJoining: program.hostNames),
+                               program.tags.joined(separator: ", ")].filter { !$0.isEmpty }.joined(separator: " · "),
+                    count: program.showCount,
+                    imageURL: program.imageURL
+                ) { selection = .program(program.name) }
+            }
+        }
+    }
+
+    private var genreList: some View {
+        LazyVStack(spacing: 8) {
+            ForEach(browser.genres) { genre in
+                CardButton(title: genre.name, subtitle: "", count: genre.showCount) { selection = .genre(genre.name) }
+            }
+        }
+    }
+}
+
+/// A row in the Host, Show or Genre picker: a name, a line beneath it, and how many shows it has.
+private struct CardButton: View {
+    let title: String
+    let subtitle: String
+    let count: Int
+    var imageURL: URL?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                if imageURL != nil { ArchivePicture(url: imageURL, size: 56) }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).font(.headline)
+                    if !subtitle.isEmpty {
+                        Text(subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                    }
+                }
+                Spacer()
+                Text(count == 1 ? "1 show" : "\(count) shows").font(.caption).foregroundStyle(.secondary)
+                Image(systemName: "chevron.forward").foregroundStyle(.tertiary).accessibilityHidden(true)
+            }
+            .padding(12)
+            .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// A picture from KEXP's own media host, or a plain placeholder.
+private struct ArchivePicture: View {
+    let url: URL?
+    let size: CGFloat
+
+    var body: some View {
+        if let url, archiveImageHosts.isAllowed(url) {
+            AsyncImage(url: url) { image in image.resizable().scaledToFill() } placeholder: { Color.secondary.opacity(0.2) }
+                .frame(width: size, height: size)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .accessibilityHidden(true)
+        } else {
+            RoundedRectangle(cornerRadius: 8).fill(.secondary.opacity(0.2)).frame(width: size, height: size)
+                .accessibilityHidden(true)
         }
     }
 }
@@ -132,18 +223,20 @@ private struct DayTileView: View {
     }
 }
 
-/// The shows on one day, in the order they aired; tapping one plays it.
-private struct DayShowsView: View {
+/// A list of shows (a day's, a host's, a program's or a genre's); tapping one plays it.
+private struct ShowListView: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
-    let tile: ArchiveDayTile
+    let shows: [ArchiveShow]
+    /// Whether rows say which day too, because the list spans several.
+    let showsDay: Bool
     let browser: ArchiveBrowserModel
 
     var body: some View {
-        List(tile.shows) { show in
+        List(shows) { show in
             Button {
                 Task { await browser.play(show) }
             } label: {
-                ShowRow(show: show, isPlaying: browser.nowPlayingShow?.id == show.id)
+                ShowRow(show: show, showsDay: showsDay, isPlaying: browser.nowPlayingShow?.id == show.id)
             }
             .buttonStyle(.plain)
         }
@@ -165,17 +258,19 @@ private struct DayShowsView: View {
 
 private struct ShowRow: View {
     let show: ArchiveShow
+    let showsDay: Bool
     let isPlaying: Bool
 
     var body: some View {
         HStack(spacing: 12) {
-            picture
+            ArchivePicture(url: show.imageURL, size: 56)
             VStack(alignment: .leading, spacing: 2) {
                 Text(show.programName).font(.headline)
                 if !show.hostNames.isEmpty {
                     Text(ListFormatter.localizedString(byJoining: show.hostNames)).font(.subheadline)
                 }
-                Text(ArchiveTiming.clock(show.startTime)).font(.caption).foregroundStyle(.secondary)
+                Text(showsDay ? ArchiveTiming.dayAndClock(show.startTime) : ArchiveTiming.clock(show.startTime))
+                    .font(.caption).foregroundStyle(.secondary)
                 if let tagline = show.tagline {
                     Text(tagline).font(.caption).foregroundStyle(.secondary).lineLimit(2)
                 }
@@ -189,17 +284,6 @@ private struct ShowRow: View {
         .accessibilityElement(children: .combine)
         .accessibilityValue(isPlaying ? "Playing" : "")
         .accessibilityHint("Plays this show")
-    }
-
-    @ViewBuilder
-    private var picture: some View {
-        if let url = show.imageURL, archiveImageHosts.isAllowed(url) {
-            AsyncImage(url: url) { image in image.resizable().scaledToFill() } placeholder: { Color.secondary.opacity(0.2) }
-                .frame(width: 56, height: 56)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-        } else {
-            RoundedRectangle(cornerRadius: 8).fill(.secondary.opacity(0.2)).frame(width: 56, height: 56)
-        }
     }
 }
 

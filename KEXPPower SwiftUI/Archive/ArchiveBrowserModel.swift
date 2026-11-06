@@ -26,6 +26,32 @@ protocol ArchivePlayer: AnyObject {
         advanced: (@MainActor (ArchiveContinuation) async -> Void)?)
 }
 
+/// The four ways into the archive, as the website offers them.
+enum ArchiveMode: String, CaseIterable, Identifiable {
+    case date, host, show, genre
+
+    var id: String { rawValue }
+
+    /// The label in the picker.
+    var title: String {
+        switch self {
+        case .date: "Date"
+        case .host: "Host"
+        case .show: "Show"
+        case .genre: "Genre"
+        }
+    }
+}
+
+/// One thing picked in the archive, which means a list of shows.
+enum ArchiveSelection: Hashable {
+    /// A day, by the start of that day (an `ArchiveDayTile`'s id).
+    case day(Date)
+    case host(String)
+    case program(String)
+    case genre(String)
+}
+
 /// What to play when an archived file runs out.
 enum ArchiveContinuation: Equatable {
     /// Roll into the show that follows, whose audio is at this address.
@@ -111,10 +137,17 @@ final class ArchiveBrowserModel {
 
     private(set) var phase: Phase = .idle
     private(set) var tiles: [ArchiveDayTile] = []
+    /// How the listener is browsing.
+    var mode: ArchiveMode = .date
+    /// Hosts, programs and genres in the loaded days, alphabetical, with how many shows each has.
+    private(set) var hosts: [ArchiveHostSummary] = []
+    private(set) var programs: [ArchiveProgramSummary] = []
+    private(set) var genres: [ArchiveGenreSummary] = []
     /// Something to tell the listener about the last attempt to play, or `nil`.
     private(set) var notice: String?
 
     private var playing: ArchiveShow?
+    @ObservationIgnored private var index = ArchiveIndex(shows: [])
     @ObservationIgnored private let catalog: any ArchiveCatalog
     @ObservationIgnored private let player: any ArchivePlayer
     @ObservationIgnored private let calendar: Calendar
@@ -152,8 +185,12 @@ final class ArchiveBrowserModel {
             byAdding: .day, value: -(Self.dayCount - 1), to: calendar.startOfDay(for: moment)) ?? moment
         do {
             let shows = try await catalog.shows(from: oldest, to: moment)
-            tiles = ArchiveDayTile.tiles(
-                index: ArchiveIndex(shows: shows), now: moment, calendar: calendar, count: Self.dayCount)
+            let loaded = ArchiveIndex(shows: shows)
+            index = loaded
+            tiles = ArchiveDayTile.tiles(index: loaded, now: moment, calendar: calendar, count: Self.dayCount)
+            hosts = loaded.hosts
+            programs = loaded.programs
+            genres = loaded.genres
             phase = .loaded
         } catch {
             phase = .failed("The archive could not be reached. Check your connection and try again.")
@@ -175,6 +212,27 @@ final class ArchiveBrowserModel {
             armContinuation()
         } catch {
             notice = "That show could not be started. Check your connection and try again."
+        }
+    }
+
+    /// The shows a selection means: a day's in the order they aired, the others newest first.
+    /// - Parameter selection: A day, host, program or genre.
+    func shows(for selection: ArchiveSelection) -> [ArchiveShow] {
+        switch selection {
+        case .day(let start): tiles.first { $0.id == start }?.shows ?? []
+        case .host(let name): index.shows(byHost: name)
+        case .program(let name): index.shows(ofProgram: name)
+        case .genre(let name): index.shows(inGenre: name)
+        }
+    }
+
+    /// The heading for a selection's list.
+    /// - Parameter selection: A day, host, program or genre.
+    func title(for selection: ArchiveSelection) -> String {
+        switch selection {
+        case .day(let start): tiles.first { $0.id == start }?.accessibilityLabel ?? ""
+        case .host(let name), .program(let name): name
+        case .genre(let name): genres.first { $0.id == name.lowercased() }?.name ?? name
         }
     }
 
