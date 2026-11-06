@@ -116,7 +116,7 @@ final class CarPlayController {
     /// Adds the song on the air to the listener's playlist, the same way the phone's button does.
     private func save() async {
         diagnostics.record("CarPlay", "save: button pressed")
-        await saving.save(model.play)
+        await saving.save(model.play, holdingGuesses: true)
         let state = saving.state(for: model.play)
         diagnostics.record("CarPlay", "save: finished, state \(state)")
         refresh()

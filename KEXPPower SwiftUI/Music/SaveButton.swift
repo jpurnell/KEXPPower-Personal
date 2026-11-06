@@ -53,6 +53,7 @@ struct SaveButton: View {
         }
         .alert("Is this the song?", isPresented: confirming, presenting: confirmingSong) { song in
             Button("Add") { Task { await model.confirm(song, for: play) } }
+            Button("Review later") { Task { await model.holdForReview(song, for: play) } }
             Button("Not this one", role: .cancel) { model.dismissConfirmation(for: play) }
         } message: { song in
             Text(description(of: song))

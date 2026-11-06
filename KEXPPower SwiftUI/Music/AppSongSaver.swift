@@ -3,6 +3,7 @@
 //  KEXPPowerExampleSwiftUI
 //
 
+import Foundation
 import StationKit
 
 /// Builds the app's saving model: MusicBrainz for ISRCs, Apple Music for the catalog and the playlists, and a
@@ -35,6 +36,20 @@ enum AppSongSaver {
             playlists: playlists,
             ledger: UserDefaultsSaveLedger(),
             defaultPlaylistName: defaultPlaylistName)
-        return SongSavingModel(saver: saver, playlists: playlists)
+        let model = SongSavingModel(saver: saver, playlists: playlists)
+        model.reviewQueue = makeReviewQueue(for: model)
+        return model
+    }
+
+    /// The queue of held matches: kept in the app's storage, with covers saved as small files beside it.
+    @MainActor
+    private static func makeReviewQueue(for model: SongSavingModel) -> ReviewQueue {
+        let folder = URL.applicationSupportDirectory.appendingPathComponent("Review", isDirectory: true)
+        let queue = ReviewQueue(
+            store: UserDefaultsReviewStore(),
+            artwork: ReviewArtworkStore(directory: folder, fetch: ReviewArtworkStore.guardedFetch()),
+            isSaved: { [weak model] in model?.isSaved(playID: $0) ?? false })
+        queue.sweepOrphans()
+        return queue
     }
 }

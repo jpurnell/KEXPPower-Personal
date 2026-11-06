@@ -69,14 +69,20 @@ struct CarPlayContentTests {
         #expect(CarPlayContent.saveButtonSymbol(for: .notFound) == "xmark.circle")
     }
 
-    @Test("The notice for a held match names the song and says to finish on the phone; other states give none")
+    @Test("The notice for a song put in the review queue says so; other states give none")
     func heldNotice() {
-        let song = CatalogSong(id: "1", title: "Sugar", artist: "NoSo")
-        let notice = CarPlayContent.saveNotice(for: .confirming(song))
-        #expect(notice?.title == "Review on your phone")
-        #expect(notice?.detail == "Sugar by NoSo is waiting there")
+        let notice = CarPlayContent.saveNotice(for: .heldForReview)
+        #expect(notice?.title == "Saved for review")
+        #expect(notice?.detail == "Check it on your phone when you are parked")
         #expect(CarPlayContent.saveNotice(for: .idle) == nil)
         #expect(CarPlayContent.saveNotice(for: .notFound) == nil)
+    }
+
+    @Test("A song in the review queue shows a tray, selected, and is spoken as saved for later")
+    func heldButton() {
+        #expect(CarPlayContent.saveButtonSymbol(for: .heldForReview) == "tray.full")
+        #expect(CarPlayContent.saveButtonSelected(for: .heldForReview))
+        #expect(CarPlayContent.saveButtonLabel(for: .heldForReview) == "Saved to review later")
     }
 
     @Test("Other states keep their own spoken labels")

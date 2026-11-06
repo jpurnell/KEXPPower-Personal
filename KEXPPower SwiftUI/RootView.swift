@@ -9,6 +9,7 @@ import SwiftUI
 struct RootView: View {
     let model: ResultRetriever
 
+    @Environment(SongSavingModel.self) private var saving
     @State private var selection: AppSection? = AppSection.defaultSection
     #if !os(macOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -28,7 +29,7 @@ struct RootView: View {
 
     private var sidebarLayout: some View {
         NavigationSplitView {
-            List(AppSection.allCases, selection: $selection) { section in
+            List(AppSection.visible(canSaveToPlaylists: AppSongSaver.canSaveToPlaylists), selection: $selection) { section in
                 Label(section.title, systemImage: section.systemImage)
                     .tag(section)
             }
@@ -43,9 +44,10 @@ struct RootView: View {
             get: { selection ?? AppSection.defaultSection },
             set: { selection = $0 }
         )) {
-            ForEach(AppSection.allCases) { section in
+            ForEach(AppSection.visible(canSaveToPlaylists: AppSongSaver.canSaveToPlaylists)) { section in
                 SectionDestination(section: section, model: model)
                     .tabItem { Label(section.title, systemImage: section.systemImage) }
+                    .badge(section == .review ? (saving.reviewQueue?.count ?? 0) : 0)
                     .tag(section)
             }
         }
@@ -61,6 +63,8 @@ struct SectionDestination: View {
         switch section {
         case .live:
             ContentView(resultsRetriever: model)
+        case .review:
+            ReviewView(model: model)
         case .archive, .playlists:
             ComingSoonView(section: section)
         }

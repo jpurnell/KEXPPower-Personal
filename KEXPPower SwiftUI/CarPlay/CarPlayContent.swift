@@ -48,16 +48,16 @@ enum CarPlayContent {
 
     /// A short notice for the car to show after a press, or `nil` when the button's own state says enough.
     ///
-    /// Only a held match gets one: the button alone cannot say which song is waiting or where.
+    /// Only a song put in the review queue gets one: the button alone cannot say it is waiting, or where.
     static func saveNotice(for state: SaveState) -> Row? {
-        guard case .confirming(let song) = state else { return nil }
-        return Row(title: "Review on your phone", detail: "\(song.title) by \(song.artist) is waiting there")
+        guard state == .heldForReview else { return nil }
+        return Row(title: "Saved for review", detail: "Check it on your phone when you are parked")
     }
 
     /// Whether the add button looks selected: only once the song is in the playlist.
     static func saveButtonSelected(for state: SaveState) -> Bool {
         if case .saved(_, let failed) = state { return failed.isEmpty }
-        return false
+        return state == .heldForReview
     }
 
     /// Whether the add button accepts a press: not while a save is in progress.

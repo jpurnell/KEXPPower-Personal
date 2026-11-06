@@ -25,6 +25,8 @@ enum SaveState: Equatable {
     case unavailable
     /// The listener has not allowed access to their Apple Music library.
     case needsPermission
+    /// Only a text match was found, and it was put in the review queue to be checked later, not guessed at.
+    case heldForReview
 
     /// The SF Symbol for the button.
     var symbolName: String {
@@ -36,6 +38,7 @@ enum SaveState: Equatable {
         case .notFound: "xmark.circle"
         case .unavailable: "wifi.exclamationmark"
         case .needsPermission: "lock.circle"
+        case .heldForReview: "tray.full"
         }
     }
 
@@ -56,6 +59,7 @@ enum SaveState: Equatable {
         case .notFound: "No match found in Apple Music"
         case .unavailable: "Apple Music is unavailable"
         case .needsPermission: "Allow access to Apple Music"
+        case .heldForReview: "Saved to review later"
         }
     }
 }
@@ -71,6 +75,8 @@ final class SongSavingModel {
 
     /// The playlists the listener can also add to, known once access has been given.
     private(set) var playlistChoices: [PlaylistSummary] = []
+    /// Where text matches are held for the listener to check later; without one they are asked about at once.
+    @ObservationIgnored var reviewQueue: ReviewQueue?
     private var states: [Int: SaveState] = [:]
     @ObservationIgnored private var pendingExtras: [Int: PlaylistSummary] = [:]
     @ObservationIgnored private let saveTrack: Save
@@ -113,17 +119,62 @@ final class SongSavingModel {
         play.id.flatMap { states[$0] } ?? .idle
     }
 
+    /// Whether a play is already in the listener's playlists, so it need not be held for review.
+    func isSaved(playID: Int) -> Bool {
+        if case .saved = states[playID] { return true }
+        return false
+    }
+
     /// Saves a play to the default playlist, and to a second one if given.
     /// - Parameters:
     ///   - play: The play to save; airbreaks and plays without an id are ignored.
     ///   - extra: A second playlist to add it to as well.
-    func save(_ play: Play, alsoTo extra: PlaylistSummary? = nil) async {
+    ///   - holdingGuesses: `true` from the car: a text match is put in the review queue instead of asking, because
+    ///     nobody can answer a prompt while driving. An exact match is added either way.
+    func save(_ play: Play, alsoTo extra: PlaylistSummary? = nil, holdingGuesses: Bool = false) async {
         guard Self.canSave(play), let id = play.id, let track = KEXPMapping.track(from: play) else { return }
         guard states[id] != .saving else { return }
         states[id] = .saving
         let outcome = await saveTrack(track, extra)
         apply(outcome, to: id, extra: extra)
+        if holdingGuesses, case .needsConfirmation(let song) = outcome {
+            await holdForReview(song, for: play)
+        }
         if outcome != .notAuthorized { await refreshPlaylistChoices() }
+    }
+
+    /// Puts a suggested match in the review queue, to be checked later.
+    ///
+    /// Without a queue the suggestion stays as a question, so it is never lost.
+    /// - Parameters:
+    ///   - song: Apple Music's suggestion.
+    ///   - play: The KEXP play it was matched to.
+    func holdForReview(_ song: CatalogSong, for play: Play) async {
+        guard let id = play.id, let queue = reviewQueue, let track = KEXPMapping.track(from: play) else { return }
+        let held = ReviewQueue.Held(
+            playID: id, playedTitle: track.title, playedArtist: track.displayArtist, playedAlbum: track.album,
+            playedArtworkURL: track.artworkURL, candidate: song, candidateArtworkURL: nil,
+            extraPlaylist: pendingExtras[id])
+        await queue.enqueue(held)
+        states[id] = .heldForReview
+        pendingExtras[id] = nil
+    }
+
+    /// Saves the suggestion for a song in the review queue.
+    /// - Returns: Whether the song is now in the listener's playlists; if not it stays in the queue.
+    func confirmHeld(_ entry: ReviewEntry) async -> Bool {
+        states[entry.id] = .saving
+        let outcome = await confirmSong(entry.candidate, entry.extraPlaylist)
+        apply(outcome, to: entry.id, extra: entry.extraPlaylist)
+        if case .saved = states[entry.id] { return true }
+        states[entry.id] = .heldForReview
+        return false
+    }
+
+    /// The listener rejected a held suggestion; the play can be saved again from scratch.
+    func releaseHeld(_ entry: ReviewEntry) {
+        states[entry.id] = nil
+        pendingExtras[entry.id] = nil
     }
 
     /// Makes a playlist with a name and saves a play to it as well as to the default one.
