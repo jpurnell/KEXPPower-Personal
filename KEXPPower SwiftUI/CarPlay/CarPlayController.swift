@@ -17,6 +17,7 @@ import UIKit
 final class CarPlayController {
     private let logger = Logger(subsystem: "com.JPEnterprises.Spinner", category: "CarPlay")
     private let interfaceController: CPInterfaceController
+    private let diagnostics = DiagnosticLog.app
     private let model: ResultRetriever
     private let saving: SongSavingModel
 
@@ -37,6 +38,7 @@ final class CarPlayController {
 
     /// Shows the root screens and starts keeping them current.
     func start() {
+        diagnostics.record("CarPlay", "controller: building root screens")
         isRunning = true
         let live = CPListTemplate(title: "Live", sections: [CPListSection(items: makeLiveItems())])
         live.tabTitle = "Live"
@@ -50,15 +52,19 @@ final class CarPlayController {
 
         let root = CPTabBarTemplate(templates: [live, archive])
         // A completion is required: without one a failed presentation throws.
-        interfaceController.setRootTemplate(root, animated: false) { [logger] success, error in
-            if !success { logger.error("CarPlay root template not shown: \(error?.localizedDescription ?? "unknown", privacy: .public)") }
+        interfaceController.setRootTemplate(root, animated: false) { [logger, diagnostics] success, error in
+            let detail = error?.localizedDescription ?? "none"
+            diagnostics.record("CarPlay", "controller: root screen shown \(success), error \(detail)")
+            if !success { logger.error("CarPlay root template not shown: \(detail, privacy: .public)") }
         }
         refresh()
-        watcher.task = Task { [weak self] in await self?.watch() }
+        watcher.task = Task { [weak self] in await self?.begin() }
+        diagnostics.record("CarPlay", "controller: started")
     }
 
     /// Stops following the app when the car disconnects.
     func stop() {
+        diagnostics.record("CarPlay", "controller: stopped")
         isRunning = false
         watcher.task?.cancel()
         watcher.task = nil
@@ -82,12 +88,16 @@ final class CarPlayController {
 
     /// Starts the stream if it is not playing and opens the system's Now Playing screen.
     private func listen() async {
+        diagnostics.record("CarPlay", "listen: row tapped")
         await AppModelRegistry.setPlayback(true)
+        diagnostics.record("CarPlay", "listen: playback requested")
         let template = CPNowPlayingTemplate.shared
         template.updateNowPlayingButtons([makeSaveButton()])
         guard interfaceController.topTemplate !== template else { return }
-        interfaceController.pushTemplate(template, animated: true) { [logger] success, error in
-            if !success { logger.error("CarPlay Now Playing not shown: \(error?.localizedDescription ?? "unknown", privacy: .public)") }
+        interfaceController.pushTemplate(template, animated: true) { [logger, diagnostics] success, error in
+            let detail = error?.localizedDescription ?? "none"
+            diagnostics.record("CarPlay", "listen: Now Playing shown \(success), error \(detail)")
+            if !success { logger.error("CarPlay Now Playing not shown: \(detail, privacy: .public)") }
         }
     }
 
@@ -105,8 +115,25 @@ final class CarPlayController {
 
     /// Adds the song on the air to the listener's playlist, the same way the phone's button does.
     private func save() async {
+        diagnostics.record("CarPlay", "save: button pressed")
         await saving.save(model.play)
+        let state = saving.state(for: model.play)
+        diagnostics.record("CarPlay", "save: finished, state \(state)")
         refresh()
+        if let notice = CarPlayContent.saveNotice(for: state) { showNotice(notice) }
+    }
+
+    /// Shows a one-button alert over the Now Playing screen, so a held match is explained rather than left as an icon.
+    private func showNotice(_ notice: CarPlayContent.Row) {
+        let ok = CPAlertAction(title: "OK", style: .default) { [interfaceController, diagnostics] _ in
+            interfaceController.dismissTemplate(animated: true) { success, error in
+                diagnostics.record("CarPlay", "notice: dismissed \(success), error \(error?.localizedDescription ?? "none")")
+            }
+        }
+        let alert = CPAlertTemplate(titleVariants: [notice.title, notice.detail], actions: [ok])
+        interfaceController.presentTemplate(alert, animated: true) { [diagnostics] success, error in
+            diagnostics.record("CarPlay", "notice: shown \(success), error \(error?.localizedDescription ?? "none")")
+        }
     }
 
     /// Fills the rows and the button from the current show, song and save state.
@@ -120,6 +147,16 @@ final class CarPlayController {
         if interfaceController.topTemplate === CPNowPlayingTemplate.shared {
             CPNowPlayingTemplate.shared.updateNowPlayingButtons([makeSaveButton()])
         }
+    }
+
+    /// Starts following the station, then keeps the screens current. CarPlay can launch the app with no window open,
+    /// and the model otherwise starts fetching only when a window asks, so the car asks for itself.
+    private func begin() async {
+        diagnostics.record("CarPlay", "controller: asking the model to start fetching")
+        await model.startIfNeeded()
+        refresh()
+        diagnostics.record("CarPlay", "controller: first fetch returned, show \(model.show.programName ?? "none")")
+        await watch()
     }
 
     /// Redraws whenever the show, the song or the save state changes, until the car disconnects.

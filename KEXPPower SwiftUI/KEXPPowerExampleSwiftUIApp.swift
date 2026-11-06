@@ -33,6 +33,10 @@ struct KEXPPowerExampleSwiftUIApp: App {
         // An App Intent from the widget, and CarPlay, reach the player through this, even if no window has opened yet.
         AppModelRegistry.model = model
         AppModelRegistry.saving = saving
+        #if os(iOS)
+        DiagnosticLog.app.trim()
+        DiagnosticLog.app.record("App", "launched")
+        #endif
     }
 
     var body: some Scene {

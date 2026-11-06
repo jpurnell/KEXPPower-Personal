@@ -62,6 +62,23 @@ struct CarPlayContentTests {
         #expect(CarPlayContent.saveButtonLabel(for: .confirming(song)) == "Review on your phone")
     }
 
+    @Test("A held match shows a phone, not a question mark, which tells a driver nothing")
+    func confirmingSymbolIsAPhone() {
+        let song = CatalogSong(id: "1", title: "Sugar", artist: "NoSo")
+        #expect(CarPlayContent.saveButtonSymbol(for: .confirming(song)) == "iphone")
+        #expect(CarPlayContent.saveButtonSymbol(for: .notFound) == "xmark.circle")
+    }
+
+    @Test("The notice for a held match names the song and says to finish on the phone; other states give none")
+    func heldNotice() {
+        let song = CatalogSong(id: "1", title: "Sugar", artist: "NoSo")
+        let notice = CarPlayContent.saveNotice(for: .confirming(song))
+        #expect(notice?.title == "Review on your phone")
+        #expect(notice?.detail == "Sugar by NoSo is waiting there")
+        #expect(CarPlayContent.saveNotice(for: .idle) == nil)
+        #expect(CarPlayContent.saveNotice(for: .notFound) == nil)
+    }
+
     @Test("Other states keep their own spoken labels")
     func labels() {
         #expect(CarPlayContent.saveButtonLabel(for: .idle) == "Add to playlist")

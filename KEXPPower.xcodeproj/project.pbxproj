@@ -35,6 +35,7 @@
 		27FB2D383E8818B9EB9F3D2D /* SongSavingModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B35617BDFD5A91A24B5285 /* SongSavingModelTests.swift */; };
 		2B912C163E843A967FB8EB5B /* ArtworkThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95B2EE0F4C7B6C9FFA3C9E82 /* ArtworkThumbnail.swift */; };
 		2F33BD8243592B10E5C89AEA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F478354AB15736CA0D325E03 /* Foundation.framework */; };
+		2F85FBE07F4805C65D1F58C8 /* DiagnosticLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CD102F6F0D5FE4F003765C /* DiagnosticLog.swift */; };
 		3005B030BCBDD7FAF7ABF7AB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EF30CA8E2C1E77C41691552 /* Cocoa.framework */; };
 		312696805BA0C3303AC52A6F /* SetPlayingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777110BBCF2098176DC35E0A /* SetPlayingIntent.swift */; };
 		3179C490CB88053F918043D6 /* AppSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A827B74B3EC0CD13F071668 /* AppSectionTests.swift */; };
@@ -82,6 +83,7 @@
 		6371A882F52F666A4473EEBA /* PlayerControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3585BE6827B310B19AEADD6 /* PlayerControllerTests.swift */; };
 		6637D63621745475499BEA32 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C895B019C2EAD90B83BC21BB /* WatchContentView.swift */; };
 		667043134FB1B623168DF009 /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = DCB48A690780DA477F96311B /* StationKit */; };
+		691DDFB85DE8CEDD9254EEE0 /* DiagnosticLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816CEBC4E5529F825157FBFD /* DiagnosticLogTests.swift */; };
 		6F456C42163C1707453D401B /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D82A2BEBD1FF0079B78E /* PlayerView.swift */; };
 		7219D81A2BEA66C70079B78E /* CombinedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D8192BEA66C70079B78E /* CombinedView.swift */; };
 		7219D81C2BEAA8710079B78E /* Extended View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81B2BEAA8710079B78E /* Extended View.swift */; };
@@ -117,6 +119,7 @@
 		837C1DA1634548A8F43EB00A /* Spinner Watch Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2D7B9A52F866786354AD4253 /* Spinner Watch Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		863A8EB4381D0929F68012D3 /* WatchPlayPauseIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4EC4F3815B3C2196D5CBF01 /* WatchPlayPauseIntent.swift */; };
 		8835B6D99EA293F07D2B61A6 /* WatchNowPlayingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C2254099D1AB02F2381486 /* WatchNowPlayingWidget.swift */; };
+		886182D371AAD6F80ECFD61D /* DiagnosticLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CD102F6F0D5FE4F003765C /* DiagnosticLog.swift */; };
 		88D77CD480DC5336DA947E3C /* CarPlayContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2772F89E8F61091348B500EC /* CarPlayContentTests.swift */; };
 		89879FD4769CD3388884CD4D /* PlaybackMenuStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A1C72889750E42993F76F8 /* PlaybackMenuStateTests.swift */; };
 		8A29ACDE9261F6A1EC5991AD /* NowPlayingWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3302719A98FCCCF9FAF40AB1 /* NowPlayingWidget.swift */; };
@@ -142,6 +145,7 @@
 		A864F40615D8F0B35409D6D5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55FB4D2E9EAC99216802E52F /* PrivacyInfo.xcprivacy */; };
 		A885824A9293F8E669871A22 /* MusicKitCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AF82B259DB7031739958A9 /* MusicKitCatalog.swift */; };
 		AADE6B230E19D0BAA9E7B8B5 /* ControlPlayState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E01502A6DA15679C398864C /* ControlPlayState.swift */; };
+		AE68BCAD894931B062B5A083 /* DiagnosticLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816CEBC4E5529F825157FBFD /* DiagnosticLogTests.swift */; };
 		B0A3E40ACC55F03B274E3F8C /* PlaybackCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFBE4378A2DAC76125F8B3C /* PlaybackCommands.swift */; };
 		B19648898476BD9E82290A84 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 708FECEEE21F1BE9070C2690 /* Foundation.framework */; };
 		B2C88CEE86C8A8D15DFB11CE /* Spinner Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E1F3A0A25B67B4420DFAF25E /* Spinner Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -304,6 +308,7 @@
 		128FD3045AB9DCA0AFE0D2F2 /* WidgetContent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetContent.swift; sourceTree = "<group>"; };
 		12E1B8A2E3028D5783D9ACCE /* VolumeControlView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VolumeControlView.swift; sourceTree = "<group>"; };
 		18A1F2EA674772D621307418 /* SpinnerWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpinnerWidgetBundle.swift; sourceTree = "<group>"; };
+		18CD102F6F0D5FE4F003765C /* DiagnosticLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DiagnosticLog.swift; sourceTree = "<group>"; };
 		1AA80595DBAA41CBE2506C66 /* AppSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppSection.swift; sourceTree = "<group>"; };
 		22C2254099D1AB02F2381486 /* WatchNowPlayingWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchNowPlayingWidget.swift; sourceTree = "<group>"; };
 		26F7394CE7817FAC472C635D /* NowPlayingWidgetViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NowPlayingWidgetViews.swift; sourceTree = "<group>"; };
@@ -364,6 +369,7 @@
 		777110BBCF2098176DC35E0A /* SetPlayingIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SetPlayingIntent.swift; sourceTree = "<group>"; };
 		7EF30CA8E2C1E77C41691552 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		80F0329F70FA2305C5C4A218 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		816CEBC4E5529F825157FBFD /* DiagnosticLogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DiagnosticLogTests.swift; sourceTree = "<group>"; };
 		820CD5465D780A78350BCECB /* WatchPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchPlayer.swift; sourceTree = "<group>"; };
 		82F4BB02D7E49916BBE7C986 /* Spinner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spinner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8499E80D002416B2EF0FF28B /* WidgetPublisher.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetPublisher.swift; sourceTree = "<group>"; };
@@ -396,7 +402,7 @@
 		D83BBE1BBFE115830674A628 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D83C963EFEC4E9CFEC269C64 /* AppModelRegistry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppModelRegistry.swift; sourceTree = "<group>"; };
 		DBB9519A3E3C59652BC44B48 /* SpinnerWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpinnerWatchApp.swift; sourceTree = "<group>"; };
-		E1F3A0A25B67B4420DFAF25E /* Spinner Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = "Spinner Widget.appex"; path = "Spinner Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1F3A0A25B67B4420DFAF25E /* Spinner Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Spinner Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3585BE6827B310B19AEADD6 /* PlayerControllerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerControllerTests.swift; sourceTree = "<group>"; };
 		E3F56B8B08C22FBD7CD28C80 /* StreamQualityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreamQualityTests.swift; sourceTree = "<group>"; };
 		E54EF902BDD6F44788AF6240 /* CarPlayController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayController.swift; sourceTree = "<group>"; };
@@ -504,7 +510,6 @@
 				4B3A6915519CE485E93236F9 /* OpenInMusicModel.swift */,
 				AFA25193ACE5863A851807F1 /* OpenInMusicButton.swift */,
 			);
-			name = Music;
 			path = Music;
 			sourceTree = "<group>";
 		};
@@ -560,7 +565,6 @@
 				FF7D358D344BD4F8ED60A025 /* Info.plist */,
 				59FE4C95E2B4607654350574 /* Spinner Watch Widget.entitlements */,
 			);
-			name = "Spinner Watch Widget";
 			path = "Spinner Watch Widget";
 			sourceTree = "<group>";
 		};
@@ -569,7 +573,6 @@
 			children = (
 				B9961D135E9C68276DE5732E /* SongRowUITests.swift */,
 			);
-			name = "Spinner Mac UITests";
 			path = "Spinner Mac UITests";
 			sourceTree = "<group>";
 		};
@@ -642,6 +645,7 @@
 				11FC0473B0C2EEADFCCFDF83 /* Music */,
 				9284FF59D2F779D135F2C479 /* Widget */,
 				786FC9E597BCD9EC04735204 /* CarPlay */,
+				D0792FAEFBBBD193FCD5D7DC /* Diagnostics */,
 			);
 			path = "KEXPPower SwiftUI";
 			sourceTree = "<group>";
@@ -678,7 +682,6 @@
 				E54EF902BDD6F44788AF6240 /* CarPlayController.swift */,
 				EE23747C58CC6E7C70D63BA4 /* CarPlaySceneDelegate.swift */,
 			);
-			name = CarPlay;
 			path = CarPlay;
 			sourceTree = "<group>";
 		};
@@ -734,7 +737,6 @@
 				777110BBCF2098176DC35E0A /* SetPlayingIntent.swift */,
 				4B9EEF363F12B3BA50DEDABA /* AccessorySummary.swift */,
 			);
-			name = Widget;
 			path = Widget;
 			sourceTree = "<group>";
 		};
@@ -748,7 +750,6 @@
 				A9A8CE5E71CEDDE6FF3AE920 /* Spinner Widget.entitlements */,
 				577E9FD465581787496E6A15 /* NowPlayingControl.swift */,
 			);
-			name = "Spinner Widget";
 			path = "Spinner Widget";
 			sourceTree = "<group>";
 		};
@@ -773,8 +774,17 @@
 				CA2FBA8AB5E51D144764E088 /* ControlPlayStateTests.swift */,
 				2DFDD932EF5CD685ED1E7BF7 /* AccessorySummaryTests.swift */,
 				2772F89E8F61091348B500EC /* CarPlayContentTests.swift */,
+				816CEBC4E5529F825157FBFD /* DiagnosticLogTests.swift */,
 			);
 			path = KEXPPowerAppTests;
+			sourceTree = "<group>";
+		};
+		D0792FAEFBBBD193FCD5D7DC /* Diagnostics */ = {
+			isa = PBXGroup;
+			children = (
+				18CD102F6F0D5FE4F003765C /* DiagnosticLog.swift */,
+			);
+			path = Diagnostics;
 			sourceTree = "<group>";
 		};
 		D53B512343A47555C3192043 /* iOS */ = {
@@ -968,7 +978,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1320;
-				LastUpgradeCheck = 2720;
+				LastUpgradeCheck = 2730;
 				ORGANIZATIONNAME = KEXP;
 				TargetAttributes = {
 					72873BF627A8D3C200132B62 = {
@@ -1158,6 +1168,7 @@
 				5E752EE90FC6C42840B13947 /* CarPlayContent.swift in Sources */,
 				8D2CE745EF17D38FFCDB6397 /* CarPlayController.swift in Sources */,
 				A03FFFDCAE331886E0A04E4B /* CarPlaySceneDelegate.swift in Sources */,
+				886182D371AAD6F80ECFD61D /* DiagnosticLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1214,6 +1225,7 @@
 				312696805BA0C3303AC52A6F /* SetPlayingIntent.swift in Sources */,
 				0AE08501FED1E2DFBD8B4FC7 /* AccessorySummary.swift in Sources */,
 				112E39EDDCC3ADFFCFABC8E4 /* CarPlayContent.swift in Sources */,
+				2F85FBE07F4805C65D1F58C8 /* DiagnosticLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1239,6 +1251,7 @@
 				44842820F268C95BBCBEDD26 /* ControlPlayStateTests.swift in Sources */,
 				0EAC978DD3C675419AE62E0F /* AccessorySummaryTests.swift in Sources */,
 				88D77CD480DC5336DA947E3C /* CarPlayContentTests.swift in Sources */,
+				AE68BCAD894931B062B5A083 /* DiagnosticLogTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1283,6 +1296,7 @@
 				ECB1FFE452B401029A6DFD91 /* ControlPlayStateTests.swift in Sources */,
 				99EF1A8D155FF41A0647E7A2 /* AccessorySummaryTests.swift in Sources */,
 				38410A541083CE5C744A95E9 /* CarPlayContentTests.swift in Sources */,
+				691DDFB85DE8CEDD9254EEE0 /* DiagnosticLogTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1339,8 +1353,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.MacUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1348,6 +1364,7 @@
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_VERSION = 6.0;
 				TEST_TARGET_NAME = "Spinner Mac";
+				XROS_DEPLOYMENT_TARGET = "$(RECOMMENDED_XROS_DEPLOYMENT_TARGET)";
 			};
 			name = Debug;
 		};
@@ -1380,6 +1397,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
 				PRODUCT_MODULE_NAME = KEXPPowerExampleSwiftUI;
 				PRODUCT_NAME = Spinner;
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -1479,6 +1497,7 @@
 				MARKETING_VERSION = 3.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -1505,8 +1524,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "KEXPPowerExampleSwiftUI--iOS--Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Spinner adds the songs you pick from the KEXP playlist to your Apple Music library.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1545,8 +1564,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "KEXPPowerExampleSwiftUI--iOS--Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Spinner adds the songs you pick from the KEXP playlist to your Apple Music library.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1781,6 +1800,7 @@
 				MARKETING_VERSION = 3.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -1829,8 +1849,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = BNDA9Y6YV9;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.MacUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1838,6 +1860,7 @@
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_VERSION = 6.0;
 				TEST_TARGET_NAME = "Spinner Mac";
+				XROS_DEPLOYMENT_TARGET = "$(RECOMMENDED_XROS_DEPLOYMENT_TARGET)";
 			};
 			name = Release;
 		};
@@ -1870,6 +1893,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
 				PRODUCT_MODULE_NAME = KEXPPowerExampleSwiftUI;
 				PRODUCT_NAME = Spinner;
+				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -1889,6 +1913,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Spinner Watch Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Now Playing";
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1906,6 +1931,7 @@
 				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				XROS_DEPLOYMENT_TARGET = "$(RECOMMENDED_XROS_DEPLOYMENT_TARGET)";
 			};
 			name = Release;
 		};
@@ -1920,6 +1946,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Spinner Watch Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Now Playing";
+				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1936,6 +1963,7 @@
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				XROS_DEPLOYMENT_TARGET = "$(RECOMMENDED_XROS_DEPLOYMENT_TARGET)";
 			};
 			name = Debug;
 		};
