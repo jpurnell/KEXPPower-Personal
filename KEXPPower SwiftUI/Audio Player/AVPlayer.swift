@@ -37,6 +37,8 @@ import UniformTypeIdentifiers
         @ObservationIgnored private var liveLink: URL?
         /// Whether the player holds an archived show's file instead of the live stream.
         private(set) var isPlayingArchive = false
+        /// Watches how long going back to live takes; replaced each time, so only the latest request is measured.
+        @ObservationIgnored private let liveTimer = TaskHolder()
         #if !os(macOS)
         let avPlayerViewController = AVPlayerViewController()
         #endif
@@ -123,6 +125,34 @@ import UniformTypeIdentifiers
             if isPlaying != wasPlaying { onPlayingChange?(isPlaying) }
             snapshot.state = isPlaying ? .playing : .paused
             publisher.publish(snapshot, artwork: currentArtwork)
+        }
+
+        /// Records how long it takes, after a request to go back to live, for the new item's clock to start moving, which
+        /// is when audio is heard, along with the player's state every two seconds until then.
+        private func measureLiveStart(of item: AVPlayerItem) {
+            liveTimer.task?.cancel()
+            liveTimer.task = Task { [weak self] in await self?.watchLiveStart(of: item, requestedAt: Date()) }
+        }
+
+        private func watchLiveStart(of item: AVPlayerItem, requestedAt requested: Date) async {
+            DiagnosticLog.app.record("Player", "back to live: requested")
+            for tick in 1...80 {
+                try? await Task.sleep(for: .milliseconds(500))
+                guard !Task.isCancelled, let player, player.currentItem === item else { return }
+                let seconds = Date().timeIntervalSince(requested).formatted(.number.precision(.fractionLength(1)))
+                let position = player.currentTime().seconds
+                if position.isFinite, position > 0.1 {
+                    DiagnosticLog.app.record("Player", "back to live: audio moving after \(seconds) s")
+                    return
+                }
+                if tick % 4 == 0 {
+                    let reason = player.reasonForWaitingToPlay?.rawValue ?? "none"
+                    DiagnosticLog.app.record(
+                        "Player",
+                        "back to live: \(seconds) s, control \(player.timeControlStatus.rawValue), item \(item.status.rawValue), waiting \(reason)")
+                }
+            }
+            DiagnosticLog.app.record("Player", "back to live: gave up watching after 40 s")
         }
 
         // MARK: - Now Playing
@@ -226,5 +256,15 @@ import UniformTypeIdentifiers
             player.replaceCurrentItem(with: item)
             isPlayingArchive = false
             playPlayer()
+            measureLiveStart(of: item)
         }
     }
+
+/// Holds a task and cancels it when its owner goes away.
+private final class TaskHolder {
+    var task: Task<Void, Never>?
+
+    deinit {
+        task?.cancel()
+    }
+}

@@ -99,7 +99,7 @@ final class ArchiveBrowserModel {
     /// Something to tell the listener about the last attempt to play, or `nil`.
     private(set) var notice: String?
 
-    @ObservationIgnored private var playing: ArchiveShow?
+    private var playing: ArchiveShow?
     @ObservationIgnored private let catalog: any ArchiveCatalog
     @ObservationIgnored private let player: any ArchivePlayer
     @ObservationIgnored private let calendar: Calendar
@@ -123,7 +123,11 @@ final class ArchiveBrowserModel {
     }
 
     /// The archived show being heard, or `nil` when the player is on the live stream.
-    var nowPlayingShow: ArchiveShow? { player.isPlayingArchive ? playing : nil }
+    var nowPlayingShow: ArchiveShow? {
+        // `playing` is read first, so a screen is told when it is set whatever the player's flag was at the time.
+        let show = playing
+        return player.isPlayingArchive ? show : nil
+    }
 
     /// Fetches the last fifteen days of shows and builds the tiles. Safe to call again to retry.
     func load() async {

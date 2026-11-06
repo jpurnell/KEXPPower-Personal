@@ -230,4 +230,22 @@ struct ArchiveBrowserModelTests {
         player.isPlayingArchive = false
         #expect(model.nowPlayingShow == nil)
     }
+
+    @Test("A screen watching the playing show is told when playback starts, so the Back to live bar appears")
+    func playingShowIsObservable() async throws {
+        let catalog = FakeCatalog()
+        catalog.playback = ArchivePlayback(url: try #require(URL(string: "https://example.com/a.mp3")), offset: 0, nextURL: nil)
+        let model = try model(catalog)
+        let (changes, signal) = AsyncStream.makeStream(of: Void.self)
+        withObservationTracking {
+            _ = model.nowPlayingShow
+        } onChange: {
+            signal.yield()
+        }
+        await model.play(try show("1", "2026-11-05T07:00:00-08:00"))
+        signal.finish()
+        var changed = false
+        for await _ in changes { changed = true }
+        #expect(changed)
+    }
 }
