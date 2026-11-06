@@ -167,12 +167,6 @@ struct ArchiveProbeView: View {
 
     var body: some View {
         List {
-            Section {
-                Text(AppSection.archive.comingSoonMessage ?? "")
-                    .foregroundStyle(.secondary)
-            } header: {
-                Text("Archive (coming soon)")
-            }
             Section("Probe (debug builds only)") {
                 Button("Find a recent show") { Task { await probe.find() } }
                 Button("Play from the show's start") { Task { await probe.playFromStart() } }

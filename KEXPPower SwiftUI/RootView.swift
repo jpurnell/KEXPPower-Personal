@@ -66,11 +66,7 @@ struct SectionDestination: View {
         case .review:
             ReviewView(model: model)
         case .archive:
-            #if os(iOS) && DEBUG
-            ArchiveProbeView(model: model)
-            #else
-            ComingSoonView(section: section)
-            #endif
+            ArchiveView(model: model)
         case .playlists:
             ComingSoonView(section: section)
         }

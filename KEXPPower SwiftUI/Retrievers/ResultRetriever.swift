@@ -92,7 +92,10 @@ public class ResultRetriever {
 			let showResult = try await networkManager.getShow(limit: 1)
 			show = showResult.shows?.first ?? Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"])
 
-			await playerController.updateNowPlaying(KEXPMapping.nowPlaying(from: plays.first))
+			// An archived show is playing: the lock screen shows it, not the live song.
+			if !playerController.isPlayingArchive {
+				await playerController.updateNowPlaying(KEXPMapping.nowPlaying(from: plays.first))
+			}
 			await widgetPublisher.update(play: plays.first, show: show, isPlaying: publishedPlaying)
 		} catch {
 			logger.error("Refresh failed: \(error.localizedDescription, privacy: .public)")

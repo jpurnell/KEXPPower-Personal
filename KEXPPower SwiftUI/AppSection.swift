@@ -42,13 +42,12 @@ enum AppSection: String, CaseIterable, Identifiable, Hashable {
     }
 
     /// Whether the section is built yet.
-    var isAvailable: Bool { self == .live || self == .review }
+    var isAvailable: Bool { self != .playlists }
 
     /// What to tell the listener about a section that is not built yet, or `nil` once it is.
     var comingSoonMessage: String? {
         switch self {
-        case .live, .review: nil
-        case .archive: "Listen to a show from the last two weeks, from any point in it."
+        case .live, .archive, .review: nil
         case .playlists: "Save the songs you hear to a KEXP playlist in Apple Music."
         }
     }

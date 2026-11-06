@@ -27,15 +27,15 @@ struct AppSectionTests {
         #expect(AppSection.allCases.allSatisfy { !$0.systemImage.isEmpty })
     }
 
-    @Test("Live and Review are built; Archive and Playlists say they are coming")
+    @Test("Live, Archive and Review are built; Playlists says it is coming")
     func availability() {
         #expect(AppSection.live.isAvailable)
-        #expect(!AppSection.archive.isAvailable)
+        #expect(AppSection.archive.isAvailable)
         #expect(!AppSection.playlists.isAvailable)
         #expect(AppSection.review.isAvailable)
         #expect(AppSection.live.comingSoonMessage == nil)
+        #expect(AppSection.archive.comingSoonMessage == nil)
         #expect(AppSection.review.comingSoonMessage == nil)
-        #expect(AppSection.archive.comingSoonMessage?.isEmpty == false)
         #expect(AppSection.playlists.comingSoonMessage?.isEmpty == false)
     }
 
