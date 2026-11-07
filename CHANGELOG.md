@@ -23,7 +23,7 @@
 - `scripts/bootstrap.sh`: enables the git hooks after a fresh clone (`core.hooksPath` is per-clone config and cannot be committed) and checks that `swift` and `quality-gate` are installed. `CLAUDE.md` already described it; the script did not exist, so a fresh clone silently ran no hooks. Safe to run twice (checked in a fresh clone).
 
 ### Changed
-- Requires `StationKit` 0.7.0. The widget's publishing logic (save on change, heartbeat the playing flag, reload only when something changed) and the play-state expectation window moved into StationKit as `WidgetFeed` and `PlayStateExpectation`, so the watch app can share them; `WidgetPublisher` now only turns KEXP's plays and shows into a snapshot and delegates. Behaviour is unchanged: its tests pass as before, and the tests of the moved logic now live in StationKit.
+- Requires `StationKit` 0.11.0 and `StationKitAdapterKEXP` 0.7.0 (this started as `StationKit` 0.7.0 for the widget's publishing logic; the archive raised it). The widget's publishing logic (save on change, heartbeat the playing flag, reload only when something changed) and the play-state expectation window moved into StationKit as `WidgetFeed` and `PlayStateExpectation`, so the watch app can share them; `WidgetPublisher` now only turns KEXP's plays and shows into a snapshot and delegates. Behaviour is unchanged: its tests pass as before, and the tests of the moved logic now live in StationKit.
 
 ## 3.3.0 - 2026-11-05
 

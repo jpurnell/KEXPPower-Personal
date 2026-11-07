@@ -2,7 +2,7 @@
 
 **Status:** APPROVED 2026-11-03 (Phase 0 starts first) — revised 2026-11-03 (separate per-platform targets; generic StationKit repo; ISRC-based song matching; tvOS/watchOS kept ready) — awaiting approval
 **Date:** 2026-11-02
-**Delivery:** four phases, each independently shippable and each gated by its own tests. Phase D (archive) is design-only until the library's async `ArchiveManager` exists (iOS 27.2 follow-up).
+**Delivery:** four phases, each independently shippable and each gated by its own tests. Phase D (archive) was built instead on StationKit and the adapter, not on `ArchiveManager` (2026-11-06, `ADR-009`; see `ArchiveBrowser.md` for what shipped).
 **Not in scope:** the iOS 27 `NowPlaying` framework (on hold). The `NowPlayingPublishing` seam (ADR-003) keeps it a later, small change.
 
 ---

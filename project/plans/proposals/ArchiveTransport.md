@@ -1,6 +1,6 @@
 # Archive Transport: scrubber, skip, catch up to live
 
-**Status:** Proposed 2026-11-07. Follows `ArchiveBrowser.md` (the player that plays archived shows).
+**Status:** APPROVED 2026-11-07 and built, steps 1 to 4 (the scrubber, play/pause, back 15, forward 30, catch up to live; then, on the owner's requests, the time of day at the scrubber, the show's playlist with jump and add-to-playlist, the player over every section, and the slim live bar). Step 3, the lock-screen and CarPlay controls, needed StationKit 0.11.0 and is checked in tests only, awaiting a device. Live rewind (§5) became its own proposal: `LiveRewind.md`. Follows `ArchiveBrowser.md` (the player that plays archived shows).
 
 ## 1. Problem
 
@@ -53,7 +53,8 @@ All of this arithmetic goes in one pure type, `ArchiveTransport`, with no player
 
 ## 5. Not in this change
 
-- **Rewinding the live stream.** ESPN's "catch up to live" implies a live stream you can pause and rewind. KEXP's live
+- **Rewinding the live stream. Probed 2026-11-07: not possible through the archive** (KEXP has no audio for the show on the air; see `LiveRewind.md`, which also sets out what is possible). The original text follows.
+  **Rewinding the live stream.** ESPN's "catch up to live" implies a live stream you can pause and rewind. KEXP's live
   stream cannot; but the archive may cover the last few minutes (`get_streaming_url` takes a timestamp), which would let
   a "rewind 15 s" on live switch to the archive at `now − 15 s`, with the bolt coming back. It needs a probe: how close to
   "now" does the archive's file reach, and does it ever refuse? Decide after the probe; the transport here is built so it

@@ -1,6 +1,6 @@
 # Design Proposal: Archive browser (by Date, Host or Show) on iPhone, iPad, Mac, Vision Pro and CarPlay
 
-**Status:** PROPOSED 2026-11-05 (from the owner's CarPlay feedback: an Archive page that resembles the KEXP website, selectable by Date / Host / Show; screenshots of kexp.org/archive supplied)
+**Status:** APPROVED and built through phase (c) and its player (2026-11-06 and 07): (a) StationKit 0.9.0 and the adapter 0.5.0, (b) Date mode and playback, (c) Host, Show and Genre (host photos: StationKit 0.10.0, adapter 0.6.0), and `ArchiveTransport.md` (the player, the playlist, lock-screen controls). Not built: (d) a Mac layout of its own (the adaptive grid also serves the Mac, which has not been looked at) and (e) CarPlay's Archive tab. Decision record: `ADR-009`. Originally PROPOSED 2026-11-05 (from the owner's CarPlay feedback: an Archive page that resembles the KEXP website, selectable by Date / Host / Show; screenshots of kexp.org/archive supplied)
 **Date:** 2026-11-05
 **Master Plan Reference:** the "Archive" sidebar section (currently a placeholder), "Finish async `ArchiveManager`", and `CarPlayAudio.md` (the Archive tab).
 **Facts marked (live) were checked against `api.kexp.org` on 2026-11-05; (SDK) against the Xcode 27.2 SDK; (repo) in this repository or `KEXPPowerKit`. Anything not confirmed is marked *unverified*.**
