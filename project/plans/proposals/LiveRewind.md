@@ -1,6 +1,6 @@
 # Design Proposal: Pausing, rewinding and cushioning the live stream
 
-**Status:** DIRECTION AGREED 2026-11-07 (owner: "pause and resume and rewind if possible"; the use is a subway, with "a 5-10 minute cache"). Not yet approved to build: §8 has two questions that change what is built. Earlier the same day it was PROPOSED, from the request for "catch up to live" in the style of ESPN's app, and from `ArchiveTransport.md` §5, which held live rewind back until a probe said whether KEXP's archive could do it. **It cannot; see §2.**
+**Status:** DIRECTION AGREED 2026-11-07 (owner: "pause and resume and rewind if possible"; the use is a subway, with "a 5-10 minute cache"). APPROVED 2026-11-07 to build through Phase 0 (owner: "ok with the 10 minute window with the 5 minute rewind, and we should make that a setting"); §8 records the decisions. Earlier the same day it was PROPOSED, from the request for "catch up to live" in the style of ESPN's app, and from `ArchiveTransport.md` §5, which held live rewind back until a probe said whether KEXP's archive could do it. **It cannot; see §2.**
 **Date:** 2026-11-07
 **Master Plan Reference:** Roadmap, Phase 3 (Live rewind); `ArchiveTransport.md` §5 (superseded by this document).
 **Facts marked (live) were checked against `api.kexp.org` and `kexp.streamguys1.com` on 2026-11-07; (repo) in this repository or `KEXPPowerKit`. Anything not confirmed is marked *unverified*.**
@@ -138,14 +138,31 @@ media sequence as segments are dropped, and nothing served for a path outside th
 background behaviour, the latency, and riding through a dead zone: only on a device, and Phase 0 is built to find out
 early.
 
-## 8. Decisions for the owner
+## 8. Decisions
 
-1. **Window length.** Ten minutes is only 12 MB, so a 10-minute window with a 5-minute rewind button is proposed, and 5
-   minutes as a setting. Is that what you meant by "5-10 minutes"?
-2. **Latency.** Always playing through the buffer means "live" is six to ten seconds behind the direct stream. Is that
-   acceptable, or should live play directly until you first rewind or pause (which would mean you cannot rewind for the
-   first ten minutes of a listen, because nothing has been recorded yet)?
-3. **Asking KEXP about a live HLS stream first.** Not a blocker; it would simplify everything if they can.
+1. **Window length: decided 2026-11-07.** A 10-minute window with a 5-minute rewind button, **as a setting** (§10).
+2. **Latency: resolved by the setting.** The window setting has an **Off** choice, which plays the direct stream as today,
+   without the extra six to ten seconds and without rewind. On (5 or 10 minutes) plays live through the buffer. The
+   default is 10 minutes, since the owner wants the cushion; the first ten minutes of a listen have a shorter window,
+   which the scrubber shows. *Not asked of the owner directly; changing the default is a one-line change.*
+3. **Asking KEXP about a live HLS stream first.** Not a blocker; it would simplify everything if they can. Open.
+
+## 10. Settings
+
+The owner: "I think we are approaching a point where settings might start looking useful." The app has one setting today
+(stream quality, in Settings on macOS only). This feature needs the first one that matters on every platform, so it is
+also the moment to give the app a Settings screen. Proposed contents, only what the app can already do:
+
+- **Rewind window:** Off, 5 minutes, 10 minutes (default 10). The rewind button jumps back by the smaller of 5 minutes
+  and the window.
+- **Stream quality:** 64 kbps (data saver) or 160 kbps. It exists on the Mac; the iPhone and iPad have no way to choose it
+  today, and it changes the window's size on disk.
+- **Times in:** my time zone or the station's. The archive now shows times in the listener's zone while its days stay
+  Seattle's (`master_plan.md`, Known Problems); a choice lets a listener see one or the other.
+
+Where it lives: a screen on iOS and iPadOS (a gear in the sidebar or tab list), the system Settings scene on the Mac
+(which already has the quality control), and the values in `UserDefaults`, read through one small tested type. The
+screen is its own small design proposal when the window setting is built; this section only fixes what it must hold.
 
 ## 9. Documentation strategy
 
