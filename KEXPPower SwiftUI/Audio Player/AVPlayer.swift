@@ -256,6 +256,18 @@ import UniformTypeIdentifiers
             armEndWatch(for: item)
         }
 
+        /// Seconds into the archived file being played, or zero when there is none.
+        var archiveFileTime: TimeInterval {
+            guard isPlayingArchive, let seconds = player?.currentTime().seconds, seconds.isFinite else { return 0 }
+            return seconds
+        }
+
+        /// The length of the archived file being played so far, or zero when it is not yet known.
+        var archiveFileDuration: TimeInterval {
+            guard isPlayingArchive, let seconds = player?.currentItem?.duration.seconds, seconds.isFinite else { return 0 }
+            return seconds
+        }
+
         /// Moves within the archived file being played.
         /// - Parameter seconds: Seconds from the start of the file.
         func seekArchive(to seconds: TimeInterval) async {

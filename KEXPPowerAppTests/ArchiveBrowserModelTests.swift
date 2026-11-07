@@ -37,6 +37,12 @@ private final class FakeCatalog: ArchiveCatalog, @unchecked Sendable {
 @MainActor
 private final class FakePlayer: ArchivePlayer {
     var isPlayingArchive = false
+    var isPlaying = false
+    var archiveFileTime: TimeInterval = 0
+    var archiveFileDuration: TimeInterval = 0
+    private(set) var seeks: [TimeInterval] = []
+    private(set) var playCalls = 0
+    private(set) var pauseCalls = 0
     private(set) var played: [(URL, TimeInterval)] = []
     private(set) var announced: [NowPlaying] = []
     private(set) var returnedToLive = 0
@@ -57,6 +63,10 @@ private final class FakePlayer: ArchivePlayer {
     }
 
     func updateNowPlaying(_ nowPlaying: NowPlaying) async { announced.append(nowPlaying) }
+
+    func seekArchive(to seconds: TimeInterval) async { seeks.append(seconds) }
+    func playPlayer() { playCalls += 1 }
+    func pausePlayer() { pauseCalls += 1 }
 
     func returnToLive() {
         returnedToLive += 1
@@ -460,6 +470,138 @@ struct ArchiveBrowserModelTests {
         #expect(model.phase == .loaded)
         #expect(model.hosts.count == 2)
         #expect(model.hostPhoto(named: "Cheryl Waters") == nil)
+    }
+
+    // MARK: Transport
+
+    private let transportFile = "https://kexp-archive.streamguys1.com/content/kexp/20261105065008-1-1-the-morning-show.mp3"
+
+    /// The Morning Show (7:00, the first of three loaded) playing from a file that holds it from 778 s in; the next
+    /// loaded show, the Midday Show, begins three hours later.
+    private func playingMorning(duration: TimeInterval = 14_000, fileTime: TimeInterval = 0) async throws
+        -> (ArchiveBrowserModel, FakePlayer, FakeCatalog)
+    {
+        let catalog = try browsable()
+        catalog.playback = ArchivePlayback(url: try #require(URL(string: transportFile)), offset: 778, nextURL: nil)
+        let player = FakePlayer()
+        player.archiveFileDuration = duration
+        player.archiveFileTime = fileTime
+        let model = try model(catalog, player)
+        await model.load()
+        let morning = try #require(model.shows(for: .host("John Richards")).first)
+        await model.play(morning)
+        return (model, player, catalog)
+    }
+
+    @Test("The playing show's range runs from its offset in the file to where the next show begins")
+    func transportRange() async throws {
+        let (model, _, _) = try await playingMorning()
+        #expect(model.transport == ArchiveTransport(offset: 778, showLength: 10_800, fileDuration: 14_000))
+    }
+
+    @Test("The newest loaded show has no next show, so its range runs to the end of the file")
+    func transportNewestShow() async throws {
+        let catalog = try browsable()
+        catalog.playback = ArchivePlayback(url: try #require(URL(string: transportFile)), offset: 778, nextURL: nil)
+        let player = FakePlayer()
+        player.archiveFileDuration = 9_000
+        let model = try model(catalog, player)
+        await model.load()
+        let midday = try #require(model.shows(for: .day(try date("2026-11-05T00:00:00-08:00"))).last)
+        await model.play(midday)
+        #expect(model.transport == ArchiveTransport(offset: 778, showLength: nil, fileDuration: 9_000))
+    }
+
+    @Test("With nothing from the archive playing there is no transport")
+    func transportNothingPlaying() async throws {
+        let model = try model(try browsable())
+        await model.load()
+        #expect(model.transport == nil)
+    }
+
+    @Test("After rolling into the next show its range begins where that show begins in its own file")
+    func transportAfterRollOver() async throws {
+        let (model, player, _) = try await playingMorning()
+        let midday = try #require(model.shows(for: .host("Cheryl Waters")).first)
+        let file = try #require(URL(string: "https://kexp-archive.streamguys1.com/content/kexp/20261105095008-2-2-the-midday-show.mp3"))
+        await player.advanced?(.show(midday, file))
+        // The file began at 9:50:08 and the show at 10:00:00: 592 s in.
+        #expect(model.transport?.lowerBound == 592)
+    }
+
+    @Test("Skipping back 15 seconds seeks 15 seconds earlier in the file")
+    func skipBack() async throws {
+        let (model, player, _) = try await playingMorning(fileTime: 2_000)
+        await model.skip(by: -15)
+        #expect(player.seeks == [1_985])
+    }
+
+    @Test("Skipping forward 30 seconds seeks 30 seconds later")
+    func skipForward() async throws {
+        let (model, player, _) = try await playingMorning(fileTime: 2_000)
+        await model.skip(by: 30)
+        #expect(player.seeks == [2_030])
+    }
+
+    @Test("Skipping forward past the end of the show plays the next show from its start")
+    func skipPastEnd() async throws {
+        let (model, player, catalog) = try await playingMorning(fileTime: 778 + 10_790)
+        await model.skip(by: 30)
+        #expect(player.seeks.isEmpty)
+        #expect(catalog.playbackRequests == ["1", "2"])
+        #expect(model.nowPlayingShow?.id == "2")
+    }
+
+    @Test("Skipping forward past the end of the newest show goes back to live")
+    func skipPastEndOfNewest() async throws {
+        let catalog = try browsable()
+        catalog.playback = ArchivePlayback(url: try #require(URL(string: transportFile)), offset: 778, nextURL: nil)
+        let player = FakePlayer()
+        player.archiveFileDuration = 9_000
+        player.archiveFileTime = 8_990
+        let model = try model(catalog, player)
+        await model.load()
+        let midday = try #require(model.shows(for: .day(try date("2026-11-05T00:00:00-08:00"))).last)
+        await model.play(midday)
+        await model.skip(by: 30)
+        #expect(player.returnedToLive == 1)
+    }
+
+    @Test("Scrubbing to half way through seeks half the show's length past its start")
+    func scrub() async throws {
+        let (model, player, _) = try await playingMorning()
+        await model.scrub(toFraction: 0.5)
+        #expect(player.seeks == [778 + 5_400])
+    }
+
+    @Test("Scrubbing to the very end plays the next show")
+    func scrubToEnd() async throws {
+        let (model, player, catalog) = try await playingMorning()
+        await model.scrub(toFraction: 1)
+        #expect(player.seeks.isEmpty)
+        #expect(catalog.playbackRequests == ["1", "2"])
+    }
+
+    @Test("Skipping or scrubbing with nothing from the archive playing does nothing")
+    func movesWithNothingPlaying() async throws {
+        let player = FakePlayer()
+        let model = try model(try browsable(), player)
+        await model.load()
+        await model.skip(by: 30)
+        await model.scrub(toFraction: 0.5)
+        #expect(player.seeks.isEmpty)
+        #expect(player.returnedToLive == 0)
+    }
+
+    @Test("The play button pauses what is playing, and plays what is paused")
+    func togglePause() async throws {
+        let (model, player, _) = try await playingMorning()
+        player.isPlaying = true
+        model.togglePause()
+        #expect(player.pauseCalls == 1)
+        player.isPlaying = false
+        model.togglePause()
+        #expect(player.playCalls == 1)
     }
 
     @Test("A selection means the shows of that host, program, genre or day")

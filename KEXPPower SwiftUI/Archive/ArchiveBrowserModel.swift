@@ -12,6 +12,18 @@ import StationKit
 protocol ArchivePlayer: AnyObject {
     /// Whether the player holds an archived show instead of the live stream.
     var isPlayingArchive: Bool { get }
+    /// Whether the player is playing, as opposed to paused.
+    var isPlaying: Bool { get }
+    /// Seconds into the archived file being played; zero when nothing is known.
+    var archiveFileTime: TimeInterval { get }
+    /// The length of the archived file so far; zero when nothing is known.
+    var archiveFileDuration: TimeInterval { get }
+    /// Moves within the archived file.
+    func seekArchive(to seconds: TimeInterval) async
+    /// Starts or resumes playing.
+    func playPlayer()
+    /// Pauses.
+    func pausePlayer()
     /// Plays an archived file from an offset in place of the live stream.
     func playArchive(url: URL, at offset: TimeInterval) async
     /// Tells the system what is playing.
@@ -149,6 +161,8 @@ final class ArchiveBrowserModel {
     private(set) var notice: String?
 
     private var playing: ArchiveShow?
+    /// Where `playing` begins in the file being heard, in seconds, or `nil` if that is not known.
+    @ObservationIgnored private var playingOffset: TimeInterval?
     @ObservationIgnored private var index = ArchiveIndex(shows: [])
     @ObservationIgnored private let catalog: any ArchiveCatalog
     @ObservationIgnored private let player: any ArchivePlayer
@@ -214,11 +228,7 @@ final class ArchiveBrowserModel {
                 notice = "That show is no longer available."
                 return
             }
-            await player.playArchive(url: playback.url, at: playback.offset)
-            await announce(show)
-            playing = show
-            notice = nil
-            armContinuation()
+            await start(show, file: playback.url, at: playback.offset)
         } catch {
             notice = "That show could not be started. Check your connection and try again."
         }
@@ -269,11 +279,64 @@ final class ArchiveBrowserModel {
         }
     }
 
+    /// The range of the show being heard, for the player's scrubber and skip buttons; `nil` when no archived show is
+    /// playing or where it begins in the file is not known.
+    var transport: ArchiveTransport? {
+        guard let show = nowPlayingShow, let offset = playingOffset else { return nil }
+        let length = nextShow(after: show).map { $0.startTime.timeIntervalSince(show.startTime) }
+        return ArchiveTransport(offset: offset, showLength: length, fileDuration: player.archiveFileDuration)
+    }
+
+    /// Jumps back or forward within the show; past its end, goes on to the next show, or to live.
+    /// - Parameter seconds: How far to move; negative to go back.
+    func skip(by seconds: TimeInterval) async {
+        guard let transport else { return }
+        await move(to: transport.target(skipping: seconds, from: player.archiveFileTime))
+    }
+
+    /// Jumps to a place in the show; its very end goes on to the next show, or to live.
+    /// - Parameter fraction: 0 for the start of the show, 1 for its end.
+    func scrub(toFraction fraction: Double) async {
+        guard let transport else { return }
+        await move(to: transport.target(fraction: fraction))
+    }
+
+    /// Pauses what is playing, or plays what is paused.
+    func togglePause() {
+        if player.isPlaying { player.pausePlayer() } else { player.playPlayer() }
+    }
+
+    /// Plays a show's file from an offset and takes it as the show being heard.
+    private func start(_ show: ArchiveShow, file: URL, at offset: TimeInterval) async {
+        await player.playArchive(url: file, at: offset)
+        await announce(show)
+        playingOffset = offset
+        playing = show
+        notice = nil
+        armContinuation()
+    }
+
+    private func move(to target: ArchiveTransport.Target) async {
+        switch target {
+        case .within(let fileTime):
+            await player.seekArchive(to: fileTime)
+        case .end:
+            guard let show = playing else { return }
+            switch await continuation(after: show) {
+            case .show(let next, let file):
+                let offset = ArchiveTiming.fileStart(of: file).map { max(0, next.startTime.timeIntervalSince($0)) } ?? 0
+                await start(next, file: file, at: offset)
+            case .live: returnToLive()
+            }
+        }
+    }
+
     /// Stops the archived show and goes back to the live stream.
     func returnToLive() {
         player.setContinuation(nil, advanced: nil)
         player.returnToLive()
         playing = nil
+        playingOffset = nil
     }
 
     private func announce(_ show: ArchiveShow) async {
@@ -296,11 +359,14 @@ final class ArchiveBrowserModel {
     /// The player has rolled over: into the next show, or onto the live stream.
     private func advanced(to plan: ArchiveContinuation) async {
         switch plan {
-        case .show(let next, _):
+        case .show(let next, let file):
+            // The next show begins as far into its own file as the show's start is after the file's.
+            playingOffset = ArchiveTiming.fileStart(of: file).map { next.startTime.timeIntervalSince($0) }
             playing = next
             await announce(next)
         case .live:
             playing = nil
+            playingOffset = nil
         }
     }
 }
