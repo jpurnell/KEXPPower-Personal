@@ -1,3 +1,9 @@
+consistency:
+  corpusPath: /Users/jpurnell/Dropbox/Computer/Development/Swift/Tools/org-judgement-corpus
+  projectID: KEXPPower
+  consistencyThreshold: 0.7
+  defaultRiskTier: 2
+
 # `excludedCheckers` and `enabledCheckers`, not `exclude` and `checkers`.
 #
 # The gate ignores keys it does not recognise, so the superseded names produced a file
@@ -23,7 +29,3 @@ status:
   guidelinesPath: "."
   masterPlanPath: project/master_plan.md
 
-# No org-judgement-corpus clone was found, so the consistency and ijs sections are
-# omitted rather than pointed at a path that does not exist. Clone it next to this
-# project (or anywhere, with ORG_JUDGEMENT_CORPUS) and re-run setup, or add
-# `consistency:` and `ijs:` here with its `corpusPath`.
