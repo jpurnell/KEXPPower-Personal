@@ -114,9 +114,26 @@ final class SongSavingModel {
         return play.id != nil && KEXPMapping.track(from: play) != nil
     }
 
+    /// The KEXP play a track came from: the adapter names tracks `kexp-<play id>`. Saved state is kept by play, so a
+    /// song saved on Live and the same song in the archive are one.
+    static func playID(of track: Track) -> Int? {
+        guard track.id.hasPrefix("kexp-") else { return nil }
+        return Int(track.id.dropFirst("kexp-".count))
+    }
+
+    /// Whether a track can be saved: it came from a KEXP play.
+    static func canSave(_ track: Track) -> Bool {
+        playID(of: track) != nil
+    }
+
     /// Where a play is in being saved.
     func state(for play: Play) -> SaveState {
         play.id.flatMap { states[$0] } ?? .idle
+    }
+
+    /// Where a track is in being saved.
+    func state(for track: Track) -> SaveState {
+        Self.playID(of: track).flatMap { states[$0] } ?? .idle
     }
 
     /// Whether a play is already in the listener's playlists, so it need not be held for review.
@@ -132,13 +149,23 @@ final class SongSavingModel {
     ///   - holdingGuesses: `true` from the car: a text match is put in the review queue instead of asking, because
     ///     nobody can answer a prompt while driving. An exact match is added either way.
     func save(_ play: Play, alsoTo extra: PlaylistSummary? = nil, holdingGuesses: Bool = false) async {
-        guard Self.canSave(play), let id = play.id, let track = KEXPMapping.track(from: play) else { return }
+        guard Self.canSave(play), let track = KEXPMapping.track(from: play) else { return }
+        await save(track, alsoTo: extra, holdingGuesses: holdingGuesses)
+    }
+
+    /// Saves a track to the default playlist, and to a second one if given.
+    /// - Parameters:
+    ///   - track: The song to save; one that did not come from a KEXP play is ignored.
+    ///   - extra: A second playlist to add it to as well.
+    ///   - holdingGuesses: As for a play.
+    func save(_ track: Track, alsoTo extra: PlaylistSummary? = nil, holdingGuesses: Bool = false) async {
+        guard let id = Self.playID(of: track) else { return }
         guard states[id] != .saving else { return }
         states[id] = .saving
         let outcome = await saveTrack(track, extra)
         apply(outcome, to: id, extra: extra)
         if holdingGuesses, case .needsConfirmation(let song) = outcome {
-            await holdForReview(song, for: play)
+            await holdForReview(song, for: track)
         }
         if outcome != .notAuthorized { await refreshPlaylistChoices() }
     }
@@ -150,7 +177,13 @@ final class SongSavingModel {
     ///   - song: Apple Music's suggestion.
     ///   - play: The KEXP play it was matched to.
     func holdForReview(_ song: CatalogSong, for play: Play) async {
-        guard let id = play.id, let queue = reviewQueue, let track = KEXPMapping.track(from: play) else { return }
+        guard let track = KEXPMapping.track(from: play) else { return }
+        await holdForReview(song, for: track)
+    }
+
+    /// Puts a suggested match for a track in the review queue, to be checked later.
+    func holdForReview(_ song: CatalogSong, for track: Track) async {
+        guard let id = Self.playID(of: track), let queue = reviewQueue else { return }
         let held = ReviewQueue.Held(
             playID: id, playedTitle: track.title, playedArtist: track.displayArtist, playedAlbum: track.album,
             playedArtworkURL: track.artworkURL, candidate: song,
@@ -182,11 +215,17 @@ final class SongSavingModel {
     ///   - play: The play to save.
     ///   - name: The new playlist's name; blank names are ignored.
     func save(_ play: Play, toNewPlaylistNamed name: String) async {
+        guard let track = KEXPMapping.track(from: play) else { return }
+        await save(track, toNewPlaylistNamed: name)
+    }
+
+    /// Makes a playlist with a name and saves a track to it as well as to the default one.
+    func save(_ track: Track, toNewPlaylistNamed name: String) async {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty, let id = play.id, KEXPMapping.track(from: play) != nil else { return }
+        guard !trimmed.isEmpty, let id = Self.playID(of: track) else { return }
         do {
             let made = try await createPlaylist(trimmed)
-            await save(play, alsoTo: made)
+            await save(track, alsoTo: made)
         } catch {
             states[id] = .unavailable
         }
@@ -195,6 +234,16 @@ final class SongSavingModel {
     /// Saves the song the listener confirmed after a text match.
     func confirm(_ song: CatalogSong, for play: Play, alsoTo extra: PlaylistSummary? = nil) async {
         guard let id = play.id else { return }
+        await confirm(song, playID: id, alsoTo: extra)
+    }
+
+    /// Saves the song the listener confirmed for a track after a text match.
+    func confirm(_ song: CatalogSong, for track: Track, alsoTo extra: PlaylistSummary? = nil) async {
+        guard let id = Self.playID(of: track) else { return }
+        await confirm(song, playID: id, alsoTo: extra)
+    }
+
+    private func confirm(_ song: CatalogSong, playID id: Int, alsoTo extra: PlaylistSummary?) async {
         let second = extra ?? pendingExtras[id]
         states[id] = .saving
         let outcome = await confirmSong(song, second)
@@ -203,7 +252,18 @@ final class SongSavingModel {
 
     /// The listener said the suggested song is not the right one.
     func dismissConfirmation(for play: Play) {
-        guard let id = play.id, case .confirming = states[id] else { return }
+        guard let id = play.id else { return }
+        dismissConfirmation(playID: id)
+    }
+
+    /// The listener said the suggested song for a track is not the right one.
+    func dismissConfirmation(for track: Track) {
+        guard let id = Self.playID(of: track) else { return }
+        dismissConfirmation(playID: id)
+    }
+
+    private func dismissConfirmation(playID id: Int) {
+        guard case .confirming = states[id] else { return }
         states[id] = nil
         pendingExtras[id] = nil
     }

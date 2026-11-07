@@ -5,25 +5,37 @@
 
 import KEXPPower
 import StationKit
+import StationKitAdapterKEXP
 import SwiftUI
 
 /// The button on a play that adds the song to the KEXP playlist: a tap adds it, and a press and hold offers another
 /// playlist to add it to as well, or a new one.
 struct SaveButton: View {
-    let play: Play
+    /// The song, as the saver knows it; `nil` for something that is not a song, which leaves the button doing nothing.
+    private let track: Track?
+
+    /// A button for a KEXP play, as on Live.
+    init(play: Play?) {
+        track = play.flatMap { KEXPMapping.track(from: $0) }
+    }
+
+    /// A button for an archived song.
+    init(track: Track?) {
+        self.track = track
+    }
 
     @Environment(SongSavingModel.self) private var model
     @State private var showingNewPlaylist = false
     @State private var newPlaylistName = ""
 
     var body: some View {
-        let state = model.state(for: play)
+        let state = track.map { model.state(for: $0) } ?? .idle
         Menu {
             if model.playlistChoices.isEmpty {
                 Text("Other playlists appear after your first save")
             } else {
                 ForEach(model.playlistChoices) { playlist in
-                    Button(playlist.name) { Task { await model.save(play, alsoTo: playlist) } }
+                    Button(playlist.name) { save(alsoTo: playlist) }
                 }
             }
             Divider()
@@ -37,24 +49,28 @@ struct SaveButton: View {
                 .frame(minWidth: 44, minHeight: 44)
                 .contentShape(Rectangle())
         } primaryAction: {
-            Task { await model.save(play) }
+            save(alsoTo: nil)
         }
         .menuIndicator(.hidden)
         .buttonStyle(.plain)
-        .disabled(state == .saving)
+        .disabled(track == nil || state == .saving)
         .accessibilityLabel(state.accessibilityLabel)
         .accessibilityHint("Touch and hold to add to another playlist")
         .alert("New Playlist", isPresented: $showingNewPlaylist) {
             TextField("Name", text: $newPlaylistName)
-            Button("Create") { Task { await model.save(play, toNewPlaylistNamed: newPlaylistName) } }
+            Button("Create") {
+                guard let track else { return }
+                let name = newPlaylistName
+                Task { await model.save(track, toNewPlaylistNamed: name) }
+            }
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("The song is added to KEXP and to this playlist.")
         }
         .alert("Is this the song?", isPresented: confirming, presenting: confirmingSong) { song in
-            Button("Add") { Task { await model.confirm(song, for: play) } }
-            Button("Review later") { Task { await model.holdForReview(song, for: play) } }
-            Button("Not this one", role: .cancel) { model.dismissConfirmation(for: play) }
+            Button("Add") { if let track { Task { await model.confirm(song, for: track) } } }
+            Button("Review later") { if let track { Task { await model.holdForReview(song, for: track) } } }
+            Button("Not this one", role: .cancel) { if let track { model.dismissConfirmation(for: track) } }
         } message: { song in
             Text(description(of: song))
         }
@@ -62,14 +78,20 @@ struct SaveButton: View {
 
     /// The song waiting for a yes or no, if the play is in that state.
     private var confirmingSong: CatalogSong? {
-        if case .confirming(let song) = model.state(for: play) { return song }
+        guard let track else { return nil }
+        if case .confirming(let song) = model.state(for: track) { return song }
         return nil
     }
 
     private var confirming: Binding<Bool> {
         Binding(
             get: { confirmingSong != nil },
-            set: { if !$0 { model.dismissConfirmation(for: play) } })
+            set: { if !$0, let track { model.dismissConfirmation(for: track) } })
+    }
+
+    private func save(alsoTo playlist: PlaylistSummary?) {
+        guard let track else { return }
+        Task { await model.save(track, alsoTo: playlist) }
     }
 
     private func description(of song: CatalogSong) -> String {

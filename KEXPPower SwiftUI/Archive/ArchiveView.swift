@@ -262,7 +262,7 @@ private struct ShowRow: View {
                 if !show.hostNames.isEmpty {
                     Text(ListFormatter.localizedString(byJoining: show.hostNames)).font(.subheadline)
                 }
-                Text(showsDay ? ArchiveTiming.dayAndClock(show.startTime) : ArchiveTiming.clock(show.startTime))
+                Text(showsDay ? ArchiveTiming.dayAndClock(show.startTime, zone: .autoupdatingCurrent) : ArchiveTiming.clock(show.startTime, zone: .autoupdatingCurrent))
                     .font(.caption).foregroundStyle(.secondary)
                 if let tagline = show.tagline {
                     Text(tagline).font(.caption).foregroundStyle(.secondary).lineLimit(2)

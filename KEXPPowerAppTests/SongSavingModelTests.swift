@@ -198,3 +198,62 @@ struct SongSavingModelNewPlaylistTests {
         #expect(model.state(for: play) == .unavailable)
     }
 }
+
+@MainActor
+@Suite("SongSavingModel with archive tracks")
+struct SongSavingModelTrackTests {
+    /// An archived song, as the adapter maps KEXP's play 42.
+    private let archived = Track(id: "kexp-42", title: "Bleeding Blue", credits: [Credit(role: .performer, name: "Cults")])
+
+    @Test("A track can be saved when its id says which KEXP play it came from")
+    func canSave() {
+        #expect(SongSavingModel.canSave(archived))
+        #expect(!SongSavingModel.canSave(Track(id: "apple-1", title: "A Song")))
+        #expect(!SongSavingModel.canSave(Track(id: "kexp-x", title: "A Song")))
+    }
+
+    @Test("Saving a track hands it to the saver and records where it went")
+    func saveTrack() async {
+        let calls = Calls()
+        let model = makeModel(outcome: .finished(wanted, added: [kexp], failed: []), calls: calls)
+        await model.save(archived)
+        #expect(model.state(for: archived) == .saved(playlists: ["KEXP"], failedPlaylists: []))
+        #expect(await calls.saved.map(\.track) == ["kexp-42"])
+    }
+
+    @Test("A song saved from the archive shows as saved on Live, and the other way round: they are one play")
+    func sharedWithLive() async {
+        let model = makeModel(outcome: .finished(wanted, added: [kexp], failed: []))
+        await model.save(archived)
+        #expect(model.state(for: play) == .saved(playlists: ["KEXP"], failedPlaylists: []))
+        let other = makeModel(outcome: .alreadySaved(wanted))
+        await other.save(play)
+        #expect(other.state(for: archived) == .saved(playlists: [], failedPlaylists: []))
+    }
+
+    @Test("A track that did not come from a KEXP play is not sent to the saver")
+    func notSaveable() async {
+        let calls = Calls()
+        let model = makeModel(outcome: .notFound, calls: calls)
+        await model.save(Track(id: "apple-1", title: "A Song"))
+        #expect(await calls.saved.isEmpty)
+    }
+
+    @Test("A text match for a track is asked about, and confirming it saves it")
+    func confirmTrack() async {
+        let calls = Calls()
+        let model = makeModel(outcome: .needsConfirmation(wanted), calls: calls)
+        await model.save(archived)
+        #expect(model.state(for: archived) == .confirming(wanted))
+        await model.confirm(wanted, for: archived)
+        #expect(await calls.confirmed.map(\.song) == ["cat-1"])
+    }
+
+    @Test("Saying a suggested match is wrong clears the question")
+    func dismissTrack() async {
+        let model = makeModel(outcome: .needsConfirmation(wanted))
+        await model.save(archived)
+        model.dismissConfirmation(for: archived)
+        #expect(model.state(for: archived) == .idle)
+    }
+}

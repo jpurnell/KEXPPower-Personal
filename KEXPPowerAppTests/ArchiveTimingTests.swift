@@ -96,6 +96,14 @@ struct ArchiveTimingTests {
         #expect(ArchiveTiming.clock(try date("2026-07-15T14:09:05-07:00")) == "2:09:05 PM PDT")
     }
 
+    @Test("A clock can be read in the listener's zone instead: the same instant is 8:01:32 AM EST in New York")
+    func clockInListenerZone() throws {
+        let aired = try date("2026-11-06T05:01:32-08:00")
+        let eastern = try #require(TimeZone(identifier: "America/New_York"))
+        #expect(ArchiveTiming.clock(aired, zone: eastern) == "8:01:32 AM EST")
+        #expect(ArchiveTiming.dayAndClock(aired, zone: eastern) == "Fri Nov 6, 8:01 AM EST")
+    }
+
     @Test("A position reads minutes and seconds, with hours once it passes an hour")
     func positionText() {
         #expect(ArchiveTiming.positionText(685) == "11:25")

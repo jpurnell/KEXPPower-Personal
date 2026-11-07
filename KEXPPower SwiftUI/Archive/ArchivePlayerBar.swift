@@ -85,7 +85,7 @@ struct ArchivePlayerBar: View {
                     Spacer()
                     if let aired = browser.airTime(atFileTime: shownFileTime) {
                         // What the clock on the studio wall read, for finding "the thing at 12:15".
-                        Text(ArchiveTiming.clock(aired)).foregroundStyle(.primary)
+                        Text(ArchiveTiming.clock(aired, zone: .autoupdatingCurrent)).foregroundStyle(.primary)
                     }
                     Spacer()
                     Text(transport.remainingText(atFileTime: shownFileTime))
@@ -177,15 +177,21 @@ private struct ArchivePlaylistView: View {
             TimelineView(.periodic(from: .now, by: 1)) { _ in
                 let current = browser.currentTrack(atFileTime: browser.fileTime)?.id
                 List(browser.tracks) { track in
-                    Button {
-                        Task {
-                            await browser.seek(to: track)
-                            dismiss()
+                    HStack {
+                        Button {
+                            Task {
+                                await browser.seek(to: track)
+                                dismiss()
+                            }
+                        } label: {
+                            TrackRow(track: track, isCurrent: track.id == current)
                         }
-                    } label: {
-                        TrackRow(track: track, isCurrent: track.id == current)
+                        .buttonStyle(.plain)
+                        // Beside the jump button, not inside it, so a tap on either does one thing.
+                        if AppSongSaver.canSaveToPlaylists, SongSavingModel.canSave(track) {
+                            SaveButton(track: track)
+                        }
                     }
-                    .buttonStyle(.plain)
                     .id(track.id)
                 }
                 .onAppear {
@@ -203,7 +209,7 @@ private struct TrackRow: View {
     var body: some View {
         HStack(spacing: 12) {
             if let aired = track.airDate {
-                Text(ArchiveTiming.clock(aired)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                Text(ArchiveTiming.clock(aired, zone: .autoupdatingCurrent)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                     .frame(width: 96, alignment: .leading)
             }
             VStack(alignment: .leading, spacing: 2) {
