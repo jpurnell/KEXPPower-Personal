@@ -82,21 +82,37 @@ struct SectionDestination: View {
             // Inside each section, not around the whole layout: a tab or split view does not pass the inset on, so a bar
             // there would float over the content instead of making room.
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                switch PlayerBarKind.kind(
-                    archiveShow: archive.nowPlayingShow, liveHasPlayed: model.playerController.hasPlayed, in: section)
-                {
-                case .archive(let show):
-                    ArchivePlayerBar(show: show, browser: archive)
-                        .padding(.horizontal)
-                        .padding(.vertical, 6)
-                case .live:
-                    LivePlayerBar(player: model.playerController)
-                        .padding(.horizontal)
-                        .padding(.vertical, 6)
-                case .none:
-                    EmptyView()
-                }
+                playerBar
             }
+    }
+
+    /// The bar for what is playing, on a solid background so it reads as a strip of its own beneath the content, not
+    /// as something laid over a list that scrolls beneath it.
+    @ViewBuilder
+    private var playerBar: some View {
+        let kind = PlayerBarKind.kind(
+            archiveShow: archive.nowPlayingShow, liveHasPlayed: model.playerController.hasPlayed, in: section)
+        if kind != .none {
+            VStack(spacing: 0) {
+                Divider()
+                bar(for: kind)
+                    .padding(.horizontal)
+                    .padding(.vertical, 6)
+            }
+            .background(.bar, ignoresSafeAreaEdges: .bottom)
+        }
+    }
+
+    @ViewBuilder
+    private func bar(for kind: PlayerBarKind) -> some View {
+        switch kind {
+        case .archive(let show):
+            ArchivePlayerBar(show: show, browser: archive)
+        case .live:
+            LivePlayerBar(player: model.playerController)
+        case .none:
+            EmptyView()
+        }
     }
 
     @ViewBuilder
