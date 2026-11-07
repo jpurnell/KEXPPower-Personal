@@ -593,6 +593,18 @@ struct ArchiveBrowserModelTests {
         #expect(player.returnedToLive == 0)
     }
 
+    @Test("The model reports the player's position in the file and whether it is playing, for the bar to show")
+    func reportsPlayerState() async throws {
+        let (model, player, _) = try await playingMorning(fileTime: 2_000)
+        player.isPlaying = true
+        #expect(model.isPlaying)
+        #expect(model.fileTime == 2_000)
+        player.archiveFileTime = 2_500
+        player.isPlaying = false
+        #expect(!model.isPlaying)
+        #expect(model.fileTime == 2_500)
+    }
+
     @Test("The play button pauses what is playing, and plays what is paused")
     func togglePause() async throws {
         let (model, player, _) = try await playingMorning()

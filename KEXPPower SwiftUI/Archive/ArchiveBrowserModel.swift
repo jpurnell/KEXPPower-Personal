@@ -287,6 +287,12 @@ final class ArchiveBrowserModel {
         return ArchiveTransport(offset: offset, showLength: length, fileDuration: player.archiveFileDuration)
     }
 
+    /// Whether the player is playing, as opposed to paused.
+    var isPlaying: Bool { player.isPlaying }
+
+    /// Where the player is in the file being heard, in seconds; read by the bar's clock rather than observed.
+    var fileTime: TimeInterval { player.archiveFileTime }
+
     /// Jumps back or forward within the show; past its end, goes on to the next show, or to live.
     /// - Parameter seconds: How far to move; negative to go back.
     func skip(by seconds: TimeInterval) async {
