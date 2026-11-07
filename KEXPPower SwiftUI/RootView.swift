@@ -29,13 +29,6 @@ struct RootView: View {
 
     var body: some View {
         layout
-            .safeAreaInset(edge: .bottom) {
-                if let show = archive.nowPlayingShow {
-                    ArchivePlayerBar(show: show, browser: archive)
-                        .padding(.horizontal)
-                        .padding(.bottom, 4)
-                }
-            }
     }
 
     @ViewBuilder
@@ -85,6 +78,20 @@ struct SectionDestination: View {
     let archive: ArchiveBrowserModel
 
     var body: some View {
+        content
+            // Inside each section, not around the whole layout: a tab or split view does not pass the inset on, so a bar
+            // there would float over the content instead of making room.
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if let show = archive.nowPlayingShow {
+                    ArchivePlayerBar(show: show, browser: archive)
+                        .padding(.horizontal)
+                        .padding(.vertical, 6)
+                }
+            }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         switch section {
         case .live:
             ContentView(resultsRetriever: model)
