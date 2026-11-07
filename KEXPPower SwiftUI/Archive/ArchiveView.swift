@@ -63,6 +63,9 @@ struct ArchiveView: View {
         #endif
     }
 
+    /// One column on a phone; as many 320-point columns as fit on an iPad or Mac.
+    private static let cardColumns = [GridItem(.adaptive(minimum: 320), spacing: 8)]
+
     private var header: some View {
         HStack {
             if selection != nil {
@@ -120,7 +123,7 @@ struct ArchiveView: View {
     }
 
     private var hostList: some View {
-        LazyVStack(spacing: 8) {
+        LazyVGrid(columns: Self.cardColumns, spacing: 8) {
             ForEach(browser.hosts) { host in
                 CardButton(
                     title: host.name,
@@ -134,7 +137,7 @@ struct ArchiveView: View {
     }
 
     private var programList: some View {
-        LazyVStack(spacing: 8) {
+        LazyVGrid(columns: Self.cardColumns, spacing: 8) {
             ForEach(browser.programs) { program in
                 CardButton(
                     title: program.name,
@@ -148,7 +151,7 @@ struct ArchiveView: View {
     }
 
     private var genreList: some View {
-        LazyVStack(spacing: 8) {
+        LazyVGrid(columns: Self.cardColumns, spacing: 8) {
             ForEach(browser.genres) { genre in
                 CardButton(title: genre.name, subtitle: "", count: genre.showCount) { selection = .genre(genre.name) }
             }
