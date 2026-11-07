@@ -48,6 +48,7 @@ private final class FakePlayer: ArchivePlayer {
     var archiveFileTime: TimeInterval = 0
     var archiveFileDuration: TimeInterval = 0
     private(set) var seeks: [TimeInterval] = []
+    private(set) var transportControls: ArchiveTransportControls?
     private(set) var playCalls = 0
     private(set) var pauseCalls = 0
     private(set) var played: [(URL, TimeInterval)] = []
@@ -72,6 +73,7 @@ private final class FakePlayer: ArchivePlayer {
     func updateNowPlaying(_ nowPlaying: NowPlaying) async { announced.append(nowPlaying) }
 
     func seekArchive(to seconds: TimeInterval) async { seeks.append(seconds) }
+    func setTransportControls(_ controls: ArchiveTransportControls?) { transportControls = controls }
     func playPlayer() { playCalls += 1 }
     func pausePlayer() { pauseCalls += 1 }
 
@@ -725,6 +727,73 @@ struct ArchiveBrowserModelTests {
         #expect(model.currentTrack(atFileTime: 778 + 250)?.id == "b")
         #expect(model.currentTrack(atFileTime: 778 + 3_000)?.id == "c")
     }
+
+    // MARK: System transport controls
+
+    @Test("While an archived show plays the player is given controls for the lock screen and the car")
+    func providesTransportControls() async throws {
+        let (_, player, _) = try await playingMorning()
+        #expect(player.transportControls != nil)
+    }
+
+    @Test("Going back to live takes the controls away")
+    func removesTransportControlsOnLive() async throws {
+        let (model, player, _) = try await playingMorning()
+        model.returnToLive()
+        #expect(player.transportControls == nil)
+    }
+
+    @Test("Rolling onto the live stream takes the controls away; rolling into the next show keeps them")
+    func transportControlsOnRollOver() async throws {
+        let (model, player, _) = try await playingMorning()
+        let midday = try #require(model.shows(for: .host("Cheryl Waters")).first)
+        let file = try #require(URL(string: "https://kexp-archive.streamguys1.com/content/kexp/20261105095008-2-2-the-midday-show.mp3"))
+        await player.advanced?(.show(midday, file))
+        #expect(player.transportControls != nil)
+        await player.advanced?(.live)
+        #expect(player.transportControls == nil)
+    }
+
+    @Test("The timeline is how far into the show the player is and how long the show is, not file times")
+    func timeline() async throws {
+        let (model, _, _) = try await playingMorning(fileTime: 778 + 125)
+        #expect(model.timeline() == PlaybackTimeline(elapsed: 125, duration: 10_800))
+    }
+
+    @Test("With nothing from the archive playing there is no timeline")
+    func timelineNothingPlaying() async throws {
+        let model = try model(try browsable())
+        await model.load()
+        #expect(model.timeline() == nil)
+    }
+
+    @Test("A skip from the system moves the player the same way as the on-screen button")
+    func systemSkip() async throws {
+        let (model, player, _) = try await playingMorning(fileTime: 2_000)
+        await player.transportControls?.skip(-15)
+        #expect(player.seeks == [1_985])
+        withExtendedLifetime(model) {}
+    }
+
+
+    @Test("A scrub from the system seeks to that position in the show")
+    func systemSeek() async throws {
+        let (model, player, _) = try await playingMorning()
+        await player.transportControls?.seek(3_600)
+        #expect(player.seeks == [778 + 3_600])
+        withExtendedLifetime(model) {}
+    }
+
+
+    @Test("The timeline the controls report follows the player's place in the show")
+    func controlsTimeline() async throws {
+        let (model, player, _) = try await playingMorning(fileTime: 778 + 60)
+        #expect(player.transportControls?.timeline() == PlaybackTimeline(elapsed: 60, duration: 10_800))
+        player.archiveFileTime = 778 + 90
+        #expect(player.transportControls?.timeline() == PlaybackTimeline(elapsed: 90, duration: 10_800))
+        withExtendedLifetime(model) {}
+    }
+
 
     @Test("The play button pauses what is playing, and plays what is paused")
     func togglePause() async throws {

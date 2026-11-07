@@ -43,6 +43,11 @@ import UniformTypeIdentifiers
         @ObservationIgnored private let liveTimer = TaskHolder()
         /// How far from the end of an archived file the next item is lined up, so it is loaded before it is needed.
         static let handoffLead: TimeInterval = 30
+        /// How far the system's skip buttons move: a short rewind and a longer skip forward.
+        static let skipBack: TimeInterval = 15
+        static let skipForward: TimeInterval = 30
+        /// What the system may ask of an archived show; `nil` on the live stream.
+        @ObservationIgnored private var transportControls: ArchiveTransportControls?
         @ObservationIgnored private var continuation: (@MainActor () async -> ArchiveContinuation)?
         @ObservationIgnored private var onAdvanced: (@MainActor (ArchiveContinuation) async -> Void)?
         @ObservationIgnored private var queued: (item: AVPlayerItem, plan: ArchiveContinuation)?
@@ -141,6 +146,7 @@ import UniformTypeIdentifiers
             if isPlaying { hasPlayed = true }
             if isPlaying != wasPlaying { onPlayingChange?(isPlaying) }
             snapshot.state = isPlaying ? .playing : .paused
+            snapshot.timeline = transportControls?.timeline()
             publisher.publish(snapshot, artwork: currentArtwork)
         }
 
@@ -179,8 +185,10 @@ import UniformTypeIdentifiers
         func updateNowPlaying(_ nowPlaying: NowPlaying) async {
             let next = NowPlayingSnapshot(
                 nowPlaying, stationName: stationName, fallbackArtworkURL: fallbackArtworkURL,
+                isLive: transportControls == nil,
                 state: isPlaying ? .playing : .paused)
             snapshot = next
+            snapshot.timeline = transportControls?.timeline()
 
             var artwork: CGImage?
             if let url = next.artworkURL { artwork = await artworkLoader.image(for: url) }
@@ -271,12 +279,38 @@ import UniformTypeIdentifiers
             return seconds
         }
 
+        /// Gives the player what the system may ask of an archived show, or with `nil` takes it away.
+        ///
+        /// While there are controls, the system is offered skip back, skip forward and a scrubber, and is told the
+        /// show's timeline and that it is not a live stream.
+        /// - Parameter controls: Skip, scrub and the timeline, or `nil` for the live stream.
+        func setTransportControls(_ controls: ArchiveTransportControls?) {
+            transportControls = controls
+            guard let controls else {
+                publisher.removeTransportCommands()
+                return
+            }
+            publisher.installTransportCommands(
+                skipBack: Self.skipBack, skipForward: Self.skipForward,
+                skip: { seconds in Task { await controls.skip(seconds) } },
+                seek: { position in Task { await controls.seek(position) } })
+        }
+
+        /// Tells the system where the player is in the show now. The system runs its clock on from the last time it was
+        /// told, so this follows anything that moves the player.
+        func refreshTimeline() {
+            guard let transportControls else { return }
+            snapshot.timeline = transportControls.timeline()
+            publisher.publish(snapshot, artwork: currentArtwork)
+        }
+
         /// Moves within the archived file being played.
         /// - Parameter seconds: Seconds from the start of the file.
         func seekArchive(to seconds: TimeInterval) async {
             guard let player, isPlayingArchive else { return }
             let target = CMTime(seconds: max(0, seconds), preferredTimescale: 600)
             await player.seek(to: target, toleranceBefore: .zero, toleranceAfter: .zero)
+            refreshTimeline()
         }
 
         /// Puts the live stream back and plays it.

@@ -30,12 +30,26 @@ protocol ArchivePlayer: AnyObject {
     func updateNowPlaying(_ nowPlaying: NowPlaying) async
     /// Puts the live stream back.
     func returnToLive()
+    /// Gives the player what the system may ask of the archived show (skip, scrub, and the timeline to report), or with
+    /// `nil` takes it away, as for the live stream.
+    func setTransportControls(_ controls: ArchiveTransportControls?)
     /// Arms (or, with `nil`, disarms) the hand-off at the end of an archived file.
     ///
     /// The player calls `provide` shortly before the file ends to learn what to roll into, and `advanced` once it has.
     func setContinuation(
         _ provide: (@MainActor () async -> ArchiveContinuation)?,
         advanced: (@MainActor (ArchiveContinuation) async -> Void)?)
+}
+
+/// What the system's lock screen and the car's Now Playing screen may ask of an archived show: skip, scrub, and where
+/// the player is in the show.
+struct ArchiveTransportControls: Sendable {
+    /// Moves by a number of seconds; negative to go back.
+    let skip: @MainActor (TimeInterval) async -> Void
+    /// Moves to a position in the show, in seconds from its start.
+    let seek: @MainActor (TimeInterval) async -> Void
+    /// How far into the show the player is, and how long the show is; `nil` when that is not known.
+    let timeline: @MainActor () -> PlaybackTimeline?
 }
 
 /// The four ways into the archive, as the website offers them.
@@ -339,6 +353,29 @@ final class ArchiveBrowserModel {
         await move(to: transport.target(showTime: aired.timeIntervalSince(show.startTime)))
     }
 
+    /// How far into the show the player is and how long the show is, as the system's lock screen wants it.
+    func timeline() -> PlaybackTimeline? {
+        guard let transport, !transport.isEmpty else { return nil }
+        return PlaybackTimeline(
+            elapsed: transport.elapsed(atFileTime: player.archiveFileTime), duration: transport.length)
+    }
+
+    /// Jumps to a position in the show, as a scrub from the lock screen does.
+    /// - Parameter showTime: Seconds from the start of the show.
+    func seek(toShowTime showTime: TimeInterval) async {
+        guard let transport else { return }
+        await move(to: transport.target(showTime: showTime))
+    }
+
+    /// Hands the player what the system may ask of the show being heard. The controls hold the model weakly, so a
+    /// player that outlives it cannot keep it alive.
+    private func provideTransportControls() {
+        player.setTransportControls(ArchiveTransportControls(
+            skip: { [weak self] seconds in await self?.skip(by: seconds) },
+            seek: { [weak self] position in await self?.seek(toShowTime: position) },
+            timeline: { [weak self] in self?.timeline() }))
+    }
+
     /// Jumps back or forward within the show; past its end, goes on to the next show, or to live.
     /// - Parameter seconds: How far to move; negative to go back.
     func skip(by seconds: TimeInterval) async {
@@ -361,11 +398,13 @@ final class ArchiveBrowserModel {
     /// Plays a show's file from an offset and takes it as the show being heard.
     private func start(_ show: ArchiveShow, file: URL, at offset: TimeInterval) async {
         await player.playArchive(url: file, at: offset)
-        await announce(show)
         playingOffset = offset
         playing = show
         clearTracks()
         notice = nil
+        provideTransportControls()
+        // After the state above, so the timeline announced with the show is this show's.
+        await announce(show)
         armContinuation()
     }
 
@@ -387,6 +426,7 @@ final class ArchiveBrowserModel {
     /// Stops the archived show and goes back to the live stream.
     func returnToLive() {
         player.setContinuation(nil, advanced: nil)
+        player.setTransportControls(nil)
         player.returnToLive()
         playing = nil
         playingOffset = nil
@@ -423,11 +463,13 @@ final class ArchiveBrowserModel {
             playingOffset = ArchiveTiming.fileStart(of: file).map { next.startTime.timeIntervalSince($0) }
             playing = next
             clearTracks()
+            provideTransportControls()
             await announce(next)
         case .live:
             playing = nil
             playingOffset = nil
             clearTracks()
+            player.setTransportControls(nil)
         }
     }
 }
