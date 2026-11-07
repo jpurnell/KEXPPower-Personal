@@ -41,7 +41,8 @@ struct ArchivePlayerBar: View {
                         .font(.title3)
                         .frame(minWidth: 44, minHeight: 44)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.plain)
+                .foregroundStyle(.tint)
                 .accessibilityHint("Stops the archive and plays the live stream")
                 Button { withAnimation(reduceMotion ? nil : .default) { isExpanded.toggle() } } label: {
                     Label(isExpanded ? "Show less" : "Show the player", systemImage: isExpanded ? "chevron.down" : "chevron.up")
