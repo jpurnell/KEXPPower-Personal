@@ -28,6 +28,8 @@ import UniformTypeIdentifiers
         // MARK: - State
 
         private(set) var isPlaying = false
+        /// Whether audio has played this session, so a bar that controls it has something to control.
+        private(set) var hasPlayed = false
 
         /// Called with the new value whenever the player starts or stops playing.
         @ObservationIgnored var onPlayingChange: (@MainActor (Bool) -> Void)?
@@ -136,6 +138,7 @@ import UniformTypeIdentifiers
             logger.info("\(message, privacy: .public)")
             let wasPlaying = isPlaying
             isPlaying = status == .playing
+            if isPlaying { hasPlayed = true }
             if isPlaying != wasPlaying { onPlayingChange?(isPlaying) }
             snapshot.state = isPlaying ? .playing : .paused
             publisher.publish(snapshot, artwork: currentArtwork)

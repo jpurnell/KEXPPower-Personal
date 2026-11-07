@@ -82,10 +82,19 @@ struct SectionDestination: View {
             // Inside each section, not around the whole layout: a tab or split view does not pass the inset on, so a bar
             // there would float over the content instead of making room.
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                if let show = archive.nowPlayingShow {
+                switch PlayerBarKind.kind(
+                    archiveShow: archive.nowPlayingShow, liveHasPlayed: model.playerController.hasPlayed, in: section)
+                {
+                case .archive(let show):
                     ArchivePlayerBar(show: show, browser: archive)
                         .padding(.horizontal)
                         .padding(.vertical, 6)
+                case .live:
+                    LivePlayerBar(player: model.playerController)
+                        .padding(.horizontal)
+                        .padding(.vertical, 6)
+                case .none:
+                    EmptyView()
                 }
             }
     }
