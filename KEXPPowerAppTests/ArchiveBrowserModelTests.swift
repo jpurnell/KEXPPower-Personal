@@ -9,6 +9,8 @@ private final class FakeCatalog: ArchiveCatalog, @unchecked Sendable {
     var shows: [ArchiveShow] = []
     var playback: ArchivePlayback?
     var failure: (any Error)?
+    var photos: [String: URL] = [:]
+    var photosFailure: (any Error)?
     private(set) var spans: [(Date, Date)] = []
     private(set) var playbackRequests: [String] = []
 
@@ -25,6 +27,11 @@ private final class FakeCatalog: ArchiveCatalog, @unchecked Sendable {
     }
 
     func tracks(of show: ArchiveShow) async throws -> [Track] { [] }
+
+    func hostPhotos() async throws -> [String: URL] {
+        if let photosFailure { throw photosFailure }
+        return photos
+    }
 }
 
 @MainActor
@@ -431,6 +438,28 @@ struct ArchiveBrowserModelTests {
         #expect(model.programs.map(\.name) == ["The Midday Show", "The Morning Show"])
         #expect(model.genres.map(\.name) == ["Eclectic", "Rock", "Variety Mix"])
         #expect(model.genres.first { $0.name == "Rock" }?.showCount == 3)
+    }
+
+    @Test("A host's picture is found by name once loaded; a host with none has no picture")
+    func hostPhotos() async throws {
+        let catalog = try browsable()
+        let picture = try #require(URL(string: "https://www.kexp.org/media/cheryl.jpg"))
+        catalog.photos = ["Cheryl Waters": picture]
+        let model = try model(catalog)
+        await model.load()
+        #expect(model.hostPhoto(named: "Cheryl Waters") == picture)
+        #expect(model.hostPhoto(named: "John Richards") == nil)
+    }
+
+    @Test("If the pictures cannot be fetched the archive still loads, with placeholders")
+    func hostPhotosFailure() async throws {
+        let catalog = try browsable()
+        catalog.photosFailure = URLError(.notConnectedToInternet)
+        let model = try model(catalog)
+        await model.load()
+        #expect(model.phase == .loaded)
+        #expect(model.hosts.count == 2)
+        #expect(model.hostPhoto(named: "Cheryl Waters") == nil)
     }
 
     @Test("A selection means the shows of that host, program, genre or day")

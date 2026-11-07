@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:jpurnell/StationKit.git",
       "state" : {
-        "revision" : "7b53897683360f27681bab71c57a24f00cbe01b5",
-        "version" : "0.9.0"
+        "revision" : "753000f1d07e576529d792ff7a3d80bfb013f3de",
+        "version" : "0.10.0"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:jpurnell/StationKitAdapterKEXP.git",
       "state" : {
-        "revision" : "6b63142ae27a31b2a7c45331a6e45e4c14633194",
-        "version" : "0.5.0"
+        "revision" : "6feed3cedbfd47122304d4df46500e7b39d1d6a5",
+        "version" : "0.6.0"
       }
     }
   ],

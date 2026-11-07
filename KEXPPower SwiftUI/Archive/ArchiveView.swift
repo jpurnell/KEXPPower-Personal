@@ -125,7 +125,9 @@ struct ArchiveView: View {
                 CardButton(
                     title: host.name,
                     subtitle: ListFormatter.localizedString(byJoining: host.programNames),
-                    count: host.showCount
+                    count: host.showCount,
+                    imageURL: browser.hostPhoto(named: host.name),
+                    alwaysShowsPicture: true
                 ) { selection = .host(host.name) }
             }
         }
@@ -160,12 +162,14 @@ private struct CardButton: View {
     let subtitle: String
     let count: Int
     var imageURL: URL?
+    /// Keeps a picture's place when there is none, so a list of names lines up.
+    var alwaysShowsPicture = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                if imageURL != nil { ArchivePicture(url: imageURL, size: 56) }
+                if imageURL != nil || alwaysShowsPicture { ArchivePicture(url: imageURL, size: 56) }
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).font(.headline)
                     if !subtitle.isEmpty {

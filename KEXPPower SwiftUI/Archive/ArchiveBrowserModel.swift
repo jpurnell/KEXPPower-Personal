@@ -143,6 +143,8 @@ final class ArchiveBrowserModel {
     private(set) var hosts: [ArchiveHostSummary] = []
     private(set) var programs: [ArchiveProgramSummary] = []
     private(set) var genres: [ArchiveGenreSummary] = []
+    /// Hosts' pictures by name; empty until loaded, and if the station has none.
+    private(set) var hostPhotos: [String: URL] = [:]
     /// Something to tell the listener about the last attempt to play, or `nil`.
     private(set) var notice: String?
 
@@ -177,6 +179,10 @@ final class ArchiveBrowserModel {
         return player.isPlayingArchive ? show : nil
     }
 
+    /// A host's picture, or `nil` if the station has none for them.
+    /// - Parameter name: The host's name.
+    func hostPhoto(named name: String) -> URL? { hostPhotos[name] }
+
     /// Fetches the last fifteen days of shows and builds the tiles. Safe to call again to retry.
     func load() async {
         phase = .loading
@@ -184,7 +190,10 @@ final class ArchiveBrowserModel {
         let oldest = calendar.date(
             byAdding: .day, value: -(Self.dayCount - 1), to: calendar.startOfDay(for: moment)) ?? moment
         do {
+            // Pictures only dress the Host list, so failing to fetch them leaves placeholders and does not fail the load.
+            async let photos = try? await catalog.hostPhotos()
             let shows = try await catalog.shows(from: oldest, to: moment)
+            hostPhotos = await photos ?? [:]
             let loaded = ArchiveIndex(shows: shows)
             index = loaded
             tiles = ArchiveDayTile.tiles(index: loaded, now: moment, calendar: calendar, count: Self.dayCount)
