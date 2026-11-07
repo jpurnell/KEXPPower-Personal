@@ -11,6 +11,9 @@ private final class FakeCatalog: ArchiveCatalog, @unchecked Sendable {
     var failure: (any Error)?
     var photos: [String: URL] = [:]
     var photosFailure: (any Error)?
+    var trackList: [Track] = []
+    var tracksFailure: (any Error)?
+    private(set) var trackRequests: [String] = []
     private(set) var spans: [(Date, Date)] = []
     private(set) var playbackRequests: [String] = []
 
@@ -26,7 +29,11 @@ private final class FakeCatalog: ArchiveCatalog, @unchecked Sendable {
         return playback
     }
 
-    func tracks(of show: ArchiveShow) async throws -> [Track] { [] }
+    func tracks(of show: ArchiveShow) async throws -> [Track] {
+        trackRequests.append(show.id)
+        if let tracksFailure { throw tracksFailure }
+        return trackList
+    }
 
     func hostPhotos() async throws -> [String: URL] {
         if let photosFailure { throw photosFailure }
@@ -603,6 +610,120 @@ struct ArchiveBrowserModelTests {
         player.isPlaying = false
         #expect(!model.isPlaying)
         #expect(model.fileTime == 2_500)
+    }
+
+    // MARK: Time of day and the playlist
+
+    private func track(_ id: String, _ iso: String?, title: String = "A Song") throws -> Track {
+        Track(id: id, title: title, credits: [Credit(role: .performer, name: "An Artist")],
+              airDate: try iso.map { try date($0) })
+    }
+
+    @Test("The time of day being heard is the show's start plus how far into the show the player is")
+    func airTime() async throws {
+        let (model, _, _) = try await playingMorning()
+        // The show began at 7:00:00; 3,725 s into it is 8:02:05.
+        #expect(model.airTime(atFileTime: 778 + 3_725) == (try date("2026-11-05T08:02:05-08:00")))
+    }
+
+    @Test("With nothing from the archive playing there is no time of day")
+    func airTimeNothingPlaying() async throws {
+        let model = try model(try browsable())
+        await model.load()
+        #expect(model.airTime(atFileTime: 100) == nil)
+    }
+
+    @Test("The playing show's songs are fetched once it is playing, and those with no air time are left out")
+    func loadTracks() async throws {
+        let (model, _, catalog) = try await playingMorning()
+        catalog.trackList = [
+            try track("a", "2026-11-05T07:00:30-08:00"), try track("b", nil), try track("c", "2026-11-05T07:04:00-08:00"),
+        ]
+        await model.loadTracks()
+        #expect(catalog.trackRequests == ["1"])
+        #expect(model.tracks.map(\.id) == ["a", "c"])
+        #expect(model.tracksState == .loaded)
+    }
+
+    @Test("Asking again for the same show's songs does not fetch them again")
+    func loadTracksOnce() async throws {
+        let (model, _, catalog) = try await playingMorning()
+        await model.loadTracks()
+        await model.loadTracks()
+        #expect(catalog.trackRequests == ["1"])
+    }
+
+    @Test("A failed fetch of the songs says so, and asking again tries again")
+    func loadTracksFailure() async throws {
+        let (model, _, catalog) = try await playingMorning()
+        catalog.tracksFailure = Boom()
+        await model.loadTracks()
+        #expect(model.tracksState == .failed)
+        #expect(model.tracks.isEmpty)
+        catalog.tracksFailure = nil
+        catalog.trackList = [try track("a", "2026-11-05T07:00:30-08:00")]
+        await model.loadTracks()
+        #expect(model.tracksState == .loaded)
+        #expect(model.tracks.count == 1)
+    }
+
+    @Test("With nothing from the archive playing no songs are fetched")
+    func loadTracksNothingPlaying() async throws {
+        let catalog = try browsable()
+        let model = try model(catalog)
+        await model.load()
+        await model.loadTracks()
+        #expect(catalog.trackRequests.isEmpty)
+        #expect(model.tracksState == .idle)
+    }
+
+    @Test("Rolling into the next show clears the songs, so the new show's are fetched")
+    func tracksResetOnRollOver() async throws {
+        let (model, player, catalog) = try await playingMorning()
+        catalog.trackList = [try track("a", "2026-11-05T07:00:30-08:00")]
+        await model.loadTracks()
+        let midday = try #require(model.shows(for: .host("Cheryl Waters")).first)
+        let file = try #require(URL(string: "https://kexp-archive.streamguys1.com/content/kexp/20261105095008-2-2-the-midday-show.mp3"))
+        await player.advanced?(.show(midday, file))
+        #expect(model.tracks.isEmpty)
+        #expect(model.tracksState == .idle)
+        await model.loadTracks()
+        #expect(catalog.trackRequests == ["1", "2"])
+    }
+
+    @Test("Choosing a song seeks to where it aired in the show")
+    func seekToTrack() async throws {
+        let (model, player, _) = try await playingMorning()
+        // Aired at 7:30:00, 1,800 s into a show that begins 778 s into its file.
+        await model.seek(to: try track("a", "2026-11-05T07:30:00-08:00"))
+        #expect(player.seeks == [778 + 1_800])
+    }
+
+    @Test("A song that aired before the show's start seeks to the start of the show")
+    func seekToEarlyTrack() async throws {
+        let (model, player, _) = try await playingMorning()
+        await model.seek(to: try track("a", "2026-11-05T06:58:00-08:00"))
+        #expect(player.seeks == [778])
+    }
+
+    @Test("A song with no air time cannot be sought to")
+    func seekToUndatedTrack() async throws {
+        let (model, player, _) = try await playingMorning()
+        await model.seek(to: try track("a", nil))
+        #expect(player.seeks.isEmpty)
+    }
+
+    @Test("The song being heard is the latest one that has aired by this point in the show")
+    func currentTrack() async throws {
+        let (model, _, catalog) = try await playingMorning()
+        catalog.trackList = [
+            try track("a", "2026-11-05T07:00:30-08:00"), try track("b", "2026-11-05T07:04:00-08:00"),
+            try track("c", "2026-11-05T07:09:00-08:00"),
+        ]
+        await model.loadTracks()
+        #expect(model.currentTrack(atFileTime: 778 + 10) == nil)
+        #expect(model.currentTrack(atFileTime: 778 + 250)?.id == "b")
+        #expect(model.currentTrack(atFileTime: 778 + 3_000)?.id == "c")
     }
 
     @Test("The play button pauses what is playing, and plays what is paused")

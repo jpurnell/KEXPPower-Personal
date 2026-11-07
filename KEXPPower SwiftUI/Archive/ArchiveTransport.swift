@@ -115,6 +115,16 @@ struct ArchiveTransport: Equatable, Sendable {
         return .within(max(landing, lowerBound))
     }
 
+    /// Where a point in the show lands, such as a song's place in it.
+    /// - Parameter showTime: Seconds into the show. Before the start reads as the start; at or past the end goes on to
+    ///   what follows; one that is not a number reads as the start.
+    func target(showTime: TimeInterval) -> Target {
+        guard !isEmpty, showTime.isFinite else { return .within(lowerBound) }
+        if showTime <= 0 { return .within(lowerBound) }
+        if showTime >= length { return .end }
+        return .within(lowerBound + showTime)
+    }
+
     /// Where a scrubber dragged to a fraction of the show lands.
     /// - Parameter fraction: 0 for the start of the show, 1 for its end; a value outside that is held to it, and one
     ///   that is not a number reads as the start.

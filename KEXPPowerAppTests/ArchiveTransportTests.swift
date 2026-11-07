@@ -149,6 +149,21 @@ struct ArchiveTransportTests {
         #expect(transport.target(fraction: .nan) == .within(778))
     }
 
+    @Test("A point in show time lands that far past where the show begins in the file")
+    func targetShowTime() {
+        let transport = twoHourShow()
+        #expect(transport.target(showTime: 0) == .within(778))
+        #expect(transport.target(showTime: 1_800) == .within(778 + 1_800))
+    }
+
+    @Test("A point before the show begins lands at its start, and one at or past its end goes on")
+    func targetShowTimeClamped() {
+        let transport = twoHourShow()
+        #expect(transport.target(showTime: -90) == .within(778))
+        #expect(transport.target(showTime: 7_200) == .end)
+        #expect(transport.target(showTime: .nan) == .within(778))
+    }
+
     // MARK: Text
 
     @Test("Elapsed and remaining read as clock times, remaining with a minus sign")

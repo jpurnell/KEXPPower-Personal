@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		009E54D1B6359B9A32CF4B22 /* AppModelRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83C963EFEC4E9CFEC269C64 /* AppModelRegistry.swift */; };
 		00F8F15E4160F547E343807F /* WidgetArtworkResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F198EB0F7925DC8A03086E6 /* WidgetArtworkResolver.swift */; };
+		02EDE374D43C25F6BF3C9832 /* ArchivePlayerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F99D75B316FA7E0F963990 /* ArchivePlayerBar.swift */; };
 		05217AF714C4F2F4700EFCED /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51E8FB2E74B8CD4C014AE930 /* SettingsView.swift */; };
 		07B60EC3C2D38B6ACB5DC369 /* WidgetContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128FD3045AB9DCA0AFE0D2F2 /* WidgetContent.swift */; };
 		09AC936FCE7F53CA1492FB4A /* WidgetContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128FD3045AB9DCA0AFE0D2F2 /* WidgetContent.swift */; };
@@ -214,6 +215,7 @@
 		E4051A9D4514EA45532C3291 /* WidgetPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8499E80D002416B2EF0FF28B /* WidgetPublisher.swift */; };
 		E47746E2CBEDC4ABE0267444 /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = 5ED6AACC820DAA1899A16CBC /* StationKitAdapterKEXP */; };
 		E47F185943BDC17585DA4FB3 /* WidgetConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAE396F6ECCCA376541188EA /* WidgetConstants.swift */; };
+		E4CE714D7DBA44801F7A784D /* ArchivePlayerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F99D75B316FA7E0F963990 /* ArchivePlayerBar.swift */; };
 		E532DBC1B343A9DFC18ED936 /* ReviewQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99A62CDA2248FFCF9C5C7DBB /* ReviewQueueTests.swift */; };
 		E59CD55DC6927C0E29884067 /* WidgetArtworkResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB84995C00E517CAB4A0C79 /* WidgetArtworkResolverTests.swift */; };
 		E8628F713EA707DCF4515AB8 /* WidgetPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8499E80D002416B2EF0FF28B /* WidgetPublisher.swift */; };
@@ -451,6 +453,7 @@
 		BFCD126D730F6A2FAFD3FDAA /* ArchiveBrowserModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ArchiveBrowserModel.swift; sourceTree = "<group>"; };
 		C1F67AAFED93A5295EA88D91 /* MusicKitPlaylists.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MusicKitPlaylists.swift; sourceTree = "<group>"; };
 		C4523AA2629849D39C35949A /* ArchiveTiming.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ArchiveTiming.swift; sourceTree = "<group>"; };
+		C4F99D75B316FA7E0F963990 /* ArchivePlayerBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ArchivePlayerBar.swift; sourceTree = "<group>"; };
 		C82B33142AFC8089593E8279 /* UserDefaultsReviewStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UserDefaultsReviewStore.swift; sourceTree = "<group>"; };
 		C895B019C2EAD90B83BC21BB /* WatchContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		CA2FBA8AB5E51D144764E088 /* ControlPlayStateTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ControlPlayStateTests.swift; sourceTree = "<group>"; };
@@ -770,6 +773,7 @@
 				BFCD126D730F6A2FAFD3FDAA /* ArchiveBrowserModel.swift */,
 				77B7CCCA03FA91E71F3245B1 /* ArchiveView.swift */,
 				D8BAF54BF4750D919D9B7429 /* ArchiveTransport.swift */,
+				C4F99D75B316FA7E0F963990 /* ArchivePlayerBar.swift */,
 			);
 			name = Archive;
 			path = Archive;
@@ -1279,6 +1283,7 @@
 				9C237F8F6D057B1B9A9BC5BA /* ArchiveBrowserModel.swift in Sources */,
 				0A8B1423236EFF130298B790 /* ArchiveView.swift in Sources */,
 				6A86F00A7018F7AB7E65F098 /* ArchiveTransport.swift in Sources */,
+				E4CE714D7DBA44801F7A784D /* ArchivePlayerBar.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1348,6 +1353,7 @@
 				BDDFC57CE189C2F4BD1D6975 /* ArchiveBrowserModel.swift in Sources */,
 				6CFCC0ABC6C6BD2FA78B7443 /* ArchiveView.swift in Sources */,
 				7B9A524E82807219C7B28221 /* ArchiveTransport.swift in Sources */,
+				02EDE374D43C25F6BF3C9832 /* ArchivePlayerBar.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

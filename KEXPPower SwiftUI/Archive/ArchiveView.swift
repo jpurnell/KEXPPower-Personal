@@ -13,20 +13,12 @@ private let archiveImageHosts = ArtworkLoader(allowedDomains: ["kexp.org"])
 /// The Archive section: browse the last two weeks by date, host, show or genre, then pick a show to hear.
 struct ArchiveView: View {
     let model: ResultRetriever
-    @State private var browser: ArchiveBrowserModel
+    /// Owned by the app's root, so the player outlives this screen.
+    let browser: ArchiveBrowserModel
     @State private var selection: ArchiveSelection?
     #if os(iOS) && DEBUG
     @State private var showingProbe = false
     #endif
-
-    init(model: ResultRetriever) {
-        self.model = model
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = ArchiveTiming.stationTimeZone
-        calendar.locale = .current
-        _browser = State(initialValue: ArchiveBrowserModel(
-            catalog: KEXPArchiveCatalog(), player: model.playerController, calendar: calendar))
-    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -37,9 +29,6 @@ struct ArchiveView: View {
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        if let show = browser.nowPlayingShow {
-                            NowPlayingArchiveBar(show: show, browser: browser)
-                        }
                         if let notice = browser.notice {
                             Label(notice, systemImage: "exclamationmark.triangle")
                                 .font(.callout)
@@ -249,9 +238,6 @@ private struct ShowListView: View {
         }
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 8) {
-                if let show = browser.nowPlayingShow {
-                    NowPlayingArchiveBar(show: show, browser: browser)
-                }
                 if let notice = browser.notice {
                     Text(notice).font(.callout)
                 }
@@ -291,91 +277,5 @@ private struct ShowRow: View {
         .accessibilityElement(children: .combine)
         .accessibilityValue(isPlaying ? "Playing" : "")
         .accessibilityHint("Plays this show")
-    }
-}
-
-/// The player for an archived show: where you are in it, play and pause, a short rewind and a longer skip forward,
-/// and a way to catch up to the live stream.
-private struct NowPlayingArchiveBar: View {
-    let show: ArchiveShow
-    let browser: ArchiveBrowserModel
-    /// The scrubber's value while a finger is on it, so the clock does not fight the drag.
-    @State private var dragFraction: Double?
-
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("Playing from the archive").font(.caption).foregroundStyle(.secondary)
-                    Text(show.programName).font(.headline)
-                }
-                Spacer()
-                Button {
-                    browser.returnToLive()
-                } label: {
-                    Label("Catch up to live", systemImage: "bolt.fill")
-                        .labelStyle(.iconOnly)
-                        .font(.title3)
-                        .frame(minWidth: 44, minHeight: 44)
-                }
-                .buttonStyle(.borderedProminent)
-                .accessibilityHint("Stops the archive and plays the live stream")
-            }
-            if let transport = browser.transport {
-                scrubber(transport)
-            }
-            controls
-        }
-        .padding()
-        .background(.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
-    }
-
-    /// The scrubber and its two clocks, redrawn twice a second by a timeline rather than by observation, so the
-    /// rest of the screen is not redrawn with it.
-    private func scrubber(_ transport: ArchiveTransport) -> some View {
-        TimelineView(.periodic(from: .now, by: 0.5)) { _ in
-            let fileTime = browser.fileTime
-            let shown = dragFraction ?? transport.fraction(atFileTime: fileTime)
-            let shownFileTime = transport.lowerBound + shown * transport.length
-            VStack(spacing: 2) {
-                Slider(
-                    value: Binding(get: { shown }, set: { dragFraction = $0 }),
-                    in: 0...1
-                ) { editing in
-                    guard !editing, let fraction = dragFraction else { return }
-                    dragFraction = nil
-                    Task { await browser.scrub(toFraction: fraction) }
-                }
-                .accessibilityLabel("Position in the show")
-                .accessibilityValue("\(transport.elapsedText(atFileTime: shownFileTime)) of \(ArchiveTiming.positionText(transport.length))")
-                HStack {
-                    Text(transport.elapsedText(atFileTime: shownFileTime))
-                    Spacer()
-                    Text(transport.remainingText(atFileTime: shownFileTime))
-                }
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
-                .accessibilityHidden(true)
-            }
-        }
-    }
-
-    private var controls: some View {
-        HStack(spacing: 32) {
-            Button { Task { await browser.skip(by: -15) } } label: {
-                Label("Back 15 seconds", systemImage: "gobackward.15").labelStyle(.iconOnly).font(.title2)
-            }
-            .disabled(browser.transport == nil)
-            Button { browser.togglePause() } label: {
-                Label(browser.isPlaying ? "Pause" : "Play", systemImage: browser.isPlaying ? "pause.fill" : "play.fill")
-                    .labelStyle(.iconOnly).font(.largeTitle)
-            }
-            Button { Task { await browser.skip(by: 30) } } label: {
-                Label("Forward 30 seconds", systemImage: "goforward.30").labelStyle(.iconOnly).font(.title2)
-            }
-            .disabled(browser.transport == nil)
-        }
-        .buttonStyle(.plain)
-        .frame(maxWidth: .infinity)
     }
 }

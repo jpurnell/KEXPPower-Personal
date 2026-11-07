@@ -157,6 +157,12 @@ final class ArchiveBrowserModel {
     private(set) var genres: [ArchiveGenreSummary] = []
     /// Hosts' pictures by name; empty until loaded, and if the station has none.
     private(set) var hostPhotos: [String: URL] = [:]
+    /// Whether the playing show's songs have been fetched.
+    enum TracksState: Equatable { case idle, loading, loaded, failed }
+    /// The songs of the show being heard, in the order they aired; only those with an air time, since the rest
+    /// cannot be placed in the show.
+    private(set) var tracks: [Track] = []
+    private(set) var tracksState: TracksState = .idle
     /// Something to tell the listener about the last attempt to play, or `nil`.
     private(set) var notice: String?
 
@@ -293,6 +299,46 @@ final class ArchiveBrowserModel {
     /// Where the player is in the file being heard, in seconds; read by the bar's clock rather than observed.
     var fileTime: TimeInterval { player.archiveFileTime }
 
+    /// The time of day, at the station, that a moment in the file was on the air.
+    /// - Parameter fileTime: Seconds into the file.
+    /// - Returns: The moment, or `nil` when no archived show is playing.
+    func airTime(atFileTime fileTime: TimeInterval) -> Date? {
+        guard let show = nowPlayingShow, let transport else { return nil }
+        return show.startTime.addingTimeInterval(transport.elapsed(atFileTime: fileTime))
+    }
+
+    /// Fetches the songs of the show being heard, unless they are already here or being fetched. Safe to call again
+    /// to retry after a failure.
+    func loadTracks() async {
+        guard let show = nowPlayingShow, tracksState == .idle || tracksState == .failed else { return }
+        tracksState = .loading
+        do {
+            let fetched = try await catalog.tracks(of: show)
+            // The player may have moved on while the songs were coming; they are no longer this show's.
+            guard playing?.id == show.id else { return }
+            tracks = fetched.filter { $0.airDate != nil }
+            tracksState = .loaded
+        } catch {
+            guard playing?.id == show.id else { return }
+            tracksState = .failed
+        }
+    }
+
+    /// The song being heard: the latest one that had aired by this point in the show.
+    /// - Parameter fileTime: Seconds into the file.
+    func currentTrack(atFileTime fileTime: TimeInterval) -> Track? {
+        guard let show = nowPlayingShow, let transport else { return nil }
+        let elapsed = transport.elapsed(atFileTime: fileTime)
+        return tracks.last { ($0.airDate?.timeIntervalSince(show.startTime) ?? .infinity) <= elapsed }
+    }
+
+    /// Jumps to where a song aired in the show.
+    /// - Parameter track: A song of the show being heard.
+    func seek(to track: Track) async {
+        guard let show = nowPlayingShow, let transport, let aired = track.airDate else { return }
+        await move(to: transport.target(showTime: aired.timeIntervalSince(show.startTime)))
+    }
+
     /// Jumps back or forward within the show; past its end, goes on to the next show, or to live.
     /// - Parameter seconds: How far to move; negative to go back.
     func skip(by seconds: TimeInterval) async {
@@ -318,6 +364,7 @@ final class ArchiveBrowserModel {
         await announce(show)
         playingOffset = offset
         playing = show
+        clearTracks()
         notice = nil
         armContinuation()
     }
@@ -343,6 +390,12 @@ final class ArchiveBrowserModel {
         player.returnToLive()
         playing = nil
         playingOffset = nil
+        clearTracks()
+    }
+
+    private func clearTracks() {
+        tracks = []
+        tracksState = .idle
     }
 
     private func announce(_ show: ArchiveShow) async {
@@ -369,10 +422,12 @@ final class ArchiveBrowserModel {
             // The next show begins as far into its own file as the show's start is after the file's.
             playingOffset = ArchiveTiming.fileStart(of: file).map { next.startTime.timeIntervalSince($0) }
             playing = next
+            clearTracks()
             await announce(next)
         case .live:
             playing = nil
             playingOffset = nil
+            clearTracks()
         }
     }
 }
