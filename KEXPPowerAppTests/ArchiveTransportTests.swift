@@ -164,6 +164,42 @@ struct ArchiveTransportTests {
         #expect(transport.target(showTime: .nan) == .within(778))
     }
 
+    // MARK: A recording shorter than its show
+
+    /// The Morning Show of 2026-11-02 as KEXP kept it: a three-hour slot whose file holds the first twenty minutes.
+    private func truncatedShow() -> ArchiveTransport {
+        ArchiveTransport(offset: 741, showLength: 10_800, fileDuration: 741 + 1_222)
+    }
+
+    @Test("A recording that stops well short of its show's slot is truncated; a full one, or one of unknown length, is not")
+    func isTruncated() {
+        #expect(truncatedShow().isTruncated)
+        #expect(!twoHourShow().isTruncated)
+        #expect(!ArchiveTransport(offset: 778, showLength: nil, fileDuration: 5_000).isTruncated)
+    }
+
+    @Test("A recording a few seconds short of its slot is not called truncated: shows end a little early or late")
+    func slackBeforeTruncated() {
+        #expect(!ArchiveTransport(offset: 778, showLength: 7_200, fileDuration: 778 + 7_200 - 30).isTruncated)
+    }
+
+    @Test("A song inside the show but past the end of the recording is not recorded, which is not the end of the show")
+    func unrecordedTarget() {
+        #expect(truncatedShow().target(showTime: 4_440) == .unrecorded)
+        #expect(truncatedShow().target(showTime: 1_222) == .unrecorded)
+    }
+
+    @Test("A song inside the recording still lands there, and one past the show's own end still goes on")
+    func recordedAndPastEnd() {
+        #expect(truncatedShow().target(showTime: 600) == .within(741 + 600))
+        #expect(truncatedShow().target(showTime: 10_800) == .end)
+    }
+
+    @Test("Skipping forward off the end of a truncated recording goes on, as the file ending would")
+    func skipOffTruncatedEnd() {
+        #expect(truncatedShow().target(skipping: 30, from: 741 + 1_210) == .end)
+    }
+
     // MARK: Text
 
     @Test("Elapsed and remaining read as clock times, remaining with a minus sign")

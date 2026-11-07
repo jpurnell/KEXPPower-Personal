@@ -51,6 +51,9 @@ struct ArchivePlayerBar: View {
                 .buttonStyle(.plain)
             }
             if isExpanded {
+                if let note = browser.truncationNote {
+                    Text(note).font(.caption).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+                }
                 if let transport = browser.transport {
                     scrubber(transport)
                 }
@@ -165,7 +168,11 @@ private struct ArchivePlaylistView: View {
             }
         case .loaded:
             if browser.tracks.isEmpty {
-                ContentUnavailableView("No songs listed for this show", systemImage: "music.note.list")
+                ContentUnavailableView {
+                    Label("No playlist for this show", systemImage: "music.note.list")
+                } description: {
+                    Text("KEXP has no songs logged for it.")
+                }
             } else {
                 trackList
             }
@@ -178,15 +185,17 @@ private struct ArchivePlaylistView: View {
                 let current = browser.currentTrack(atFileTime: browser.fileTime)?.id
                 List(browser.tracks) { track in
                     HStack {
+                        let playable = browser.isPlayable(track)
                         Button {
                             Task {
                                 await browser.seek(to: track)
                                 dismiss()
                             }
                         } label: {
-                            TrackRow(track: track, isCurrent: track.id == current)
+                            TrackRow(track: track, isCurrent: track.id == current, isRecorded: playable)
                         }
                         .buttonStyle(.plain)
+                        .disabled(!playable)
                         // Beside the jump button, not inside it, so a tap on either does one thing.
                         if AppSongSaver.canSaveToPlaylists, SongSavingModel.canSave(track) {
                             SaveButton(track: track)
@@ -205,6 +214,8 @@ private struct ArchivePlaylistView: View {
 private struct TrackRow: View {
     let track: Track
     let isCurrent: Bool
+    /// Whether the song is in the part of the show that was recorded; if not, it cannot be played.
+    var isRecorded = true
 
     var body: some View {
         HStack(spacing: 12) {
@@ -219,11 +230,14 @@ private struct TrackRow: View {
             Spacer()
             if isCurrent {
                 Image(systemName: "speaker.wave.2.fill").foregroundStyle(.tint).accessibilityHidden(true)
+            } else if !isRecorded {
+                Text("Not recorded").font(.caption).foregroundStyle(.secondary)
             }
         }
+        .opacity(isRecorded ? 1 : 0.5)
         .contentShape(Rectangle())
         .accessibilityElement(children: .combine)
-        .accessibilityValue(isCurrent ? "Playing" : "")
-        .accessibilityHint("Jumps to this song")
+        .accessibilityValue(isCurrent ? "Playing" : (isRecorded ? "" : "Not recorded"))
+        .accessibilityHint(isRecorded ? "Jumps to this song" : "This part of the show was not recorded")
     }
 }

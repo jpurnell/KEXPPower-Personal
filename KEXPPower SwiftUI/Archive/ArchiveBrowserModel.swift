@@ -338,6 +338,19 @@ final class ArchiveBrowserModel {
         }
     }
 
+    /// Whether a song is in the part of the show that was recorded.
+    /// - Parameter track: A song of the show being heard.
+    func isPlayable(_ track: Track) -> Bool {
+        guard let show = nowPlayingShow, let transport, let aired = track.airDate else { return false }
+        return aired.timeIntervalSince(show.startTime) < transport.length
+    }
+
+    /// A note for when the recording holds only part of the show, or `nil`.
+    var truncationNote: String? {
+        guard let transport, transport.isTruncated else { return nil }
+        return "Only the first \(ArchiveTiming.positionText(transport.length)) of this show was recorded."
+    }
+
     /// The song being heard: the latest one that had aired by this point in the show.
     /// - Parameter fileTime: Seconds into the file.
     func currentTrack(atFileTime fileTime: TimeInterval) -> Track? {
@@ -412,6 +425,8 @@ final class ArchiveBrowserModel {
         switch target {
         case .within(let fileTime):
             await player.seekArchive(to: fileTime)
+        case .unrecorded:
+            notice = "That song is past the end of this recording."
         case .end:
             guard let show = playing else { return }
             switch await continuation(after: show) {

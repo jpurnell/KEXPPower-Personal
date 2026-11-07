@@ -795,6 +795,38 @@ struct ArchiveBrowserModelTests {
     }
 
 
+    // MARK: A recording shorter than its show
+
+    /// A song that aired 74 minutes into the Morning Show, which begins at 7:00.
+    private func lateTrack() throws -> Track { try track("late", "2026-11-05T08:14:00-08:00") }
+
+    @Test("Choosing a song past the end of a truncated recording says so, and stays where it is, rather than rolling on")
+    func seekPastRecording() async throws {
+        // The file holds 20 minutes of the show: 778 + 1,222 s.
+        let (model, player, catalog) = try await playingMorning(duration: 778 + 1_222)
+        await model.seek(to: try lateTrack())
+        #expect(player.seeks.isEmpty)
+        #expect(catalog.playbackRequests == ["1"])
+        #expect(model.nowPlayingShow?.id == "1")
+        #expect(model.notice == "That song is past the end of this recording.")
+    }
+
+    @Test("A song in the recorded part is playable; one past its end, or with no air time, is not")
+    func isPlayable() async throws {
+        let (model, _, _) = try await playingMorning(duration: 778 + 1_222)
+        #expect(model.isPlayable(try track("early", "2026-11-05T07:10:00-08:00")))
+        #expect(!model.isPlayable(try lateTrack()))
+        #expect(!model.isPlayable(try track("undated", nil)))
+    }
+
+    @Test("A recording shorter than its show carries a note saying how much was recorded")
+    func truncationNote() async throws {
+        let (truncated, _, _) = try await playingMorning(duration: 778 + 1_222)
+        #expect(truncated.truncationNote == "Only the first 20:22 of this show was recorded.")
+        let (full, _, _) = try await playingMorning()
+        #expect(full.truncationNote == nil)
+    }
+
     @Test("The play button pauses what is playing, and plays what is paused")
     func togglePause() async throws {
         let (model, player, _) = try await playingMorning()

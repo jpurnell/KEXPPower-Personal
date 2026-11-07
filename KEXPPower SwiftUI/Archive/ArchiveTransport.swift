@@ -19,12 +19,20 @@ struct ArchiveTransport: Equatable, Sendable {
         case within(TimeInterval)
         /// At or past the show's end: the player goes on to the next show, or to live.
         case end
+        /// Inside the show, but past the end of what was recorded: there is no audio there, and going on to the next show
+        /// would be wrong, since the show has not ended.
+        case unrecorded
     }
 
     /// File time at which the show begins.
     let lowerBound: TimeInterval
     /// File time at which the show ends.
     let upperBound: TimeInterval
+    /// How long the show's slot is, or `nil` if unknown.
+    private let slotLength: TimeInterval?
+    /// How far short of its slot a recording may fall before it is called truncated: shows start and end a little off
+    /// the hour, and a file ends when its recording did.
+    private static let truncationSlack: TimeInterval = 60
 
     /// - Parameters:
     ///   - offset: Seconds into the file at which the show begins; a negative offset reads as the start of the file.
@@ -32,6 +40,7 @@ struct ArchiveTransport: Equatable, Sendable {
     ///     which case the show runs to the end of the file.
     ///   - fileDuration: The length of the file so far.
     init(offset: TimeInterval, showLength: TimeInterval?, fileDuration: TimeInterval) {
+        slotLength = showLength.flatMap { $0.isFinite && $0 > 0 ? $0 : nil }
         guard offset.isFinite, fileDuration.isFinite, showLength?.isFinite ?? true else {
             lowerBound = 0
             upperBound = 0
@@ -50,6 +59,13 @@ struct ArchiveTransport: Equatable, Sendable {
 
     /// How long the show is, in seconds; zero when there is nothing to play.
     var length: TimeInterval { upperBound - lowerBound }
+
+    /// Whether the recording stops well short of the show's slot: KEXP's archive sometimes holds only the first part of a
+    /// show, and the audio past it does not exist.
+    var isTruncated: Bool {
+        guard !isEmpty, let slotLength else { return false }
+        return length < slotLength - Self.truncationSlack
+    }
 
     /// Whether the range is empty: the numbers were not usable, or the show lies outside the file.
     var isEmpty: Bool { length <= 0 }
@@ -117,12 +133,14 @@ struct ArchiveTransport: Equatable, Sendable {
 
     /// Where a point in the show lands, such as a song's place in it.
     /// - Parameter showTime: Seconds into the show. Before the start reads as the start; at or past the end goes on to
-    ///   what follows; one that is not a number reads as the start.
+    ///   what follows (unless the recording is truncated and the show was still on, which is `.unrecorded`); one that is not a number reads as the start.
     func target(showTime: TimeInterval) -> Target {
         guard !isEmpty, showTime.isFinite else { return .within(lowerBound) }
         if showTime <= 0 { return .within(lowerBound) }
-        if showTime >= length { return .end }
-        return .within(lowerBound + showTime)
+        if showTime < length { return .within(lowerBound + showTime) }
+        // Past the recording: if the show was still on, that part was never kept.
+        if isTruncated, let slotLength, showTime < slotLength { return .unrecorded }
+        return .end
     }
 
     /// Where a scrubber dragged to a fraction of the show lands.
