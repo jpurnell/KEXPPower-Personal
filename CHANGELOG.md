@@ -30,6 +30,8 @@
 
 - `LiveWindow`, the arithmetic for the live controls (Phase 1, not yet wired to the player): how much is held, how far through it the listener is, how far behind live (by the clock when the player can say, since a gap in the stream shortens the window and not the delay), where a skip or scrub lands, and the rewind step (five minutes, or the whole window if shorter). 14 tests.
 
+- Live now plays through a recording of the stream (live rewind, Phase 1, step 1; the controls come next). With the rewind window on, which it is by default at ten minutes, pressing play on live starts a recorder and a server on this device and plays from them: audio begins after about four seconds, not two, and runs about three seconds behind the broadcast. If the recording cannot start in fifteen seconds, the stream plays directly, as before. Playing an archived show stops the recording; returning to live starts it again. A setting of Off (`RewindWindow`, stored under `rewindWindow`; the Settings screen to change it is still to come) plays the direct stream exactly as in 3.3.0. 25 more tests.
+
 ### Changed
 - Requires `StationKit` 0.11.0 and `StationKitAdapterKEXP` 0.7.0 (this started as `StationKit` 0.7.0 for the widget's publishing logic; the archive raised it). The widget's publishing logic (save on change, heartbeat the playing flag, reload only when something changed) and the play-state expectation window moved into StationKit as `WidgetFeed` and `PlayStateExpectation`, so the watch app can share them; `WidgetPublisher` now only turns KEXP's plays and shows into a snapshot and delegates. Behaviour is unchanged: its tests pass as before, and the tests of the moved logic now live in StationKit.
 

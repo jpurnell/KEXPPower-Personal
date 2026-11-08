@@ -73,6 +73,10 @@ public class ResultRetriever {
 			let streams = KEXPStation().streams
 			if let stream = streams.first(where: { $0.id == quality.rawValue }) ?? streams.first {
 				playerController.initPlayer(link: stream.url)
+				// With a rewind window on, live plays through a recording of the stream; off, directly as before.
+				if let window = RewindWindow.resolve(stored: UserDefaults.standard.string(forKey: RewindWindow.storageKey)).duration {
+					playerController.liveShift = LiveTimeShift(source: URLSessionByteSource(url: stream.url), window: window)
+				}
 			}
 		}
 		polling.task = Task { [weak self] in

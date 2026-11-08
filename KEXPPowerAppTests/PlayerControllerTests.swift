@@ -40,6 +40,25 @@ private final class FakePublisher: NowPlayingPublishing {
     }
 }
 
+/// Stands in for the time-shift: hands out a fixed address, or none, and counts its calls.
+@MainActor
+private final class FakeShift: LiveShifting {
+    private(set) var starts = 0
+    private(set) var stops = 0
+    let address: URL?
+    let delay: Duration
+    init(address: URL?, delay: Duration = .zero) {
+        self.address = address
+        self.delay = delay
+    }
+    func start() async -> URL? {
+        starts += 1
+        try? await Task.sleep(for: delay)
+        return Task.isCancelled ? nil : address
+    }
+    func stop() async { stops += 1 }
+}
+
 @MainActor
 @Suite("PlayerController")
 struct PlayerControllerTests {
@@ -204,5 +223,84 @@ struct PlayerControllerTests {
         let controller = PlayerController(fallbackArtworkURL: nil, publisher: publisher)
         controller.refreshTimeline()
         #expect(publisher.published.isEmpty)
+    }
+
+    // MARK: Live through the time-shift
+
+    private func itemURL(_ controller: PlayerController) -> URL? {
+        (controller.player?.currentItem?.asset as? AVURLAsset)?.url
+    }
+
+    private let direct = URL(string: "https://example.com/direct.aac") ?? .temporaryDirectory
+    private let local = URL(string: "http://127.0.0.1:50000/live.m3u8") ?? .temporaryDirectory
+
+    @Test("Playing live through the time-shift plays its local address in place of the direct stream")
+    func playsLocalAddress() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        #expect(itemURL(controller) == local)
+        #expect(shift.starts == 1)
+    }
+
+    @Test("If the time-shift cannot start, the direct stream plays as it always has")
+    func fallsBackToDirect() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.liveShift = FakeShift(address: nil)
+        await controller.playLive()
+        #expect(itemURL(controller) == direct)
+    }
+
+    @Test("With no time-shift (the setting is off) nothing changes: the direct stream plays")
+    func offPlaysDirect() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        await controller.playLive()
+        #expect(itemURL(controller) == direct)
+    }
+
+    @Test("Pausing while the recording is still starting stops playback from beginning")
+    func pauseDuringStart() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.liveShift = FakeShift(address: local, delay: .milliseconds(200))
+        controller.playPlayer()
+        try? await Task.sleep(for: .milliseconds(50))
+        controller.pausePlayer()
+        try? await Task.sleep(for: .milliseconds(400))
+        #expect(!controller.isPlaying)
+        #expect(itemURL(controller) != local)
+    }
+
+    @Test("Playing again does not start the time-shift again")
+    func startsOnce() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        await controller.playLive()
+        #expect(shift.starts == 1)
+    }
+
+    @Test("Playing an archived show stops the recording, and going back to live starts it again")
+    func archiveStopsRecording() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        await controller.playArchive(url: URL(string: "https://example.com/show.aac") ?? .temporaryDirectory, at: 0)
+        #expect(shift.stops == 1)
+        controller.returnToLive()
+        // Going back to live starts on its own task; wait for it to land.
+        for _ in 0..<300 where shift.starts < 2 || itemURL(controller) != local {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(shift.starts == 2)
+        #expect(itemURL(controller) == local)
     }
 }

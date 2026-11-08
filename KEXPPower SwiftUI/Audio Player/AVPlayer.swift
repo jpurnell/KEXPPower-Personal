@@ -39,6 +39,13 @@ import UniformTypeIdentifiers
         @ObservationIgnored private var liveLink: URL?
         /// Whether the player holds an archived show's file instead of the live stream.
         private(set) var isPlayingArchive = false
+        /// Records the live stream so it can be paused and rewound; `nil` when the rewind window is off.
+        @ObservationIgnored var liveShift: (any LiveShifting)?
+        /// Whether the live stream has been resolved to the time-shift's address or to the direct stream since live
+        /// last began, and whether that is under way.
+        private enum LiveSource { case unresolved, resolving, shifted, direct }
+        @ObservationIgnored private var liveSource = LiveSource.unresolved
+        @ObservationIgnored private let shiftTask = TaskHolder()
         /// Watches how long going back to live takes; replaced each time, so only the latest request is measured.
         @ObservationIgnored private let liveTimer = TaskHolder()
         /// How far from the end of an archived file the next item is lined up, so it is loaded before it is needed.
@@ -237,10 +244,50 @@ import UniformTypeIdentifiers
 
         func playPlayer() {
             sessionCoordinator.activate()
-            player?.play()
+            guard !isPlayingArchive, liveSource == .unresolved else {
+                player?.play()
+                return
+            }
+            shiftTask.task = Task { [weak self] in await self?.playLive() }
+        }
+
+        /// Plays the live stream, through the time-shift if there is one and it is ready, and directly if not.
+        ///
+        /// The first play after live begins waits a few seconds for the recording to have something to play; after that
+        /// it is an ordinary play.
+        func playLive() async {
+            guard let player, !isPlayingArchive else { return }
+            guard liveSource == .unresolved else {
+                if liveSource != .resolving { player.play() }
+                return
+            }
+            guard let liveShift else {
+                liveSource = .direct
+                player.play()
+                return
+            }
+            liveSource = .resolving
+            let address = await liveShift.start()
+            guard !isPlayingArchive, !Task.isCancelled else {
+                liveSource = .unresolved
+                return
+            }
+            if let address {
+                let item = AVPlayerItem(url: address)
+                replaceItems(with: item)
+                liveSource = .shifted
+                measureLiveStart(of: item)
+            } else {
+                // The recording could not start: the stream the app has always played.
+                if player.currentItem == nil, let liveLink { replaceItems(with: AVPlayerItem(url: liveLink)) }
+                liveSource = .direct
+            }
+            player.play()
         }
 
         func pausePlayer() {
+            // A pause while the recording is still starting means the listener does not want to hear it begin.
+            if liveSource == .resolving { shiftTask.task?.cancel() }
             player?.pause()
         }
 
@@ -259,9 +306,15 @@ import UniformTypeIdentifiers
         func playArchive(url: URL, at offset: TimeInterval) async {
             guard let player else { return }
             sessionCoordinator.activate()
+            shiftTask.task?.cancel()
             let item = AVPlayerItem(url: url)
             replaceItems(with: item)
             isPlayingArchive = true
+            // The recording is not needed while an archived show plays, and costs data.
+            if liveSource != .unresolved {
+                liveSource = .unresolved
+                await liveShift?.stop()
+            }
             await seekArchive(to: offset)
             player.play()
             armEndWatch(for: item)
@@ -319,10 +372,17 @@ import UniformTypeIdentifiers
             endWatch.task?.cancel()
             continuation = nil
             onAdvanced = nil
+            isPlayingArchive = false
+            liveSource = .unresolved
+            guard liveShift == nil else {
+                // Through the time-shift: the item is chosen once the recording is ready.
+                (player as? AVQueuePlayer)?.removeAllItems()
+                playPlayer()
+                return
+            }
             let item = AVPlayerItem(url: liveLink)
             item.preferredForwardBufferDuration = 300
             replaceItems(with: item)
-            isPlayingArchive = false
             playPlayer()
             measureLiveStart(of: item)
         }
