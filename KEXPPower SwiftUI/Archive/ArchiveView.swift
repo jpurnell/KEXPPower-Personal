@@ -50,7 +50,7 @@ struct ArchiveView: View {
         }
         #if os(iOS) && DEBUG
         .sheet(isPresented: $showingProbe) { ArchiveProbeView(model: model) }
-        .sheet(isPresented: $showingLiveProbe) { LiveRewindProbeView() }
+        .sheet(isPresented: $showingLiveProbe) { LiveRewindProbeView(appPlayer: model.playerController) }
         #endif
     }
 

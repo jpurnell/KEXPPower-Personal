@@ -67,18 +67,22 @@ actor LiveRecorder {
     private let relay: LiveRelay
     private let backoff = ReconnectBackoff()
     private let sleep: @Sendable (TimeInterval) async -> Void
+    private let report: @Sendable (String) -> Void
     private var task: Task<Void, Never>?
 
     /// - Parameters:
     ///   - source: Where the stream comes from.
     ///   - relay: Where it goes.
     ///   - sleep: Waits for a number of seconds; a test passes one that returns at once.
+    ///   - report: Told what the recorder is doing, in words, for a log.
     init(
         source: any LiveByteSource, relay: LiveRelay,
         sleep: @escaping @Sendable (TimeInterval) async -> Void = { seconds in
             try? await Task.sleep(for: .seconds(seconds))
-        }
+        },
+        report: @escaping @Sendable (String) -> Void = { _ in }
     ) {
+        self.report = report
         self.source = source
         self.relay = relay
         self.sleep = sleep
@@ -91,23 +95,37 @@ actor LiveRecorder {
         let relay = relay
         let backoff = backoff
         let sleep = sleep
+        let report = report
         task = Task {
             var failures = 0
+            var attempt = 0
             while !Task.isCancelled {
                 var received = false
+                var bytes = 0
+                attempt += 1
+                report("connecting (attempt \(attempt))")
                 do {
                     for try await chunk in source.chunks() {
+                        if !received { report("first bytes of attempt \(attempt)") }
                         received = true
+                        bytes += chunk.count
                         await relay.ingest(chunk)
                     }
+                    // A loop cut short by cancelling ends quietly, so this tells stopping from the connection ending.
+                    try Task.checkCancellation()
+                    report("connection ended after \(bytes) bytes")
+                } catch is CancellationError {
+                    break
                 } catch {
-                    // The connection failed; handled the same as one that ended.
+                    report("connection failed after \(bytes) bytes: \(error.localizedDescription)")
                 }
                 guard !Task.isCancelled else { break }
                 await relay.streamBroke()
                 // Audio since the last attempt means the stream was up, so the wait starts over.
                 failures = received ? 1 : failures + 1
-                await sleep(backoff.delay(afterFailures: failures))
+                let wait = backoff.delay(afterFailures: failures)
+                report("retrying in \(wait) s")
+                await sleep(wait)
             }
         }
     }

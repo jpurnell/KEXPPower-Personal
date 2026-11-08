@@ -5,7 +5,9 @@
 
 #if os(iOS) && DEBUG
 import AVFoundation
+import Network
 import SwiftUI
+import UIKit
 
 /// A debug-only panel for Phase 0 of live rewind: it records the live stream into a `LiveRelay`, serves it from the
 /// loopback address, and plays it with a separate `AVPlayer`, to find out on a device what the design only assumes.
@@ -18,33 +20,46 @@ import SwiftUI
 final class LiveRewindProbeModel {
     private static let streamURL = URL(string: "https://kexp.streamguys1.com/kexp160.aac")
     private static let firstSegmentsNeeded: TimeInterval = 6
-    private static let logEvery = 5
+    private static let logEvery = 2
 
     private let relay = LiveRelay(windowDuration: 600)
     private let server: LocalHLSServer
+    private let appPlayer: PlayerController
+    private var heartbeat: Task<Void, Never>?
     private let diagnostics = DiagnosticLog.app
     private var recorder: LiveRecorder?
     private var ticks = 0
+    private var observers: [any NSObjectProtocol] = []
+    private var pathMonitor: NWPathMonitor?
 
     private(set) var player: AVPlayer?
     private(set) var readout = "Stopped"
     private(set) var lines: [String] = []
 
-    init() {
+    init(appPlayer: PlayerController) {
+        self.appPlayer = appPlayer
         server = LocalHLSServer(relay: relay)
+    }
+
+    isolated deinit {
+        heartbeat?.cancel()
     }
 
     /// Records the stream, waits for a few segments, and plays through the local server.
     func start() async {
         guard player == nil, let stream = Self.streamURL else { return }
-        note("starting")
+        note("starting; the app's own player was \(appPlayer.isPlaying ? "playing" : "not playing")")
+        if appPlayer.isPlaying { appPlayer.pausePlayer() }
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             note("audio session: \(error.localizedDescription)")
         }
-        let recorder = LiveRecorder(source: URLSessionByteSource(url: stream), relay: relay)
+        let log = diagnostics
+        let recorder = LiveRecorder(
+            source: URLSessionByteSource(url: stream), relay: relay,
+            report: { log.record("LiveProbe", "recorder: \($0)") })
         self.recorder = recorder
         await recorder.start()
         for _ in 0..<40 where await relay.bufferedDuration < Self.firstSegmentsNeeded {
@@ -57,7 +72,9 @@ final class LiveRewindProbeModel {
             let item = AVPlayerItem(url: url)
             let player = AVPlayer(playerItem: item)
             self.player = player
+            observe(item, player)
             player.play()
+            startHeartbeat()
         } catch {
             note("server failed: \(error.localizedDescription)")
         }
@@ -68,10 +85,73 @@ final class LiveRewindProbeModel {
         note("stopping")
         player?.pause()
         player = nil
+        stopObserving()
+        heartbeat?.cancel()
+        heartbeat = nil
         server.stop()
         await recorder?.stop()
         recorder = nil
         readout = "Stopped"
+    }
+
+    /// Writes down what the system tells the player and the app, so a gap or a stall can be explained afterwards.
+    private func observe(_ item: AVPlayerItem, _ player: AVPlayer) {
+        let center = NotificationCenter.default
+        let log = diagnostics
+        func watch(_ name: Notification.Name, _ object: Any?, _ text: @escaping @Sendable (Notification) -> String) {
+            observers.append(center.addObserver(forName: name, object: object, queue: .main) { note in
+                log.record("LiveProbe", "event: \(text(note))")
+            })
+        }
+        watch(.AVPlayerItemPlaybackStalled, item) { _ in "playback stalled" }
+        watch(.AVPlayerItemFailedToPlayToEndTime, item) { note in
+            let error = note.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? NSError
+            return "failed to play to end: \(error?.localizedDescription ?? "unknown")"
+        }
+        watch(.AVPlayerItemTimeJumped, item) { _ in "time jumped" }
+        watch(.AVPlayerItemNewErrorLogEntry, item) { _ in
+            "error log: \(item.errorLog()?.events.last?.errorComment ?? "-") (\(item.errorLog()?.events.last?.errorStatusCode ?? 0))"
+        }
+        watch(.AVPlayerItemNewAccessLogEntry, item) { _ in
+            let last = item.accessLog()?.events.last
+            return "access log: \(last?.numberOfMediaRequests ?? 0) requests, \(last?.numberOfStalls ?? 0) stalls, "
+                + "\(last?.numberOfServerAddressChanges ?? 0) server changes, \(last?.downloadOverdue ?? 0) overdue"
+        }
+        watch(UIApplication.didEnterBackgroundNotification, nil) { _ in "app in background" }
+        watch(UIApplication.willEnterForegroundNotification, nil) { _ in "app to foreground" }
+        watch(AVAudioSession.interruptionNotification, nil) { note in
+            "audio interruption \(note.userInfo?[AVAudioSessionInterruptionTypeKey] ?? "?")"
+        }
+        let monitor = NWPathMonitor()
+        pathMonitor = monitor
+        monitor.pathUpdateHandler = { path in
+            log.record("LiveProbe", "network: \(path.status) \(path.isExpensive ? "expensive" : "")")
+        }
+        monitor.start(queue: .main)
+        note("watching events")
+    }
+
+    /// Logs from the model, not the screen, so it carries on while the screen is locked (the panel's own timer stops).
+    private func startHeartbeat() {
+        heartbeat = Task { [weak self] in
+            while !Task.isCancelled {
+                await self?.beat()
+                try? await Task.sleep(for: .seconds(2))
+            }
+        }
+    }
+
+    /// One reading, and whether the app's own player has started on its own.
+    private func beat() async {
+        await refresh()
+        diagnostics.record("LiveProbe", "heartbeat: \(appPlayer.isPlaying ? "app player PLAYING" : "app player idle")")
+    }
+
+    private func stopObserving() {
+        observers.forEach(NotificationCenter.default.removeObserver)
+        observers = []
+        pathMonitor?.cancel()
+        pathMonitor = nil
     }
 
     func skip(by seconds: TimeInterval) {
@@ -134,7 +214,11 @@ final class LiveRewindProbeModel {
 
 /// The panel: start, then try pause, back 15, back 5 minutes and the live edge, and watch the readout.
 struct LiveRewindProbeView: View {
-    @State private var probe = LiveRewindProbeModel()
+    @State private var probe: LiveRewindProbeModel
+
+    init(appPlayer: PlayerController) {
+        _probe = State(initialValue: LiveRewindProbeModel(appPlayer: appPlayer))
+    }
 
     var body: some View {
         List {
@@ -155,6 +239,7 @@ struct LiveRewindProbeView: View {
                 }
             }
         }
+        .onDisappear { Task { await probe.stop() } }
         .task {
             while !Task.isCancelled {
                 await probe.refresh()
