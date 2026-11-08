@@ -18,6 +18,7 @@ struct ArchiveView: View {
     @State private var selection: ArchiveSelection?
     #if os(iOS) && DEBUG
     @State private var showingProbe = false
+    @State private var showingLiveProbe = false
     #endif
 
     var body: some View {
@@ -49,6 +50,7 @@ struct ArchiveView: View {
         }
         #if os(iOS) && DEBUG
         .sheet(isPresented: $showingProbe) { ArchiveProbeView(model: model) }
+        .sheet(isPresented: $showingLiveProbe) { LiveRewindProbeView() }
         #endif
     }
 
@@ -68,6 +70,7 @@ struct ArchiveView: View {
             Spacer()
             #if os(iOS) && DEBUG
             Button("Probe") { showingProbe = true }
+            Button("Live") { showingLiveProbe = true }
             #endif
         }
         .padding(.horizontal)
