@@ -109,7 +109,7 @@ struct ArchiveBrowserModelTests {
         _ catalog: FakeCatalog, _ player: FakePlayer = FakePlayer(), now: String = "2026-11-06T14:00:00-08:00"
     ) throws -> ArchiveBrowserModel {
         let fixed = try date(now)
-        return ArchiveBrowserModel(catalog: catalog, player: player, calendar: calendar, now: { fixed })
+        return ArchiveBrowserModel(catalog: catalog, player: player, calendar: calendar, now: { fixed }, songCheckInterval: nil)
     }
 
     // MARK: Tiles
@@ -726,6 +726,91 @@ struct ArchiveBrowserModelTests {
         #expect(model.currentTrack(atFileTime: 778 + 10) == nil)
         #expect(model.currentTrack(atFileTime: 778 + 250)?.id == "b")
         #expect(model.currentTrack(atFileTime: 778 + 3_000)?.id == "c")
+    }
+
+    // MARK: The song follows the timecode
+
+    private func playingWithSongs(fileTime: TimeInterval = 0) async throws -> (ArchiveBrowserModel, FakePlayer) {
+        let (model, player, catalog) = try await playingMorning(fileTime: fileTime)
+        catalog.trackList = [
+            try track("a", "2026-11-05T07:00:30-08:00", title: "First"), try track("b", "2026-11-05T07:04:00-08:00", title: "Second"),
+            try track("c", "2026-11-05T07:09:00-08:00", title: "Third"),
+        ]
+        await model.loadTracks()
+        return (model, player)
+    }
+
+    @Test("The song heard is announced to the lock screen and the car once the player is past where it aired")
+    func announcesSongHeard() async throws {
+        let (model, player) = try await playingWithSongs()
+        player.archiveFileTime = 778 + 250
+        await model.announceCurrentSong()
+        #expect(player.announced.last?.track?.id == "b")
+    }
+
+    @Test("A song already announced is not announced again")
+    func announcesOnce() async throws {
+        let (model, player) = try await playingWithSongs()
+        player.archiveFileTime = 778 + 250
+        await model.announceCurrentSong()
+        let count = player.announced.count
+        player.archiveFileTime = 778 + 260
+        await model.announceCurrentSong()
+        #expect(player.announced.count == count)
+    }
+
+    @Test("Moving on to the next song, and back to an earlier one, announces each")
+    func announcesEachChange() async throws {
+        let (model, player) = try await playingWithSongs()
+        for (fileTime, expected) in [(778.0 + 250, "b"), (778 + 3_000, "c"), (778 + 100, "a")] {
+            player.archiveFileTime = fileTime
+            await model.announceCurrentSong()
+            #expect(player.announced.last?.track?.id == expected)
+        }
+    }
+
+    @Test("Before the show's first song the show is announced, not a song")
+    func announcesShowBeforeFirstSong() async throws {
+        let (model, player) = try await playingWithSongs()
+        player.archiveFileTime = 778 + 250
+        await model.announceCurrentSong()
+        player.archiveFileTime = 778 + 10
+        await model.announceCurrentSong()
+        guard case .program(let info) = player.announced.last else {
+            Issue.record("expected the show")
+            return
+        }
+        #expect(info.title == "The Morning Show")
+    }
+
+    @Test("Nothing is announced before the songs have loaded, or when no archived show is playing")
+    func announcesNothingWithoutSongs() async throws {
+        let (playing, player, _) = try await playingMorning(fileTime: 778 + 250)
+        let count = player.announced.count
+        await playing.announceCurrentSong()
+        #expect(player.announced.count == count)
+
+        let idle = try model(try browsable())
+        await idle.announceCurrentSong()
+    }
+
+    @Test("While a show plays the model fetches its songs and keeps announcing the one heard, with no screen asking")
+    func followsOnItsOwn() async throws {
+        let catalog = try browsable()
+        catalog.playback = ArchivePlayback(url: try #require(URL(string: transportFile)), offset: 778, nextURL: nil)
+        catalog.trackList = [try track("a", "2026-11-05T07:00:30-08:00", title: "First")]
+        let player = FakePlayer()
+        player.archiveFileDuration = 14_000
+        player.archiveFileTime = 778 + 100
+        let fixed = try date("2026-11-06T14:00:00-08:00")
+        let model = ArchiveBrowserModel(
+            catalog: catalog, player: player, calendar: calendar, now: { fixed }, songCheckInterval: .milliseconds(10))
+        await model.load()
+        let morning = try #require(model.shows(for: .host("John Richards")).first)
+        await model.play(morning)
+        for _ in 0..<200 where player.announced.last?.track == nil { try await Task.sleep(for: .milliseconds(10)) }
+        #expect(player.announced.last?.track?.id == "a")
+        model.returnToLive()
     }
 
     // MARK: System transport controls

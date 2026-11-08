@@ -19,12 +19,12 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
         _ templateApplicationScene: CPTemplateApplicationScene, didConnect interfaceController: CPInterfaceController
     ) {
         diagnostics.record("CarPlay", "scene delegate: car connected")
-        guard let model = AppModelRegistry.model, let saving = AppModelRegistry.saving else {
+        guard let model = AppModelRegistry.model, let saving = AppModelRegistry.saving, let archive = AppModelRegistry.archive else {
             logger.error("CarPlay connected before the app's player was ready")
             diagnostics.record("CarPlay", "scene delegate: connected before the player was ready")
             return
         }
-        let controller = CarPlayController(interfaceController: interfaceController, model: model, saving: saving)
+        let controller = CarPlayController(interfaceController: interfaceController, model: model, saving: saving, archive: archive)
         self.controller = controller
         controller.start()
     }

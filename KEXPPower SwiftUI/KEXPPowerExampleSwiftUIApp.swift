@@ -20,6 +20,8 @@ struct KEXPPowerExampleSwiftUIApp: App {
     @State private var model: ResultRetriever
     /// Saves songs to the listener's playlists; the add buttons read it from the environment.
     @State private var saving: SongSavingModel
+    /// The archive's browser, shared with CarPlay through the registry.
+    @State private var archive: ArchiveBrowserModel
     #if os(iOS)
     /// Lets CarPlay connect: the system asks the app delegate for the car's scene configuration.
     @UIApplicationDelegateAdaptor(CarPlayAppDelegate.self) private var appDelegate
@@ -30,9 +32,12 @@ struct KEXPPowerExampleSwiftUIApp: App {
         let saving = AppSongSaver.makeModel()
         _model = State(initialValue: model)
         _saving = State(initialValue: saving)
+        let archive = ArchiveBrowserModel.standard(player: model.playerController)
+        _archive = State(initialValue: archive)
         // An App Intent from the widget, and CarPlay, reach the player through this, even if no window has opened yet.
         AppModelRegistry.model = model
         AppModelRegistry.saving = saving
+        AppModelRegistry.archive = archive
         #if os(iOS)
         DiagnosticLog.app.trim()
         DiagnosticLog.app.record("App", "launched")
@@ -43,7 +48,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
         #if os(macOS)
         // A single window, so "Show Full Window" brings the existing one back instead of opening another.
         Window("Spinner", id: SceneID.main) {
-            RootView(model: model)
+            RootView(model: model, archive: archive)
                 .environment(saving)
         }
         .defaultSize(width: 780, height: 900)
@@ -66,7 +71,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
         }
         #else
         WindowGroup {
-            RootView(model: model)
+            RootView(model: model, archive: archive)
                 .environment(saving)
         }
         .commands {
