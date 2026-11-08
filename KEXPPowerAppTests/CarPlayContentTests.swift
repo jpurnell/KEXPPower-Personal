@@ -70,10 +70,18 @@ struct CarPlayContentTests {
 
     @Test("An archived show is its name over its start time at the station and its hosts")
     func archiveShowRow() {
-        let row = CarPlayContent.archiveShowRow(show("1", "2026-11-06T07:00:00-08:00"))
+        let seattle = TimeZone(identifier: "America/Los_Angeles") ?? .gmt
+        let row = CarPlayContent.archiveShowRow(show("1", "2026-11-06T07:00:00-08:00"), zone: seattle)
         #expect(row == CarPlayContent.Row(title: "The Morning Show", detail: "7:00 AM · John Richards"))
-        let hostless = CarPlayContent.archiveShowRow(show("1", "2026-11-06T13:30:00-08:00", hosts: []))
+        let hostless = CarPlayContent.archiveShowRow(show("1", "2026-11-06T13:30:00-08:00", hosts: []), zone: seattle)
         #expect(hostless.detail == "1:30 PM")
+    }
+
+    @Test("The start time is read in the zone the listener chose")
+    func archiveShowRowZone() {
+        let utc = TimeZone(identifier: "UTC") ?? .gmt
+        let row = CarPlayContent.archiveShowRow(show("1", "2026-11-06T07:00:00-08:00"), zone: utc)
+        #expect(row.detail == "3:00 PM · John Richards")
     }
 
     @Test("The Now Playing screen offers the add button on the live stream, and the way back to live on an archived show")

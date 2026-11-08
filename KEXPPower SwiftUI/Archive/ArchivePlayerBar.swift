@@ -9,6 +9,9 @@ import SwiftUI
 /// The player for an archived show, shown over every section of the app while one plays: where you are in it, play and pause, a short rewind and a longer skip forward,
 /// and a way to catch up to the live stream.
 struct ArchivePlayerBar: View {
+    @AppStorage(ShowTimeZone.storageKey) private var storedZone = ShowTimeZone.mine.rawValue
+    /// The zone times of day are drawn in, from Settings.
+    private var zone: TimeZone { ShowTimeZone.resolve(stored: storedZone).zone }
     let show: ArchiveShow
     let browser: ArchiveBrowserModel
     /// The scrubber's value while a finger is on it, so the clock does not fight the drag.
@@ -88,7 +91,7 @@ struct ArchivePlayerBar: View {
                     Spacer()
                     if let aired = browser.airTime(atFileTime: shownFileTime) {
                         // What the clock on the studio wall read, for finding "the thing at 12:15".
-                        Text(ArchiveTiming.clock(aired, zone: .autoupdatingCurrent)).foregroundStyle(.primary)
+                        Text(ArchiveTiming.clock(aired, zone: zone)).foregroundStyle(.primary)
                     }
                     Spacer()
                     Text(transport.remainingText(atFileTime: shownFileTime))
@@ -212,6 +215,9 @@ private struct ArchivePlaylistView: View {
 }
 
 private struct TrackRow: View {
+    @AppStorage(ShowTimeZone.storageKey) private var storedZone = ShowTimeZone.mine.rawValue
+    /// The zone times of day are drawn in, from Settings.
+    private var zone: TimeZone { ShowTimeZone.resolve(stored: storedZone).zone }
     let track: Track
     let isCurrent: Bool
     /// Whether the song is in the part of the show that was recorded; if not, it cannot be played.
@@ -220,7 +226,7 @@ private struct TrackRow: View {
     var body: some View {
         HStack(spacing: 12) {
             if let aired = track.airDate {
-                Text(ArchiveTiming.clock(aired, zone: .autoupdatingCurrent)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                Text(ArchiveTiming.clock(aired, zone: zone)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                     .frame(width: 96, alignment: .leading)
             }
             VStack(alignment: .leading, spacing: 2) {

@@ -48,11 +48,12 @@ enum CarPlayContent {
         return Row(title: title, detail: detail)
     }
 
-    /// An archived show: its name over the time it began at the station and its hosts.
-    static func archiveShowRow(_ show: ArchiveShow) -> Row {
+    /// An archived show: its name over the time it began and its hosts.
+    /// - Parameter zone: The time zone to read the start in, from Settings.
+    static func archiveShowRow(_ show: ArchiveShow, zone: TimeZone) -> Row {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = ArchiveTiming.stationTimeZone
+        formatter.timeZone = zone
         formatter.dateFormat = "h:mm a"
         let start = formatter.string(from: show.startTime)
         let hosts = show.hostNames.map(trimmed).filter { !$0.isEmpty }

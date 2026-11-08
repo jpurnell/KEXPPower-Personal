@@ -170,8 +170,9 @@ final class CarPlayController {
 
     /// Pushes the list of a day's shows.
     private func showShows(of day: ArchiveDayTile) async {
+        let zone = ShowTimeZone.resolve(stored: UserDefaults.standard.string(forKey: ShowTimeZone.storageKey)).zone
         let items = day.shows.prefix(CPListTemplate.maximumItemCount).map { show in
-            let row = CarPlayContent.archiveShowRow(show)
+            let row = CarPlayContent.archiveShowRow(show, zone: zone)
             let item = CPListItem(text: row.title, detailText: row.detail)
             item.handler = { [weak self] _, completion in
                 Task { @MainActor in
