@@ -44,7 +44,11 @@ import UniformTypeIdentifiers
         /// Whether the live stream has been resolved to the time-shift's address or to the direct stream since live
         /// last began, and whether that is under way.
         private enum LiveSource { case unresolved, resolving, shifted, direct }
-        @ObservationIgnored private var liveSource = LiveSource.unresolved
+        @ObservationIgnored private var liveSource = LiveSource.unresolved {
+            didSet { isTimeShifted = liveSource == .shifted }
+        }
+        /// Whether live is playing through the recording, so it can be paused and rewound.
+        private(set) var isTimeShifted = false
         @ObservationIgnored private let shiftTask = TaskHolder()
         /// Watches how long going back to live takes; replaced each time, so only the latest request is measured.
         @ObservationIgnored private let liveTimer = TaskHolder()
@@ -293,6 +297,59 @@ import UniformTypeIdentifiers
 
         func playOrPause() {
             isPlaying ? pausePlayer() : playPlayer()
+        }
+
+        // MARK: - Rewinding the live stream
+
+        /// How much of the live stream is held and where the listener is in it, or `nil` unless live plays through the
+        /// recording and the player has said what it can seek to.
+        var liveWindow: LiveWindow? {
+            guard liveSource == .shifted, let player, let item = player.currentItem,
+                let range = item.seekableTimeRanges.last?.timeRangeValue
+            else { return nil }
+            let lag = item.currentDate().map { Date().timeIntervalSince($0) }
+            return LiveWindow(
+                start: range.start.seconds, end: range.end.seconds, position: player.currentTime().seconds,
+                wallClockLag: lag)
+        }
+
+        /// How far the rewind button goes back: five minutes, or the whole window if it is shorter.
+        var rewindStep: TimeInterval { LiveWindow.rewindStep(forWindow: liveShift?.window ?? .nan) }
+
+        /// Moves within the live window; a skip forward to the newest audio is live again.
+        /// - Parameter seconds: How far to move; negative to go back.
+        func skipLive(by seconds: TimeInterval) async {
+            guard let window = liveWindow else { return }
+            await move(to: window.target(skipping: seconds), in: window)
+        }
+
+        /// Goes back by the rewind step.
+        func rewindLive() async {
+            await skipLive(by: -rewindStep)
+        }
+
+        /// Moves to a fraction of the live window, from the oldest audio (0) to the newest (1).
+        func scrubLive(toFraction fraction: Double) async {
+            guard let window = liveWindow else { return }
+            await move(to: window.target(fraction: fraction), in: window)
+        }
+
+        /// Goes to the newest audio the recording holds.
+        func catchUpToLive() async {
+            guard let window = liveWindow else { return }
+            await move(to: .live, in: window)
+        }
+
+        private func move(to target: LiveWindow.Target, in window: LiveWindow) async {
+            guard let player else { return }
+            let seconds: TimeInterval
+            switch target {
+            case .within(let time): seconds = time
+            case .live: seconds = window.end
+            }
+            await player.seek(
+                to: CMTime(seconds: seconds, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
+            if case .live = target { player.play() }
         }
 
         // MARK: - Archive

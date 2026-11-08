@@ -46,9 +46,11 @@ private final class FakeShift: LiveShifting {
     private(set) var starts = 0
     private(set) var stops = 0
     let address: URL?
+    let window: TimeInterval
     let delay: Duration
-    init(address: URL?, delay: Duration = .zero) {
+    init(address: URL?, window: TimeInterval = 600, delay: Duration = .zero) {
         self.address = address
+        self.window = window
         self.delay = delay
     }
     func start() async -> URL? {
@@ -302,5 +304,38 @@ struct PlayerControllerTests {
         }
         #expect(shift.starts == 2)
         #expect(itemURL(controller) == local)
+    }
+
+    @Test("Until live is playing through the time-shift there is no live window, and the controls stay away")
+    func noWindowBeforeShift() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        #expect(!controller.isTimeShifted)
+        #expect(controller.liveWindow == nil)
+        controller.liveShift = FakeShift(address: nil)
+        await controller.playLive()
+        #expect(!controller.isTimeShifted)
+    }
+
+    @Test("Once live plays through the time-shift, the player says so, and that is observable")
+    func shiftedIsObservable() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.liveShift = FakeShift(address: local)
+        let changed = Flag()
+        withObservationTracking { _ = controller.isTimeShifted } onChange: { changed.fire() }
+        await controller.playLive()
+        #expect(controller.isTimeShifted)
+        #expect(changed.fired)
+    }
+
+    @Test("The rewind step is five minutes, or the whole window when that is shorter")
+    func rewindStep() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.liveShift = FakeShift(address: local, window: 600)
+        #expect(abs(controller.rewindStep - 300) < 1e-9)
+        controller.liveShift = FakeShift(address: local, window: 120)
+        #expect(abs(controller.rewindStep - 120) < 1e-9)
     }
 }

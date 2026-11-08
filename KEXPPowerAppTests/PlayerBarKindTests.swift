@@ -24,6 +24,19 @@ struct PlayerBarKindTests {
         #expect(PlayerBarKind.kind(archiveShow: nil, liveHasPlayed: true, in: .live) == .none)
     }
 
+    @Test("When live can be rewound, the Live section gets the bar too, since the controls belong at the bottom there as everywhere")
+    func liveRewindableInLive() {
+        for section in AppSection.allCases {
+            #expect(PlayerBarKind.kind(archiveShow: nil, liveHasPlayed: true, isTimeShifted: true, in: section) == .live)
+        }
+    }
+
+    @Test("A rewindable live that has not been started has no bar, and an archived show still wins")
+    func rewindableEdges() {
+        #expect(PlayerBarKind.kind(archiveShow: nil, liveHasPlayed: false, isTimeShifted: true, in: .live) == .none)
+        #expect(PlayerBarKind.kind(archiveShow: show(), liveHasPlayed: true, isTimeShifted: true, in: .live) == .archive(show()))
+    }
+
     @Test("Before anything has played there is no bar")
     func none() {
         for section in AppSection.allCases {

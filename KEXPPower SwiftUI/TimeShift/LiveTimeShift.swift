@@ -8,6 +8,8 @@ import Foundation
 /// Something that can offer the player a live stream with a rewind window.
 @MainActor
 protocol LiveShifting: AnyObject {
+    /// How many seconds of the stream are kept.
+    var window: TimeInterval { get }
     /// Starts recording the live stream and serving it locally.
     /// - Returns: The address to play, or `nil` if it could not be made ready, in which case the direct stream is played.
     func start() async -> URL?
@@ -25,6 +27,7 @@ final class LiveTimeShift: LiveShifting {
     private let firstAudio: TimeInterval
     private let timeout: TimeInterval
     private var address: URL?
+    let window: TimeInterval
 
     /// - Parameters:
     ///   - source: Where the live stream comes from.
@@ -37,6 +40,7 @@ final class LiveTimeShift: LiveShifting {
         recorder = LiveRecorder(
             source: source, relay: relay, report: { DiagnosticLog.app.record("TimeShift", "recorder: \($0)") })
         server = LocalHLSServer(relay: relay)
+        self.window = window
         self.firstAudio = firstAudio
         self.timeout = timeout
     }

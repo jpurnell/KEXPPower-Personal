@@ -88,6 +88,7 @@
 		471E07558466100EC4D87175 /* PlayerBarKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 742332F2DD84136F05577C26 /* PlayerBarKind.swift */; };
 		49412411926F4D9C5E7C6FB8 /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = 3AE9640B328391A892B3013F /* StationKitAdapterKEXP */; };
 		49A0D8BAE3BA3AED7652341A /* CompactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7219D81D2BEAA8B80079B78E /* CompactView.swift */; };
+		4AF5ED5FAAF74C39F02BB98B /* LiveRewindControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2704D4123F24F7E75DFC1B /* LiveRewindControls.swift */; };
 		4B6D7214728CB574073F5E8D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EF30CA8E2C1E77C41691552 /* Cocoa.framework */; };
 		4BC8B6733BAC4EA4EC90C087 /* LiveWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5556C6D46A570A910C62A /* LiveWindow.swift */; };
 		4BFC6CE38F9372B5EFD76F5A /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1E1AE6BCC0646A0E8C4526E6 /* StationKit */; };
@@ -227,6 +228,7 @@
 		C05C782078751E5174E0AFC3 /* ADTSSegmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91DCC24277E26EEC7493428 /* ADTSSegmenter.swift */; };
 		C1011BC886E933FBF05CB940 /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = BBAB57C5E9B7981118104FC1 /* StationKitAdapterKEXP */; };
 		C3553AE905F4D68840C2C21D /* SetPlayingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777110BBCF2098176DC35E0A /* SetPlayingIntent.swift */; };
+		C53C46F367A6E3726AE27A41 /* LiveRewindControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2704D4123F24F7E75DFC1B /* LiveRewindControls.swift */; };
 		C7B96B15AAF8D1241F410897 /* PlayPauseIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E566CF41C97EAB3E3BBEC7 /* PlayPauseIntent.swift */; };
 		C93E4690292EFCEA372CFD3A /* WidgetConstantsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B581D086F4D834217B4F630 /* WidgetConstantsTests.swift */; };
 		CC6B1625F8C107A1ECFDA81D /* MusicKitCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AF82B259DB7031739958A9 /* MusicKitCatalog.swift */; };
@@ -525,6 +527,7 @@
 		E54EF902BDD6F44788AF6240 /* CarPlayController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayController.swift; sourceTree = "<group>"; };
 		E7C2F39956AFF7B54CCA1107 /* MiniPlayerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MiniPlayerView.swift; sourceTree = "<group>"; };
 		E7E3CE8242017EB914AB9365 /* SongSavingModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SongSavingModel.swift; sourceTree = "<group>"; };
+		EC2704D4123F24F7E75DFC1B /* LiveRewindControls.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LiveRewindControls.swift; sourceTree = "<group>"; };
 		EE23747C58CC6E7C70D63BA4 /* CarPlaySceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlaySceneDelegate.swift; sourceTree = "<group>"; };
 		EFA4B65AE234AEEF0BC3D85F /* ArchiveProbeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ArchiveProbeView.swift; sourceTree = "<group>"; };
 		F478354AB15736CA0D325E03 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -890,6 +893,7 @@
 				89A5556C6D46A570A910C62A /* LiveWindow.swift */,
 				FA46F38BDB93670268A2B07F /* RewindWindow.swift */,
 				3DB37A0F80E3387358760B70 /* LiveTimeShift.swift */,
+				EC2704D4123F24F7E75DFC1B /* LiveRewindControls.swift */,
 			);
 			name = TimeShift;
 			path = TimeShift;
@@ -1383,6 +1387,7 @@
 				4BC8B6733BAC4EA4EC90C087 /* LiveWindow.swift in Sources */,
 				A237718C0D29CE0ECAFBB297 /* RewindWindow.swift in Sources */,
 				4EBBBBBCBFF70C88C40D32BB /* LiveTimeShift.swift in Sources */,
+				C53C46F367A6E3726AE27A41 /* LiveRewindControls.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1463,6 +1468,7 @@
 				E81A0F2D90A7DF2097F073F9 /* LiveWindow.swift in Sources */,
 				05BF991D78E97AFF4D0C9E9B /* RewindWindow.swift in Sources */,
 				B195D069E4405C151C8F16A0 /* LiveTimeShift.swift in Sources */,
+				4AF5ED5FAAF74C39F02BB98B /* LiveRewindControls.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

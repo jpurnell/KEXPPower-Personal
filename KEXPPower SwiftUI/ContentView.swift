@@ -64,23 +64,19 @@ struct ContentView: View {
                 }.padding(.horizontal)
             #endif
             Text("Previously").fontWeight(.semibold).padding([.horizontal])
-            #if os(macOS)
-                // A scroll view, not a List: a Mac List adds its own insets and gutters, so the rows would not line up with Now Playing.
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(previousPlays) { play in
-                            CombinedView(play: play)
-                        }
+            // A scroll view, not a List: a List adds its own insets and, on iOS, a grouped background, so the cards would
+            // not line up with Now Playing above them.
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(previousPlays) { play in
+                        CombinedView(play: play)
                     }
-                    .padding([.horizontal, .bottom])
                 }
+                .padding([.horizontal, .bottom])
+            }
+            #if os(macOS)
                 .background(OverlayScrollers().frame(width: 0, height: 0).allowsHitTesting(false))
             #else
-                List(previousPlays) { play in
-                    CombinedView(play: play)
-                        .listRowSeparator(.hidden)
-                        .listSectionSeparator(.hidden)
-                }
                 .refreshable {
                     press.toggle()
                     let _ = await resultsRetriever.getResults()

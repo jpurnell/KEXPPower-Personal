@@ -91,7 +91,8 @@ struct SectionDestination: View {
     @ViewBuilder
     private var playerBar: some View {
         let kind = PlayerBarKind.kind(
-            archiveShow: archive.nowPlayingShow, liveHasPlayed: model.playerController.hasPlayed, in: section)
+            archiveShow: archive.nowPlayingShow, liveHasPlayed: model.playerController.hasPlayed,
+            isTimeShifted: model.playerController.isTimeShifted, in: section)
         if kind != .none {
             VStack(spacing: 0) {
                 Divider()
@@ -109,7 +110,7 @@ struct SectionDestination: View {
         case .archive(let show):
             ArchivePlayerBar(show: show, browser: archive)
         case .live:
-            LivePlayerBar(player: model.playerController)
+            LivePlayerBar(player: model.playerController, showsPlayButton: section != .live)
         case .none:
             EmptyView()
         }
