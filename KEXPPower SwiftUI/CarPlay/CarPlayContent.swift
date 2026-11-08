@@ -43,15 +43,9 @@ enum CarPlayContent {
     /// A match held for review shows a phone: the phone's question mark means nothing to someone driving.
     static func saveButtonSymbol(for state: SaveState) -> String {
         if case .confirming = state { return "iphone" }
+        // The car says nothing more than this: an alert to read or dismiss is a distraction, and the phone has the rest.
+        if state == .heldForReview { return "iphone.gen3.badge.exclamationmark" }
         return state.symbolName
-    }
-
-    /// A short notice for the car to show after a press, or `nil` when the button's own state says enough.
-    ///
-    /// Only a song put in the review queue gets one: the button alone cannot say it is waiting, or where.
-    static func saveNotice(for state: SaveState) -> Row? {
-        guard state == .heldForReview else { return nil }
-        return Row(title: "Saved for review", detail: "Check it on your phone when you are parked")
     }
 
     /// Whether the add button looks selected: only once the song is in the playlist.

@@ -338,4 +338,41 @@ struct PlayerControllerTests {
         controller.liveShift = FakeShift(address: local, window: 120)
         #expect(abs(controller.rewindStep - 120) < 1e-9)
     }
+
+    @Test("Once live plays through the time-shift, the lock screen is offered skip back 15, skip forward 30 and scrub")
+    func liveOffersTransport() async {
+        let publisher = FakePublisher()
+        let controller = PlayerController(publisher: publisher)
+        controller.initPlayer(link: direct)
+        controller.liveShift = FakeShift(address: local)
+        await controller.playLive()
+        #expect(publisher.installed?.skipBack == 15)
+        #expect(publisher.installed?.skipForward == 30)
+    }
+
+    @Test("Without the time-shift live offers no skip or scrub, as before")
+    func directOffersNone() async {
+        let publisher = FakePublisher()
+        let controller = PlayerController(publisher: publisher)
+        controller.initPlayer(link: direct)
+        await controller.playLive()
+        #expect(publisher.installed == nil)
+    }
+
+    @Test("Playing an archived show takes the live transport away; the archive's own is installed after")
+    func archiveReplacesLiveTransport() async {
+        let publisher = FakePublisher()
+        let controller = PlayerController(publisher: publisher)
+        controller.initPlayer(link: direct)
+        controller.liveShift = FakeShift(address: local)
+        await controller.playLive()
+        await controller.playArchive(url: URL(string: "https://example.com/show.aac") ?? .temporaryDirectory, at: 0)
+        #expect(publisher.installed == nil)
+    }
+
+    @Test("Not behind live, the heard lag is zero")
+    func lagZeroWhenDirect() {
+        let controller = PlayerController(publisher: FakePublisher())
+        #expect(controller.heardLag < 0.001)
+    }
 }

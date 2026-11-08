@@ -69,18 +69,9 @@ struct CarPlayContentTests {
         #expect(CarPlayContent.saveButtonSymbol(for: .notFound) == "xmark.circle")
     }
 
-    @Test("The notice for a song put in the review queue says so; other states give none")
-    func heldNotice() {
-        let notice = CarPlayContent.saveNotice(for: .heldForReview)
-        #expect(notice?.title == "Saved for review")
-        #expect(notice?.detail == "Check it on your phone when you are parked")
-        #expect(CarPlayContent.saveNotice(for: .idle) == nil)
-        #expect(CarPlayContent.saveNotice(for: .notFound) == nil)
-    }
-
-    @Test("A song in the review queue shows a tray, selected, and is spoken as saved for later")
+    @Test("A song in the review queue shows a phone with a badge, selected, and is spoken as saved for later")
     func heldButton() {
-        #expect(CarPlayContent.saveButtonSymbol(for: .heldForReview) == "tray.full")
+        #expect(CarPlayContent.saveButtonSymbol(for: .heldForReview) == "iphone.gen3.badge.exclamationmark")
         #expect(CarPlayContent.saveButtonSelected(for: .heldForReview))
         #expect(CarPlayContent.saveButtonLabel(for: .heldForReview) == "Saved to review later")
     }

@@ -49,6 +49,10 @@ import UniformTypeIdentifiers
         }
         /// Whether live is playing through the recording, so it can be paused and rewound.
         private(set) var isTimeShifted = false
+        /// How far behind the broadcast the audio being heard is, in seconds; zero unless live is time-shifted. The song
+        /// shown follows it, so that it is the one in the listener's ears.
+        private(set) var heardLag: TimeInterval = 0
+        @ObservationIgnored private let lagWatch = TaskHolder()
         @ObservationIgnored private let shiftTask = TaskHolder()
         /// Watches how long going back to live takes; replaced each time, so only the latest request is measured.
         @ObservationIgnored private let liveTimer = TaskHolder()
@@ -280,6 +284,8 @@ import UniformTypeIdentifiers
                 let item = AVPlayerItem(url: address)
                 replaceItems(with: item)
                 liveSource = .shifted
+                setTransportControls(liveTransportControls())
+                watchLag()
                 measureLiveStart(of: item)
             } else {
                 // The recording could not start: the stream the app has always played.
@@ -350,6 +356,46 @@ import UniformTypeIdentifiers
             await player.seek(
                 to: CMTime(seconds: seconds, preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
             if case .live = target { player.play() }
+            refreshTimeline()
+        }
+
+        /// What the system's lock screen and the car may ask of live while it plays through the recording: skip back,
+        /// skip forward and scrub, with the window as the timeline.
+        private func liveTransportControls() -> ArchiveTransportControls {
+            ArchiveTransportControls(
+                skip: { [weak self] seconds in await self?.skipLive(by: seconds) },
+                seek: { [weak self] position in await self?.seekLive(toWindowPosition: position) },
+                timeline: { [weak self] in
+                    self?.liveWindow.map { PlaybackTimeline(elapsed: $0.position - $0.start, duration: $0.length) }
+                })
+        }
+
+        /// Moves to a place in the window, counted in seconds from its oldest audio, as the lock screen's scrubber does.
+        private func seekLive(toWindowPosition position: TimeInterval) async {
+            guard let window = liveWindow else { return }
+            await skipLive(by: window.start + position - window.position)
+        }
+
+        /// Keeps `heardLag` up to date while live is time-shifted, but only when it has moved by a second or more, so what
+        /// reads it is not redrawn for nothing.
+        private func watchLag() {
+            lagWatch.task?.cancel()
+            lagWatch.task = Task { [weak self] in
+                while !Task.isCancelled {
+                    await self?.updateLag()
+                    try? await Task.sleep(for: .seconds(2))
+                }
+            }
+        }
+
+        private func updateLag() async {
+            let lag = liveWindow?.behindLive ?? 0
+            if abs(lag - heardLag) >= 1 { heardLag = lag }
+        }
+
+        private func stopWatchingLag() {
+            lagWatch.task?.cancel()
+            heardLag = 0
         }
 
         // MARK: - Archive
@@ -369,6 +415,9 @@ import UniformTypeIdentifiers
             isPlayingArchive = true
             // The recording is not needed while an archived show plays, and costs data.
             if liveSource != .unresolved {
+                // The live transport gives way to the archive's own, installed once the show is set up.
+                if liveSource == .shifted { setTransportControls(nil) }
+                stopWatchingLag()
                 liveSource = .unresolved
                 await liveShift?.stop()
             }
@@ -430,6 +479,7 @@ import UniformTypeIdentifiers
             continuation = nil
             onAdvanced = nil
             isPlayingArchive = false
+            stopWatchingLag()
             liveSource = .unresolved
             guard liveShift == nil else {
                 // Through the time-shift: the item is chosen once the recording is ready.

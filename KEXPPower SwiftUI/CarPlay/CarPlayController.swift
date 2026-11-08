@@ -4,6 +4,7 @@
 //
 
 #if os(iOS)
+import AVFoundation
 import CarPlay
 import KEXPPower
 import OSLog
@@ -104,7 +105,8 @@ final class CarPlayController {
     /// The add-to-playlist button, drawn for the current save state.
     private func makeSaveButton() -> CPNowPlayingImageButton {
         let state = saving.state(for: model.play)
-        let image = UIImage(systemName: CarPlayContent.saveButtonSymbol(for: state)) ?? UIImage()
+        // A symbol the system lacks falls back to a plain phone rather than a blank button.
+        let image = UIImage(systemName: CarPlayContent.saveButtonSymbol(for: state)) ?? UIImage(systemName: "iphone") ?? UIImage()
         let button = CPNowPlayingImageButton(image: image) { [weak self] _ in
             Task { @MainActor in await self?.save() }
         }
@@ -120,20 +122,6 @@ final class CarPlayController {
         let state = saving.state(for: model.play)
         diagnostics.record("CarPlay", "save: finished, state \(state)")
         refresh()
-        if let notice = CarPlayContent.saveNotice(for: state) { showNotice(notice) }
-    }
-
-    /// Shows a one-button alert over the Now Playing screen, so a held match is explained rather than left as an icon.
-    private func showNotice(_ notice: CarPlayContent.Row) {
-        let ok = CPAlertAction(title: "OK", style: .default) { [interfaceController, diagnostics] _ in
-            interfaceController.dismissTemplate(animated: true) { success, error in
-                diagnostics.record("CarPlay", "notice: dismissed \(success), error \(error?.localizedDescription ?? "none")")
-            }
-        }
-        let alert = CPAlertTemplate(titleVariants: [notice.title, notice.detail], actions: [ok])
-        interfaceController.presentTemplate(alert, animated: true) { [diagnostics] success, error in
-            diagnostics.record("CarPlay", "notice: shown \(success), error \(error?.localizedDescription ?? "none")")
-        }
     }
 
     /// Fills the rows and the button from the current show, song and save state.

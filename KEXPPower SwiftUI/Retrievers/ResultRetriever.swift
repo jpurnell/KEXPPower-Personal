@@ -20,8 +20,12 @@ public class ResultRetriever {
 	/// so this bounds each request and the memory held.
 	static let playsPerRefresh = 50
 
-	var plays: [Play] = []
-	var play: Play = .fixture()
+	/// The station's recent plays as it reported them, newest first: what is on the air.
+	private(set) var latestPlays: [Play] = []
+	/// The plays up to what the listener is hearing, which is behind the air when live is paused or rewound.
+	var plays: [Play] { HeardPlays.plays(latestPlays, behind: playerController.heardLag, now: Date()) }
+	/// The song being heard.
+	var play: Play { plays.first ?? .fixture() }
 	var show: Show = Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"], tagline: "", imageURI: "")
 
 	var playerController = PlayerController()
@@ -63,8 +67,7 @@ public class ResultRetriever {
 		polling.task?.cancel()
 		// A UI test gets fixed songs and no stream, so it neither needs the network nor starts audio.
 		if UITestFixtures.isActive() {
-			plays = UITestFixtures.plays
-			play = plays.first ?? .fixture()
+			latestPlays = UITestFixtures.plays
 			return
 		}
 		// A refresh must not replace the player: that would cut off what is playing.
@@ -90,8 +93,7 @@ public class ResultRetriever {
 	private func refresh() async {
 		do {
 			let playResult = try await networkManager.getPlay(limit: Self.playsPerRefresh)
-			plays = playResult.plays ?? []
-			play = plays.first ?? .fixture()
+			latestPlays = playResult.plays ?? []
 
 			let showResult = try await networkManager.getShow(limit: 1)
 			show = showResult.shows?.first ?? Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"])
@@ -100,7 +102,7 @@ public class ResultRetriever {
 			if !playerController.isPlayingArchive {
 				await playerController.updateNowPlaying(KEXPMapping.nowPlaying(from: plays.first))
 			}
-			await widgetPublisher.update(play: plays.first, show: show, isPlaying: publishedPlaying)
+			await widgetPublisher.update(play: latestPlays.first, show: show, isPlaying: publishedPlaying)
 		} catch {
 			logger.error("Refresh failed: \(error.localizedDescription, privacy: .public)")
 			// A failed poll must not let the widget's playing flag go stale while the stream is still playing.

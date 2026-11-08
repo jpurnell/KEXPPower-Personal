@@ -20,7 +20,7 @@ struct LiveWindow: Equatable, Sendable {
     }
 
     /// The stream is played about three seconds late even at its newest, so "live" has to allow for that.
-    private static let liveSlack: TimeInterval = 10
+    static let liveSlack: TimeInterval = 10
     private static let defaultRewind: TimeInterval = 300
 
     /// The oldest audio held.
