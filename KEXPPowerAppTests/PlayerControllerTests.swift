@@ -375,4 +375,82 @@ struct PlayerControllerTests {
         let controller = PlayerController(publisher: FakePublisher())
         #expect(controller.heardLag < 0.001)
     }
+
+    // MARK: Changing the live stream's settings
+
+    private var lowQuality: URL { URL(string: "https://example.com/low.aac") ?? .temporaryDirectory }
+    private var otherLocal: URL { URL(string: "http://127.0.0.1:9/other.m3u8") ?? .temporaryDirectory }
+
+    @Test("Before anything has played, a new address replaces the old one")
+    func reconfigureBeforePlay() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        await controller.reconfigureLive(link: lowQuality, liveShift: nil)
+        #expect(itemURL(controller) == lowQuality)
+    }
+
+    @Test("Live is rebuilt: the old recording stops, and the new one starts when live plays")
+    func reconfigureReplacesShift() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let old = FakeShift(address: local)
+        controller.liveShift = old
+        await controller.playLive()
+        #expect(controller.isTimeShifted)
+        let new = FakeShift(address: otherLocal)
+        await controller.reconfigureLive(link: lowQuality, liveShift: new)
+        #expect(old.stops == 1)
+        #expect(new.starts == 1)
+        #expect(itemURL(controller) == otherLocal)
+        #expect(controller.isTimeShifted)
+    }
+
+    @Test("Turning the window off leaves live playing the direct stream, at the new address")
+    func reconfigureToOff() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let old = FakeShift(address: local)
+        controller.liveShift = old
+        await controller.playLive()
+        await controller.reconfigureLive(link: lowQuality, liveShift: nil)
+        #expect(old.stops == 1)
+        #expect(!controller.isTimeShifted)
+        #expect(itemURL(controller) == lowQuality)
+    }
+
+    @Test("A paused player stays paused, and the new recording is not started until it plays")
+    func reconfigureKeepsPause() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.liveShift = FakeShift(address: local)
+        await controller.playLive()
+        controller.pausePlayer()
+        let new = FakeShift(address: otherLocal)
+        await controller.reconfigureLive(link: lowQuality, liveShift: new)
+        #expect(!controller.isPlaying)
+        #expect(new.starts == 0)
+        await controller.playLive()
+        #expect(new.starts == 1)
+    }
+
+    @Test("An archived show is not interrupted; the new settings are used when live comes back")
+    func reconfigureDuringArchive() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.liveShift = FakeShift(address: local)
+        await controller.playLive()
+        let show = URL(string: "https://example.com/show.aac") ?? .temporaryDirectory
+        await controller.playArchive(url: show, at: 0)
+        let new = FakeShift(address: otherLocal)
+        await controller.reconfigureLive(link: lowQuality, liveShift: new)
+        #expect(itemURL(controller) == show)
+        #expect(controller.isPlayingArchive)
+        #expect(new.starts == 0)
+        controller.returnToLive()
+        for _ in 0..<300 where new.starts < 1 || itemURL(controller) != otherLocal {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(new.starts == 1)
+        #expect(itemURL(controller) == otherLocal)
+    }
 }

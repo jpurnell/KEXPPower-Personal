@@ -494,6 +494,35 @@ import UniformTypeIdentifiers
             measureLiveStart(of: item)
         }
 
+        /// Replaces the live stream's address and recording, as when the listener changes the quality or the rewind window.
+        ///
+        /// Live starts over: the old recording stops (and its window is emptied), and the new settings are used from the
+        /// next audio. Whether the player was playing is kept. An archived show is not interrupted; the new settings are
+        /// used when live comes back.
+        /// - Parameters:
+        ///   - link: The live stream's address, at the chosen quality.
+        ///   - liveShift: The recording of it, or `nil` to play the stream directly.
+        func reconfigureLive(link: URL, liveShift newShift: (any LiveShifting)?) async {
+            // Waiting to play counts: the listener pressed play, and the stream may simply be slow to start.
+            let wasPlaying = player.map { $0.timeControlStatus != .paused } ?? false
+            let old = liveShift
+            liveLink = link
+            liveShift = newShift
+            guard player != nil, !isPlayingArchive else { return }
+            shiftTask.task?.cancel()
+            stopWatchingLag()
+            if liveSource == .shifted { setTransportControls(nil) }
+            liveSource = .unresolved
+            await old?.stop()
+            if newShift == nil {
+                replaceItems(with: AVPlayerItem(url: link))
+            } else {
+                // The item is chosen once the new recording is ready.
+                (player as? AVQueuePlayer)?.removeAllItems()
+            }
+            if wasPlaying { await playLive() }
+        }
+
         // MARK: - Hand-off at the end of an archived file
 
         /// Arms (or, with `nil`, disarms) the hand-off at the end of an archived file.

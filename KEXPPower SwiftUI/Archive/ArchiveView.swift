@@ -72,6 +72,9 @@ struct ArchiveView: View {
             Button("Probe") { showingProbe = true }
             Button("Live") { showingLiveProbe = true }
             #endif
+            #if os(iOS)
+            SettingsButton(model: model)
+            #endif
         }
         .padding(.horizontal)
         .padding(.top)

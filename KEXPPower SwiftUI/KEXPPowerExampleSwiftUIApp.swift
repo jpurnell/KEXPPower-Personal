@@ -67,7 +67,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
         .defaultSize(width: 420, height: 112)
 
         Settings {
-            SettingsView()
+            SettingsView(model: model)
         }
         #else
         WindowGroup {

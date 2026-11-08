@@ -31,6 +31,9 @@ struct ContentView: View {
             HStack {
                 ShowView(show: resultsRetriever.show).padding([.horizontal, .top])
                 Spacer()
+                #if os(iOS)
+                SettingsButton(model: resultsRetriever).padding([.horizontal, .top])
+                #endif
             }
             #if os(macOS)
                 VStack(alignment: .leading) {

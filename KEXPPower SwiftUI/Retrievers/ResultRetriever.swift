@@ -71,16 +71,10 @@ public class ResultRetriever {
 			return
 		}
 		// A refresh must not replace the player: that would cut off what is playing.
-		if playerController.player == nil {
-			let quality = StreamQuality.resolve(stored: UserDefaults.standard.string(forKey: StreamQuality.storageKey))
-			let streams = KEXPStation().streams
-			if let stream = streams.first(where: { $0.id == quality.rawValue }) ?? streams.first {
-				playerController.initPlayer(link: stream.url)
-				// With a rewind window on, live plays through a recording of the stream; off, directly as before.
-				if let window = RewindWindow.resolve(stored: UserDefaults.standard.string(forKey: RewindWindow.storageKey)).duration {
-					playerController.liveShift = LiveTimeShift(source: URLSessionByteSource(url: stream.url), window: window)
-				}
-			}
+		if playerController.player == nil, let live = Self.liveStream(for: ListeningSettings.current()) {
+			playerController.initPlayer(link: live.url)
+			// With a rewind window on, live plays through a recording of the stream; off, directly as before.
+			playerController.liveShift = live.shift
 		}
 		polling.task = Task { [weak self] in
 			while !Task.isCancelled {
@@ -88,6 +82,22 @@ public class ResultRetriever {
 				try? await Task.sleep(for: .seconds(5))
 			}
 		}
+	}
+
+	/// The live stream for a set of settings: the address at the chosen quality, and its recording if a window is kept.
+	/// - Parameter settings: The listener's quality and rewind window.
+	static func liveStream(for settings: ListeningSettings) -> (url: URL, shift: (any LiveShifting)?)? {
+		let streams = KEXPStation().streams
+		guard let stream = streams.first(where: { $0.id == settings.quality.rawValue }) ?? streams.first else { return nil }
+		let shift = settings.window.duration.map { LiveTimeShift(source: URLSessionByteSource(url: stream.url), window: $0) }
+		return (stream.url, shift)
+	}
+
+	/// Starts the live stream over with new settings: another quality, or another rewind window.
+	/// - Parameter settings: The listener's quality and rewind window.
+	func apply(_ settings: ListeningSettings) async {
+		guard let live = Self.liveStream(for: settings) else { return }
+		await playerController.reconfigureLive(link: live.url, liveShift: live.shift)
 	}
 
 	private func refresh() async {

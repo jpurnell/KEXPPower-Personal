@@ -57,4 +57,28 @@ struct ListeningSettingsTests {
         #expect(ListeningSettings.approximateBytes(window: .off, quality: .standard) == 0)
         #expect(ListeningSettings.approximateBytes(window: .off, quality: .dataSaver) == 0)
     }
+
+    @Test("The note under the window picker says what is kept and how much room it takes")
+    func windowNote() {
+        let ten = ListeningSettings.windowNote(window: .tenMinutes, quality: .standard)
+        #expect(ten.contains("10 minutes"))
+        #expect(ten.contains("12 MB"))
+        let five = ListeningSettings.windowNote(window: .fiveMinutes, quality: .dataSaver)
+        #expect(five.contains("5 minutes"))
+        #expect(five.contains("2.4 MB"))
+    }
+
+    @Test("With the window off the note says there is no pause or rewind")
+    func windowNoteOff() {
+        let note = ListeningSettings.windowNote(window: .off, quality: .standard)
+        #expect(note.contains("directly"))
+        #expect(!note.contains("MB"))
+    }
+
+    @Test("The note under the quality picker says how much data an hour of listening uses")
+    func qualityNote() {
+        // 20,000 bytes a second for an hour is 72 MB; 8,000 is 28.8 MB.
+        #expect(ListeningSettings.qualityNote(for: .standard).contains("72 MB"))
+        #expect(ListeningSettings.qualityNote(for: .dataSaver).contains("28.8 MB"))
+    }
 }

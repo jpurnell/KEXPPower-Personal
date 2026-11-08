@@ -30,6 +30,25 @@ struct ListeningSettings: Equatable, Sendable {
         return Int(seconds) * bytesPerSecond(of: quality)
     }
 
+    /// The line under the window picker: what is kept, and how much room it takes.
+    static func windowNote(window: RewindWindow, quality: StreamQuality) -> String {
+        guard let seconds = window.duration else {
+            return "Plays the stream directly. There is no pause or rewind."
+        }
+        let minutes = Int(seconds / 60)
+        let size = byteText(approximateBytes(window: window, quality: quality))
+        return "Keeps the last \(minutes) minutes so you can pause, go back and ride through a dead zone. Uses about \(size)."
+    }
+
+    /// The line under the quality picker: how much data an hour of listening uses.
+    static func qualityNote(for quality: StreamQuality) -> String {
+        "About \(byteText(3_600 * bytesPerSecond(of: quality))) an hour."
+    }
+
+    private static func byteText(_ bytes: Int) -> String {
+        ByteCountFormatter.string(fromByteCount: Int64(bytes), countStyle: .file)
+    }
+
     /// What the stream delivers each second: 160 kbps is 20,000 bytes, and 64 kbps is 8,000.
     private static func bytesPerSecond(of quality: StreamQuality) -> Int {
         switch quality {
