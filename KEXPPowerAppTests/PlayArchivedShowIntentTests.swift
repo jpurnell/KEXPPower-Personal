@@ -68,11 +68,24 @@ struct PlayArchivedShowTests {
         }
     }
 
-    @Test("Suggestions are the newest shows, with no phrase needed")
+    @Test("Suggestions are the newest shows, without the one on the air, which is not an archive yet")
     func suggestions() async {
         await withArchive(shows, loaded: true) { _, _, _ in
-            let found = await AppModelRegistry.showsMatching("")
-            #expect(found.map(\.id) == ["b", "a", "c"])
+            let found = await AppModelRegistry.suggestedShows()
+            #expect(found.map(\.id) == ["a", "c"])
+        }
+    }
+
+    @Test("A list that failed to load, or is still loading, is loaded again before matching")
+    func reloadsWhenNotLoaded() async {
+        await withArchive(shows) { archive, _, catalog in
+            catalog.failure = Boom()
+            await archive.load()
+            #expect(archive.phase != .loaded)
+            catalog.failure = nil
+            let found = await AppModelRegistry.showsMatching("variety mix")
+            #expect(found.map(\.id) == ["b", "c"])
+            #expect(await AppModelRegistry.playShow(id: "a").hasPrefix("Playing"))
         }
     }
 
@@ -122,7 +135,7 @@ struct PlayArchivedShowTests {
             let byName = try await ShowEntityQuery().entities(matching: "positive")
             #expect(byName.map(\.id) == ["a"])
             let suggested = try await ShowEntityQuery().suggestedEntities()
-            #expect(suggested.count == 3)
+            #expect(suggested.map(\.id) == ["a", "c"])
         }
     }
 

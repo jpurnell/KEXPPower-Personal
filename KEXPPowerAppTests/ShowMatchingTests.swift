@@ -93,4 +93,51 @@ struct ShowMatchingTests {
         #expect(ShowMatching.matches("variety", in: [], limit: 5, calendar: calendar).isEmpty)
         #expect(ids("variety", limit: 0).isEmpty)
     }
+
+    // MARK: Dates
+
+    private var afternoons: [StationKit.ArchiveShow] {
+        [
+            show("n3", "The Afternoon Show", hosts: ["Larry Mizell, Jr."], day: 3, hour: 13),
+            show("n4", "The Afternoon Show", hosts: ["Larry Mizell, Jr."], day: 4, hour: 13),
+            show("n5", "The Afternoon Show", hosts: ["Larry Mizell, Jr."], day: 5, hour: 13),
+            show("n4d", "Drive Time", hosts: ["Evie Stokes"], day: 4, hour: 16),
+        ]
+    }
+
+    private func found(_ phrase: String, now: Date? = nil) -> [String] {
+        let moment = now ?? calendar.date(from: DateComponents(year: 2026, month: 11, day: 9, hour: 10)) ?? .now
+        return ShowMatching.matches(phrase, in: afternoons, limit: 5, calendar: calendar, now: moment).map(\.id)
+    }
+
+    @Test("A month and a day narrow the airings to that date, as a listener says it")
+    func monthAndDay() {
+        #expect(found("afternoon show from november 4th") == ["n4"])
+        #expect(found("the afternoon show november 4") == ["n4"])
+        #expect(found("afternoon show nov 4th") == ["n4"])
+        #expect(found("afternoon show on the 4th") == ["n4"])
+    }
+
+    @Test("A date alone lists that day's shows")
+    func dateOnly() {
+        #expect(Set(found("november 4th")) == ["n4", "n4d"])
+    }
+
+    @Test("A plain number counts as a day only beside a month, so a number in a name is left alone")
+    func plainNumber() {
+        let ninety = [show("t", "90.TEEN", hosts: ["Youth DJ"], day: 7, hour: 9)]
+        #expect(ShowMatching.matches("90 teen", in: ninety, limit: 5, calendar: calendar).map(\.id) == ["t"])
+    }
+
+    @Test("Today and yesterday are read against the moment of asking")
+    func relativeDays() {
+        let nov5 = calendar.date(from: DateComponents(year: 2026, month: 11, day: 5, hour: 20)) ?? .now
+        #expect(found("afternoon show today", now: nov5) == ["n5"])
+        #expect(found("afternoon show yesterday", now: nov5) == ["n4"])
+    }
+
+    @Test("A date with no show on it matches nothing")
+    func dateWithNoShow() {
+        #expect(found("afternoon show november 20th").isEmpty)
+    }
 }

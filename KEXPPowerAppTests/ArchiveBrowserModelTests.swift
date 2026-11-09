@@ -83,7 +83,7 @@ final class FakePlayer: ArchivePlayer {
     }
 }
 
-private struct Boom: Error {}
+struct Boom: Error {}
 
 @Suite("ArchiveBrowserModel")
 @MainActor

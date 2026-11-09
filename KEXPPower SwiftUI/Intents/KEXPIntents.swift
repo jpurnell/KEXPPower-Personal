@@ -13,7 +13,7 @@ struct WhatsPlayingIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
-        let said = AppModelRegistry.whatsPlaying()
+        let said = await AppModelRegistry.whatsPlaying()
         return .result(value: said, dialog: IntentDialog(stringLiteral: said))
     }
 }
@@ -102,7 +102,7 @@ struct ShowEntityQuery: EntityStringQuery {
 
     @MainActor
     func suggestedEntities() async throws -> [ShowEntity] {
-        await AppModelRegistry.showsMatching("").map(ShowEntity.init)
+        await AppModelRegistry.suggestedShows().map(ShowEntity.init)
     }
 }
 

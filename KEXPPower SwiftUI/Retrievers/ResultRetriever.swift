@@ -21,12 +21,14 @@ public class ResultRetriever {
 	static let playsPerRefresh = 50
 
 	/// The station's recent plays as it reported them, newest first: what is on the air.
-	private(set) var latestPlays: [Play] = []
+	var latestPlays: [Play] = []
 	/// The plays up to what the listener is hearing, which is behind the air when live is paused or rewound.
 	var plays: [Play] { HeardPlays.plays(latestPlays, behind: playerController.heardLag, now: Date()) }
 	/// The song being heard.
 	var play: Play { plays.first ?? .fixture() }
-	var show: Show = Show.fixture(hosts: [0], programName: "Retrieving…", hostNames: ["Retrieving…"], tagline: "", imageURI: "")
+	/// Shown as the show's name until the first one has arrived.
+	static let retrievingName = "Retrieving…"
+	var show: Show = Show.fixture(hosts: [0], programName: ResultRetriever.retrievingName, hostNames: [ResultRetriever.retrievingName], tagline: "", imageURI: "")
 
 	var playerController = PlayerController()
 
@@ -60,6 +62,15 @@ public class ResultRetriever {
 	func startIfNeeded() async {
 		guard !isPolling else { return }
 		await getResults()
+	}
+
+	/// Starts following the station and waits until the first playlist has arrived, for a caller that must answer from it.
+	///
+	/// A cold launch from Siri or CarPlay has no window to ask for the fetch, and `startIfNeeded` returns before the first
+	/// reply, so the playlist is still empty when it does. A failed fetch leaves it empty.
+	func firstResults() async {
+		await startIfNeeded()
+		if latestPlays.isEmpty { await refresh() }
 	}
 
 	/// Starts refreshing the playlist and show every five seconds, replacing any earlier loop.

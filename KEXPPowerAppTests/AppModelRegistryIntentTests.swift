@@ -1,3 +1,4 @@
+import KEXPPower
 import Foundation
 import Testing
 @testable import KEXPPowerExampleSwiftUI
@@ -27,7 +28,7 @@ struct IntentTests {
     func notReady() async {
         let saved = AppModelRegistry.model
         AppModelRegistry.model = nil
-        #expect(AppModelRegistry.whatsPlaying() == AppModelRegistry.notReady)
+        #expect(await AppModelRegistry.whatsPlaying() == AppModelRegistry.notReady)
         #expect(await AppModelRegistry.playLive() == AppModelRegistry.notReady)
         #expect(AppModelRegistry.pause() == AppModelRegistry.notReady)
         #expect(await AppModelRegistry.backToLive() == AppModelRegistry.notReady)
@@ -52,10 +53,19 @@ struct IntentTests {
         }
     }
 
-    @Test("Asking what is playing before anything has loaded is answered in a sentence, not left empty")
-    func whatsPlayingAnswers() async {
-        await withRegistry { _ in
-            #expect(!AppModelRegistry.whatsPlaying().isEmpty)
+    @Test("Before the playlist has loaded it says so, and never reads out the placeholder song")
+    func whatsPlayingBeforeLoad() async {
+        await withRegistry { model in
+            #expect(model.latestPlays.isEmpty)
+            #expect(AppModelRegistry.nowPlayingSentence() == AppModelRegistry.playlistUnavailable)
+        }
+    }
+
+    @Test("Once it has loaded, it names the song heard")
+    func whatsPlayingAfterLoad() async {
+        await withRegistry { model in
+            model.latestPlays = [Play(id: 42, song: "Bleeding Blue", artist: "Cults", playType: .trackplay)]
+            #expect(AppModelRegistry.nowPlayingSentence().hasPrefix("Bleeding Blue by Cults, on KEXP."))
         }
     }
 
@@ -105,8 +115,17 @@ struct AddSongTests {
         let kexp = PlaylistSummary(id: "p-kexp", name: "KEXP")
         let saving = savingModel(.finished(wanted, added: [kexp], failed: []))
         await withRegistry(saving: saving) {
-            let title = NowPlayingSummary(AppModelRegistry.model?.play).title
-            #expect(await AppModelRegistry.addSong() == "Added \(title) to KEXP.")
+            AppModelRegistry.model?.latestPlays = [Play(id: 42, song: "Bleeding Blue", artist: "Cults", playType: .trackplay)]
+            #expect(await AppModelRegistry.addLoadedSong() == "Added Bleeding Blue to KEXP.")
+        }
+    }
+
+    @Test("Before the playlist has loaded nothing is added: the placeholder song is not the one on the air")
+    func addsNothingBeforeLoad() async {
+        let wanted = CatalogSong(id: "cat-1", title: "Bleeding Blue", artist: "Cults")
+        let saving = savingModel(.finished(wanted, added: [PlaylistSummary(id: "p", name: "KEXP")], failed: []))
+        await withRegistry(saving: saving) {
+            #expect(await AppModelRegistry.addLoadedSong() == AppModelRegistry.noSongToAdd)
         }
     }
 
@@ -115,7 +134,8 @@ struct AddSongTests {
         let guess = CatalogSong(id: "cat-2", title: "Bleeding Blue (Live)", artist: "Cults")
         let saving = savingModel(.needsConfirmation(guess))
         await withRegistry(saving: saving) {
-            let said = await AppModelRegistry.addSong()
+            AppModelRegistry.model?.latestPlays = [Play(id: 42, song: "Bleeding Blue", artist: "Cults", playType: .trackplay)]
+            let said = await AppModelRegistry.addLoadedSong()
             #expect(said.hasSuffix("is held for review on your phone."))
         }
     }
