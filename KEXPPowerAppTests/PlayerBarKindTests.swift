@@ -24,6 +24,12 @@ struct PlayerBarKindTests {
         #expect(PlayerBarKind.kind(archiveShow: nil, liveHasPlayed: true, in: .live) == .none)
     }
 
+    @Test("Now Playing, tvOS's player tab, shows the live player once live has started, rewindable or not")
+    func nowPlaying() {
+        #expect(PlayerBarKind.kind(archiveShow: nil, liveHasPlayed: true, in: .nowPlaying) == .live)
+        #expect(PlayerBarKind.kind(archiveShow: nil, liveHasPlayed: true, isTimeShifted: true, in: .nowPlaying) == .live)
+    }
+
     @Test("When live can be rewound, the Live section gets the bar too, since the controls belong at the bottom there as everywhere")
     func liveRewindableInLive() {
         for section in AppSection.allCases {

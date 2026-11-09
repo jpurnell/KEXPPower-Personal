@@ -54,8 +54,13 @@ struct ArchiveView: View {
         #endif
     }
 
-    /// One column on a phone; as many 320-point columns as fit on an iPad or Mac.
+    /// One column on a phone; as many 320-point columns as fit on an iPad or Mac. On tvOS, whose type is about twice
+    /// the size, 520: at 320 a host's name broke a syllable per line.
+    #if os(tvOS)
+    private static let cardColumns = [GridItem(.adaptive(minimum: 520), spacing: 24)]
+    #else
     private static let cardColumns = [GridItem(.adaptive(minimum: 320), spacing: 8)]
+    #endif
 
     private var header: some View {
         HStack {
@@ -166,16 +171,19 @@ private struct CardButton: View {
             HStack(spacing: 12) {
                 if imageURL != nil || alwaysShowsPicture { ArchivePicture(url: imageURL, size: 56) }
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(title).font(.headline)
+                    Text(title).font(.headline).lineLimit(2)
                     if !subtitle.isEmpty {
                         Text(subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(2)
                     }
                 }
                 Spacer()
-                Text(count == 1 ? "1 show" : "\(count) shows").font(.caption).foregroundStyle(.secondary)
+                // Never wrapped: the name and its line beneath take what room is short.
+                Text(count == 1 ? "1 show" : "\(count) shows").font(.caption).foregroundStyle(.secondary).fixedSize()
                 Image(systemName: "chevron.forward").foregroundStyle(.tertiary).accessibilityHidden(true)
             }
             .padding(12)
+            // As tall as the tallest card in its grid row, so a two-line name does not leave its neighbours short.
+            .frame(maxHeight: .infinity)
             .background(Color.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
             .contentShape(Rectangle())
         }

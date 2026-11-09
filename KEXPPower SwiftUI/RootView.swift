@@ -59,12 +59,22 @@ struct RootView: View {
         }
     }
 
+    /// Whether the player has a tab of its own: on tvOS, once something has played.
+    private var showsNowPlaying: Bool {
+        #if os(tvOS)
+        archive.nowPlayingShow != nil || model.playerController.hasPlayed
+        #else
+        false
+        #endif
+    }
+
     private var tabLayout: some View {
         TabView(selection: Binding(
             get: { selection ?? AppSection.defaultSection },
             set: { selection = $0 }
         )) {
-            ForEach(AppSection.visible(canSaveToPlaylists: AppSongSaver.canSaveToPlaylists)) { section in
+            ForEach(AppSection.visible(canSaveToPlaylists: AppSongSaver.canSaveToPlaylists,
+                                       showsNowPlaying: showsNowPlaying)) { section in
                 SectionDestination(section: section, model: model, archive: archive)
                     .tabItem { Label(section.title, systemImage: section.systemImage) }
                     #if !os(tvOS)
@@ -87,19 +97,13 @@ struct SectionDestination: View {
     let section: AppSection
     let model: ResultRetriever
     let archive: ArchiveBrowserModel
-    #if os(tvOS)
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
-    #endif
 
     var body: some View {
         #if os(tvOS)
-        // A column beside the content, not a strip beneath it: the remote moves focus by arrows, and Down in a list finds
-        // the next row before anything under the list, so a bar there was reached only past the last row. Right from any
-        // row reaches the column.
+        // No bar on tvOS. The remote reached a bar beneath a list only past its last row, and a column beside it took
+        // the width of every section to show one line, so the player is a section of its own: Now Playing, which Menu
+        // and a move along the tab bar reach from anywhere.
         content
-            .safeAreaInset(edge: .trailing, spacing: 0) {
-                playerBar
-            }
         #else
         content
             // Inside each section, not around the whole layout: a tab or split view does not pass the inset on, so a bar
@@ -110,28 +114,19 @@ struct SectionDestination: View {
         #endif
     }
 
+    private var playerKind: PlayerBarKind {
+        PlayerBarKind.kind(
+            archiveShow: archive.nowPlayingShow, liveHasPlayed: model.playerController.hasPlayed,
+            isTimeShifted: model.playerController.isTimeShifted, in: section)
+    }
+
+    #if !os(tvOS)
     /// The bar for what is playing, on a solid background so it reads as a strip of its own beneath the content, not
     /// as something laid over a list that scrolls beneath it.
     @ViewBuilder
     private var playerBar: some View {
-        let kind = PlayerBarKind.kind(
-            archiveShow: archive.nowPlayingShow, liveHasPlayed: model.playerController.hasPlayed,
-            isTimeShifted: model.playerController.isTimeShifted, in: section)
+        let kind = playerKind
         if kind != .none {
-            #if os(tvOS)
-            HStack(spacing: 0) {
-                Divider()
-                bar(for: kind)
-                    .padding()
-                    .frame(width: Self.tvBarWidth)
-                    .frame(maxHeight: .infinity, alignment: .top)
-            }
-            // One focus section, so Right reaches the column from a row at any height, not only from one level with it.
-            .focusSection()
-            // tvOS has no `.bar` style. A material, or a solid colour when the viewer has asked for less transparency.
-            .background(reduceTransparency ? AnyShapeStyle(Color.black) : AnyShapeStyle(.regularMaterial),
-                        ignoresSafeAreaEdges: [.vertical, .trailing])
-            #else
             VStack(spacing: 0) {
                 Divider()
                 bar(for: kind)
@@ -139,25 +134,36 @@ struct SectionDestination: View {
                     .padding(.vertical, 6)
             }
             .background(.bar, ignoresSafeAreaEdges: .bottom)
-            #endif
         }
     }
-
-    #if os(tvOS)
-    /// The player column's width: room for the archive player's title line and its row of controls.
-    private static let tvBarWidth = 560.0
     #endif
 
+    /// - Parameters:
+    ///   - kind: Which player.
+    ///   - canFold: Whether it offers to fold to its title line; not on a screen of its own.
     @ViewBuilder
-    private func bar(for kind: PlayerBarKind) -> some View {
+    private func bar(for kind: PlayerBarKind, canFold: Bool = true) -> some View {
         switch kind {
         case .archive(let show):
-            ArchivePlayerBar(show: show, browser: archive)
+            ArchivePlayerBar(show: show, browser: archive, canFold: canFold)
         case .live:
-            LivePlayerBar(player: model.playerController, showsPlayButton: section != .live)
+            LivePlayerBar(player: model.playerController, showsPlayButton: section != .live, canFold: canFold)
         case .none:
             EmptyView()
         }
+    }
+
+    /// The Now Playing section: the player, large and unfolded, and for live the song on the air.
+    private var nowPlaying: some View {
+        VStack(alignment: .leading, spacing: 40) {
+            bar(for: playerKind, canFold: false)
+            if playerKind == .live {
+                CombinedView(play: model.play)
+            }
+        }
+        .frame(maxWidth: 1200)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(.top, 40)
     }
 
     @ViewBuilder
@@ -171,6 +177,8 @@ struct SectionDestination: View {
             ArchiveView(model: model, browser: archive)
         case .playlists:
             ComingSoonView(section: section)
+        case .nowPlaying:
+            nowPlaying
         }
     }
 }

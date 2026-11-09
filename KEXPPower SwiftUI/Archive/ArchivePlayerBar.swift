@@ -11,6 +11,8 @@ import SwiftUI
 struct ArchivePlayerBar: View {
     let show: ArchiveShow
     let browser: ArchiveBrowserModel
+    /// Whether it offers to fold to its title line; not when it is a screen of its own (tvOS's Now Playing).
+    var canFold = true
     /// The scrubber's value while a finger is on it, so the clock does not fight the drag.
     @State private var dragFraction: Double?
     @State private var showingPlaylist = false
@@ -44,11 +46,13 @@ struct ArchivePlayerBar: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(.tint)
                 .accessibilityHint("Stops the archive and plays the live stream")
-                Button { withAnimation(reduceMotion ? nil : .default) { isExpanded.toggle() } } label: {
-                    Label(isExpanded ? "Show less" : "Show the player", systemImage: isExpanded ? "chevron.down" : "chevron.up")
-                        .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
+                if canFold {
+                    Button { withAnimation(reduceMotion ? nil : .default) { isExpanded.toggle() } } label: {
+                        Label(isExpanded ? "Show less" : "Show the player", systemImage: isExpanded ? "chevron.down" : "chevron.up")
+                            .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             if isExpanded {
                 if let note = browser.truncationNote {
@@ -168,6 +172,10 @@ private struct ArchivePlaylistView: View {
         .task(id: browser.nowPlayingShow?.id) { await browser.loadTracks() }
         #if os(macOS)
         .frame(minWidth: 420, minHeight: 480)
+        #elseif os(tvOS)
+        // A tvOS sheet is as large as its content, and a list has no size of its own: without this it was the title
+        // line and the top of the spinner.
+        .frame(width: 1200, height: 820)
         #endif
     }
 
@@ -233,11 +241,19 @@ private struct TrackRow: View {
     /// Whether the song is in the part of the show that was recorded; if not, it cannot be played.
     var isRecorded = true
 
+    /// Room for "12:03:14 AM EST" on one line; tvOS's caption type is about twice the size.
+    #if os(tvOS)
+    private static let clockWidth = 220.0
+    #else
+    private static let clockWidth = 96.0
+    #endif
+
     var body: some View {
         HStack(spacing: 12) {
             if let aired = track.airDate {
                 Text(ArchiveTiming.clock(aired, zone: .autoupdatingCurrent)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
-                    .frame(width: 96, alignment: .leading)
+                    .lineLimit(1).minimumScaleFactor(0.8)
+                    .frame(width: Self.clockWidth, alignment: .leading)
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(track.title).font(.headline)
