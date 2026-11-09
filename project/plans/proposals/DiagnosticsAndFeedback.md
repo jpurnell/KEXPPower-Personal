@@ -39,7 +39,7 @@ When something goes wrong in a Spinner build, the developer sees it within minut
 3. **Channel** (`BuildChannel`: `.development`, `.testFlight`, `.appStore`), read from the receipt (*unverified on this OS: TestFlight builds carry `sandboxReceipt`*), defaulting to `.appStore` when unsure, so an uncertain build sends less.
 4. **Uploader** (`DiagnosticsUploader`): a disk-backed queue, batched, gzipped, sent over a background `URLSession`, with backoff and a cap that drops the oldest; sends nothing when the setting is off or the channel forbids it.
 5. **Scrubber** (`LogScrubber`): removes anything shaped like a token, an email, a long hex or base64 run, a home-folder path or an Apple Music identifier from a line before it leaves. Defense in depth; the line itself is the types.
-6. **MetricKit** (`MetricKitCollector`), required in every app target. See §4a.
+6. **MetricKit** (`MetricKitCollector`): **an experiment in the first TestFlight round, not a requirement.** The owner (2026-11-09) is not yet sure what it adds beyond TestFlight's and Xcode Organizer's own crash and hang data, so it is built small, kept behind `#if canImport(MetricKit)`, and judged on what a real payload shows (§4a, §16 question 6). The typed events and the clean-exit marker do not depend on it.
 7. **Settings:** a Diagnostics section: what this build sends, a switch for automatic health events, "Send Diagnostics" (manual, full log, share sheet), and a read-only view of the last lines for the owner.
 
 ### 4a. What adopting MetricKit takes (beyond importing it)
@@ -142,7 +142,7 @@ Red first, Swift Testing.
 
 - **ADR:** the privacy line is enforced by types and by channel, not by review.
 - **ADR:** a small shared client package, so every app gets the same line.
-- **ADR:** MetricKit is required in app targets and checked by the quality gate.
+- **ADR:** MetricKit is an experiment, and the quality-gate rule for it is advisory and opt-in (only projects that declare a distribution are evaluated, as a note, not a warning).
 - **Layer:** `DiagnosticLog`, the event enum, the scrubber and the queue are plain types; the settings view and the MetricKit subscriber are the only platform code.
 
 ## 13. Adversarial Review
@@ -162,7 +162,7 @@ Red first, Swift Testing.
 2. **A third-party service (Sentry, Firebase).** Rejected: an SDK, an account, and a privacy label we do not control.
 3. **One policy for every channel.** Rejected: too permissive for the App Store, too thin to debug a beta.
 4. **TestFlight and MetricKit alone.** Rejected: neither shows what the app was doing, or non-crash failures such as a stalled stream or a failed Siri intent.
-5. **MetricKit optional.** Rejected by the owner.
+5. **MetricKit as a requirement in every app.** Considered, then pulled back by the owner on 2026-11-09: its value over TestFlight and Organizer is unproven for a small user base, so it is an experiment and the quality-gate rule is advisory and opt-in (`LoggingMetricKit.md`).
 
 ## 15. Future Directions
 
@@ -182,6 +182,7 @@ Order of work:
 2. **MetricKit on watchOS, tvOS and visionOS, and for app extensions** (*unverified*). Recorded per platform as checked.
 3. **Cellular.** *Recommendation:* health events yes; log chunks on Wi-Fi only.
 4. **Automatic health events in App Store builds: on by default and visible, or off until chosen?** *Recommendation:* on, visible, easy to turn off, disclosed in the label and a first-run note.
+6. **What does MetricKit add here?** Candidates: exit reasons by cause (for a background audio app, memory-pressure and watchdog kills), hang call stacks, and delivery into our own pipeline joined to our logs. Against that: TestFlight and Organizer already show crashes, hangs and (for App Store builds with enough opted-in users) exit and performance data with no code; MetricKit delivery to TestFlight builds is reported as unreliable (iOS 18 forum reports) and may depend on a device setting. *Decision rule:* after one TestFlight round, keep it only if a real payload showed something the typed events and Apple's own tools did not.
 5. **What does "#11" refer to in the Stack Map?** Not found; taken to mean user feedback gathering. Please confirm so the right entry is closed.
 
 ## 17. Documentation Strategy
