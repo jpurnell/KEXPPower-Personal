@@ -88,6 +88,16 @@ struct RootView: View {
         // The remote's Play/Pause button pauses and resumes from anywhere. Here rather than in a section, so it works
         // while focus is in the tab bar, where it is when the app opens.
         .onPlayPauseCommand { model.playerController.playOrPause() }
+        // The Top Shelf's Play: the live stream, leaving an archived show if one is playing.
+        .onOpenURL { url in
+            guard SpinnerLink(url: url) == .playLive else { return }
+            selection = .live
+            if archive.nowPlayingShow != nil {
+                archive.returnToLive()
+            } else if !model.playerController.isPlaying {
+                model.playerController.playPlayer()
+            }
+        }
         #endif
     }
 }

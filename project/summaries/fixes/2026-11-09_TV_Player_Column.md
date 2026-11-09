@@ -29,3 +29,6 @@ Owner feedback on DeviceHub: a cleaner Date grid, taller and better-spaced cards
 - A details (ⓘ) button and sheet for each song on tvOS; Select on + adds instead of expanding the row.
 - The lock opens Settings (`SaveState.opensSettings`, test first); the Playlists placeholder is gone everywhere (tests updated first); Spinner TV's icon and Top Shelf generated from the visionOS layers.
 - An iPhone-simulator test run hung for 10 minutes before running a test (xcodebuild at 4 s of CPU); stopped and rerun, it passed in 65 s.
+
+## Then: the Top Shelf
+Owner request: show the playing song in the Top Shelf when Spinner is in the top row. Layout chosen by the owner: a row of square covers. Proposal `project/plans/proposals/TopShelf.md`; `TopShelfRow` and `SpinnerLink` written test first (9 tests); a new `Spinner TV Top Shelf` extension target added to the project by script. 386 app tests pass. Seen working on the simulator's Home screen, Play included.

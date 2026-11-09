@@ -11,6 +11,9 @@ import StationKitAdapterKEXP
 #if canImport(WidgetKit)
 import WidgetKit
 #endif
+#if canImport(TVServices)
+import TVServices
+#endif
 
 /// Tells the widget what is on the air: saves a snapshot where the widget can read it, keeps the playing flag fresh,
 /// and asks WidgetKit to reload only when something the widget shows has changed.
@@ -74,7 +77,7 @@ final class WidgetPublisher {
         logger.info("\(message, privacy: .public)")
     }
 
-    /// Asks WidgetKit to reload the app's widgets. Widgets on visionOS need visionOS 26.
+    /// Asks WidgetKit to reload the app's widgets, or on tvOS the Top Shelf. Widgets on visionOS need visionOS 26.
     static func reloadWidgets() {
         #if canImport(WidgetKit)
         #if os(visionOS)
@@ -84,6 +87,9 @@ final class WidgetPublisher {
         // The Control Center control reads the same play state, so it is told at the same moment.
         if #available(iOS 18.0, macOS 26.0, *) { ControlCenter.shared.reloadControls(ofKind: WidgetConstants.controlKind) }
         #endif
+        #elseif canImport(TVServices)
+        // tvOS has no widgets; the same change refreshes the Top Shelf.
+        TVTopShelfContentProvider.topShelfContentDidChange()
         #endif
     }
 }

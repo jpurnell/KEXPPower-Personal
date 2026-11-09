@@ -361,6 +361,14 @@
 		4DA0419975EC216FEB2D367F /* KEXPPower in Frameworks */ = {isa = PBXBuildFile; productRef = EF9E3F7F90CE519E87A00C34 /* KEXPPower */; };
 		3D129D3D9F920C5B9257D815 /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = F2A89C2BEE87613A39DF6081 /* StationKit */; };
 		2D29ECB8011377E998D3A854 /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = 21BD9B15E8289A32C8D3D2A7 /* StationKitAdapterKEXP */; };
+		41EA7CE4F6D252921248C688 /* TopShelfContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F820903A29DFD95688CFD91 /* TopShelfContentTests.swift */; };
+		15692B433428034FB85A915A /* TopShelfContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A289AAD994E8809701D3D91E /* TopShelfContent.swift */; };
+		49255B20C17563EB1599A330 /* TopShelfContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A289AAD994E8809701D3D91E /* TopShelfContent.swift */; };
+		8CF8F402D71C66143C649FEA /* ContentProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FCE5FD48215591A1E9A02A5 /* ContentProvider.swift */; };
+		C17FC4AF59AE3104F0832065 /* TopShelfContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A289AAD994E8809701D3D91E /* TopShelfContent.swift */; };
+		40A49000B56647B28BCE14FD /* StationKit in Frameworks */ = {isa = PBXBuildFile; productRef = CF33CD71146AEE0622167624 /* StationKit */; };
+		8CC4E8665B9DE1990F34DE1A /* StationKitAdapterKEXP in Frameworks */ = {isa = PBXBuildFile; productRef = F6C93AC8298883434C2640EA /* StationKitAdapterKEXP */; };
+		22E74B596AA2DF44614889B1 /* Spinner TV Top Shelf.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A6837980F42883C20CDAAFA9 /* Spinner TV Top Shelf.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -413,6 +421,13 @@
 			remoteGlobalIDString = 277CF9D58DFAE7DD5EF566A7;
 			remoteInfo = "Spinner Watch";
 		};
+		455EF3B67315D4041CCD49CB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8BFFECAC22C95E6100E3378C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16D42CB354E823F966779843;
+			remoteInfo = "Spinner TV Top Shelf";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -456,6 +471,17 @@
 			dstSubfolderSpec = 13;
 			files = (
 				B2C88CEE86C8A8D15DFB11CE /* Spinner Widget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		56502252721AD6EDB62C4055 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				22E74B596AA2DF44614889B1 /* Spinner TV Top Shelf.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -624,6 +650,11 @@
 		FFD73668FE19EB1E7DD918AA /* LivePlayerBar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LivePlayerBar.swift; sourceTree = "<group>"; };
 		D461528B45997D09220FA277 /* Spinner TV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spinner TV.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0251E3449513067EDECED7C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0F820903A29DFD95688CFD91 /* TopShelfContentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TopShelfContentTests.swift"; sourceTree = "<group>"; };
+		A289AAD994E8809701D3D91E /* TopShelfContent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TopShelfContent.swift"; sourceTree = "<group>"; };
+		A6837980F42883C20CDAAFA9 /* Spinner TV Top Shelf.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Spinner TV Top Shelf.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FCE5FD48215591A1E9A02A5 /* ContentProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "ContentProvider.swift"; sourceTree = "<group>"; };
+		B79F71288B06F7B97B0568F6 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -710,6 +741,15 @@
 				4DA0419975EC216FEB2D367F /* KEXPPower in Frameworks */,
 				3D129D3D9F920C5B9257D815 /* StationKit in Frameworks */,
 				2D29ECB8011377E998D3A854 /* StationKitAdapterKEXP in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEF6249A730116E6911304F0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				40A49000B56647B28BCE14FD /* StationKit in Frameworks */,
+				8CC4E8665B9DE1990F34DE1A /* StationKitAdapterKEXP in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -885,6 +925,7 @@
 				742332F2DD84136F05577C26 /* PlayerBarKind.swift */,
 				FFD73668FE19EB1E7DD918AA /* LivePlayerBar.swift */,
 				8CCF460C7A9E0E3CD5E24F95 /* TimeShift */,
+				1098B0BC15A8414B2A91D6C1 /* TV */,
 			);
 			path = "KEXPPower SwiftUI";
 			sourceTree = "<group>";
@@ -953,6 +994,7 @@
 				67FBD9654996269FE0368BF5 /* Spinner Mac UITests */,
 				64E4371AD4B8D775ED3F13C9 /* Spinner Watch Widget */,
 				588B20B9AACF968F7F9B0164 /* Spinner TV */,
+				71F82407482EB54398ADC74D /* Spinner TV Top Shelf */,
 			);
 			sourceTree = "<group>";
 		};
@@ -973,6 +1015,7 @@
 				57CA15C1437457B0F298C238 /* Spinner Mac UITests.xctest */,
 				2D7B9A52F866786354AD4253 /* Spinner Watch Widget.appex */,
 				D461528B45997D09220FA277 /* Spinner TV.app */,
+				A6837980F42883C20CDAAFA9 /* Spinner TV Top Shelf.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1066,6 +1109,7 @@
 				FA7F19F39B0F8F5BBAE3A267 /* RewindWindowTests.swift */,
 				6DB02CEA355C432900F24087 /* LiveTimeShiftTests.swift */,
 				305A6734750DD5C141FD7833 /* HeardPlaysTests.swift */,
+				0F820903A29DFD95688CFD91 /* TopShelfContentTests.swift */,
 			);
 			path = KEXPPowerAppTests;
 			sourceTree = "<group>";
@@ -1092,6 +1136,23 @@
 				0251E3449513067EDECED7C1 /* Info.plist */,
 			);
 			path = "Spinner TV";
+			sourceTree = "<group>";
+		};
+		1098B0BC15A8414B2A91D6C1 /* TV */ = {
+			isa = PBXGroup;
+			children = (
+				A289AAD994E8809701D3D91E /* TopShelfContent.swift */,
+			);
+			path = TV;
+			sourceTree = "<group>";
+		};
+		71F82407482EB54398ADC74D /* Spinner TV Top Shelf */ = {
+			isa = PBXGroup;
+			children = (
+				1FCE5FD48215591A1E9A02A5 /* ContentProvider.swift */,
+				B79F71288B06F7B97B0568F6 /* Info.plist */,
+			);
+			path = "Spinner TV Top Shelf";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1276,10 +1337,12 @@
 				B93590783131A645FF110619 /* Sources */,
 				D0D857931A2FEE8666EB16E4 /* Frameworks */,
 				5164EDA6B4FB8A710D2BE147 /* Resources */,
+				56502252721AD6EDB62C4055 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F3E6967811AA5D7DBB30A673 /* PBXTargetDependency */,
 			);
 			name = "Spinner TV";
 			packageProductDependencies = (
@@ -1290,6 +1353,27 @@
 			productName = "Spinner TV";
 			productReference = D461528B45997D09220FA277 /* Spinner TV.app */;
 			productType = "com.apple.product-type.application";
+		};
+		16D42CB354E823F966779843 /* Spinner TV Top Shelf */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA158E965CF99B07BBF40A7F /* Build configuration list for PBXNativeTarget "Spinner TV Top Shelf" */;
+			buildPhases = (
+				2CC93087F200C3B24D99DCDC /* Sources */,
+				AEF6249A730116E6911304F0 /* Frameworks */,
+				8FDA1A0D0C3B6CCEF63B9884 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Spinner TV Top Shelf";
+			packageProductDependencies = (
+				CF33CD71146AEE0622167624 /* StationKit */,
+				F6C93AC8298883434C2640EA /* StationKitAdapterKEXP */,
+			);
+			productName = "Spinner TV Top Shelf";
+			productReference = A6837980F42883C20CDAAFA9 /* Spinner TV Top Shelf.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -1334,6 +1418,7 @@
 				5A20566905E70B9B2557C9AD /* Spinner Mac UITests */,
 				E7A2D4A2B025158D179612FC /* Spinner Watch Widget */,
 				0F801806236B5A9439564E34 /* Spinner TV */,
+				16D42CB354E823F966779843 /* Spinner TV Top Shelf */,
 			);
 		};
 /* End PBXProject section */
@@ -1406,6 +1491,13 @@
 			files = (
 				A77DAC683D0532E7ECC88DF8 /* Assets.xcassets in Resources */,
 				BCCC04D4AE369328C9B57550 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FDA1A0D0C3B6CCEF63B9884 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1527,6 +1619,7 @@
 				4EBBBBBCBFF70C88C40D32BB /* LiveTimeShift.swift in Sources */,
 				C53C46F367A6E3726AE27A41 /* LiveRewindControls.swift in Sources */,
 				935AEC44BADCC9E8A8C85DEF /* HeardPlays.swift in Sources */,
+				15692B433428034FB85A915A /* TopShelfContent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1714,6 +1807,7 @@
 				73946D958291B7941AFAAAF9 /* RewindWindowTests.swift in Sources */,
 				0D85C3102BD38081E8685103 /* LiveTimeShiftTests.swift in Sources */,
 				6D354504952AA88D2A87170B /* HeardPlaysTests.swift in Sources */,
+				41EA7CE4F6D252921248C688 /* TopShelfContentTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1792,6 +1886,16 @@
 				B3A48529B5A8630256855E52 /* RewindWindow.swift in Sources */,
 				8BD87DE300C9801F1C91E2CF /* LiveTimeShift.swift in Sources */,
 				ED84803528870092B5020AD3 /* LiveRewindControls.swift in Sources */,
+				49255B20C17563EB1599A330 /* TopShelfContent.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2CC93087F200C3B24D99DCDC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8CF8F402D71C66143C649FEA /* ContentProvider.swift in Sources */,
+				C17FC4AF59AE3104F0832065 /* TopShelfContent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1840,6 +1944,11 @@
 			platformFilter = ios;
 			target = 277CF9D58DFAE7DD5EF566A7 /* Spinner Watch */;
 			targetProxy = E50145E54EACA98334404513 /* PBXContainerItemProxy */;
+		};
+		F3E6967811AA5D7DBB30A673 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16D42CB354E823F966779843 /* Spinner TV Top Shelf */;
+			targetProxy = 455EF3B67315D4041CCD49CB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2525,6 +2634,63 @@
 			};
 			name = Release;
 		};
+		ABB9C17229E929973B74EEFC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Spinner TV Top Shelf/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Top Shelf";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.topshelf;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
+			};
+			name = Debug;
+		};
+		238D30E3D321950114B314B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BNDA9Y6YV9;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Spinner TV Top Shelf/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Top Shelf";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 3.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.topshelf;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 17.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2614,6 +2780,15 @@
 			buildConfigurations = (
 				5BD032F6B76C9A99803BE4CC /* Debug */,
 				34BB2D1054F79E3C4F235C41 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA158E965CF99B07BBF40A7F /* Build configuration list for PBXNativeTarget "Spinner TV Top Shelf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABB9C17229E929973B74EEFC /* Debug */,
+				238D30E3D321950114B314B9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2724,6 +2899,16 @@
 			productName = StationKit;
 		};
 		21BD9B15E8289A32C8D3D2A7 /* StationKitAdapterKEXP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AB6DF3C2B3BF307D38068231 /* XCRemoteSwiftPackageReference "StationKitAdapterKEXP" */;
+			productName = StationKitAdapterKEXP;
+		};
+		CF33CD71146AEE0622167624 /* StationKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 97A49C75DB4DAD4BE7C42135 /* XCRemoteSwiftPackageReference "StationKit" */;
+			productName = StationKit;
+		};
+		F6C93AC8298883434C2640EA /* StationKitAdapterKEXP */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AB6DF3C2B3BF307D38068231 /* XCRemoteSwiftPackageReference "StationKitAdapterKEXP" */;
 			productName = StationKitAdapterKEXP;
