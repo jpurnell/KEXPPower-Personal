@@ -241,6 +241,9 @@ private struct ShowListView: View {
                 ShowRow(show: show, showsDay: showsDay, isPlaying: browser.nowPlayingShow?.id == show.id)
             }
             .buttonStyle(.plain)
+            .contextMenu {
+                Button("Play from the start", systemImage: "play.fill") { Task { await browser.play(show) } }
+            }
         }
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 8) {
