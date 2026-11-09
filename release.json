@@ -1,0 +1,17 @@
+{
+  "projectOrWorkspacePath": "KEXPPower.xcodeproj",
+  "scheme": "Spinner Mac",
+  "configuration": "Release",
+  "teamID": "BNDA9Y6YV9",
+  "archivePath": "build/Spinner.xcarchive",
+  "exportPath": "build/export",
+  "appName": "Spinner.app",
+  "zipPath": "build/Spinner.zip",
+  "exportMethod": "developer-id",
+  "signingStyle": "automatic",
+  "allowProvisioningUpdates": true,
+  "notaryProfile": "fleetwatch-notary",
+  "bundleIdentifier": "com.JPEnterprises.Spinner",
+  "deviceConfiguration": "Debug",
+  "deviceBuildPath": "build/device"
+}
