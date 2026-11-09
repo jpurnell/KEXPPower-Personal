@@ -4,6 +4,7 @@
 //
 
 import AppIntents
+import StationKit
 
 /// Says the song on the air, or the show between songs. Does not open the app.
 struct WhatsPlayingIntent: AppIntent {
@@ -61,6 +62,64 @@ struct RewindLiveIntent: AudioPlaybackIntent {
     }
 }
 
+/// One archived airing of a show, as Siri and Shortcuts see it. A program that airs most days is several of these, told
+/// apart by their day and time.
+struct ShowEntity: AppEntity {
+    static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Show")
+    static let defaultQuery = ShowEntityQuery()
+
+    let id: String
+    let programName: String
+    /// The hosts and the day and time it began, such as "Morgan · Sat 3:00 PM".
+    let subtitle: String
+
+    init(_ show: StationKit.ArchiveShow) {
+        id = show.id
+        programName = show.programName
+        let when = ArchiveTiming.dayAndClock(show.startTime, zone: AppModelRegistry.shownZone)
+        let hosts = show.hostNames.isEmpty ? "" : show.hostNames.formatted(.list(type: .and)) + " · "
+        subtitle = hosts + when
+    }
+
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(title: "\(programName)", subtitle: "\(subtitle)")
+    }
+}
+
+/// Finds shows by id, by what the listener says, and as suggestions. Show titles are not known ahead of time, so it
+/// looks through the archive's last two weeks.
+struct ShowEntityQuery: EntityStringQuery {
+    @MainActor
+    func entities(for identifiers: [String]) async throws -> [ShowEntity] {
+        let wanted = Set(identifiers)
+        return await AppModelRegistry.archivedShows().filter { wanted.contains($0.id) }.map(ShowEntity.init)
+    }
+
+    @MainActor
+    func entities(matching string: String) async throws -> [ShowEntity] {
+        await AppModelRegistry.showsMatching(string).map(ShowEntity.init)
+    }
+
+    @MainActor
+    func suggestedEntities() async throws -> [ShowEntity] {
+        await AppModelRegistry.showsMatching("").map(ShowEntity.init)
+    }
+}
+
+/// Plays an archived show from its start. Siri asks which show when the name fits several airings.
+struct PlayArchivedShowIntent: AudioPlaybackIntent {
+    static let title: LocalizedStringResource = "Play an Archived Show"
+    static let description = IntentDescription("Plays a show from the KEXP archive from its start.")
+
+    @Parameter(title: "Show", requestValueDialog: IntentDialog("Which show?"))
+    var show: ShowEntity
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        .result(dialog: IntentDialog(stringLiteral: await AppModelRegistry.playShow(id: show.id)))
+    }
+}
+
 #if !os(macOS)
 /// Adds the song heard to the playlist, without unlocking the phone: the car's button does the same.
 struct AddSongToPlaylistIntent: AppIntent {
@@ -95,6 +154,10 @@ struct KEXPShortcuts: AppShortcutsProvider {
             phrases: ["Add this song on \(.applicationName)", "Save this song on \(.applicationName)"],
             shortTitle: "Add This Song", systemImageName: "plus.circle")
         #endif
+        AppShortcut(
+            intent: PlayArchivedShowIntent(),
+            phrases: ["Play a show on \(.applicationName)", "Play an archived show on \(.applicationName)"],
+            shortTitle: "Play a Show", systemImageName: "archivebox")
         AppShortcut(
             intent: BackToLiveIntent(),
             phrases: ["Back to live on \(.applicationName)"],

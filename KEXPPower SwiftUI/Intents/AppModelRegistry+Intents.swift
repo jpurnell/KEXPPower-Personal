@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import StationKit
 
 /// What Siri and Shortcuts ask of the app, each answered with the sentence to speak.
 ///
@@ -93,4 +94,43 @@ extension AppModelRegistry {
     /// Spoken when there is no song to add: between songs, or before the first of an archived show.
     static let noSongToAdd = "No song is playing to add."
     #endif
+
+    // MARK: Archived shows
+
+    /// The shows a spoken phrase means, newest first, at most five. A blank phrase gives the newest shows. The archive is
+    /// loaded first if it has not been.
+    /// - Parameter phrase: What the listener said, such as "variety mix saturday".
+    static func showsMatching(_ phrase: String) async -> [StationKit.ArchiveShow] {
+        guard let archive else { return [] }
+        if archive.phase == .idle { await archive.load() }
+        let shows = archive.tiles.flatMap(\.shows)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = ArchiveTiming.stationTimeZone
+        return ShowMatching.matches(phrase, in: shows, limit: 5, calendar: calendar)
+    }
+
+    /// Every show the archive holds, for looking one up by its id.
+    static func archivedShows() async -> [StationKit.ArchiveShow] {
+        guard let archive else { return [] }
+        if archive.phase == .idle { await archive.load() }
+        return archive.tiles.flatMap(\.shows)
+    }
+
+    /// Plays an archived show from its start.
+    /// - Parameter id: The show's id, as `ShowEntity` carries it.
+    static func playShow(id: String) async -> String {
+        guard let archive, model != nil else { return notReady }
+        guard let show = await archivedShows().first(where: { $0.id == id }) else { return noSuchShow }
+        await archive.play(show)
+        guard archive.nowPlayingShow?.id == show.id else { return archive.notice ?? noSuchShow }
+        return "Playing \(show.programName), \(ArchiveTiming.dayAndClock(show.startTime, zone: shownZone))."
+    }
+
+    /// Spoken when a show is gone from the archive, or has no audio.
+    static let noSuchShow = "That show is no longer available."
+
+    /// The zone times are spoken in, from Settings.
+    nonisolated static var shownZone: TimeZone {
+        ShowTimeZone.resolve(stored: UserDefaults.standard.string(forKey: ShowTimeZone.storageKey)).zone
+    }
 }

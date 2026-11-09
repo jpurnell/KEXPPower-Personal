@@ -5,7 +5,7 @@ import Testing
 
 /// A catalog that answers from fixed data and remembers what it was asked.
 // Justification: a test double used from one test at a time; nothing touches it from two tasks at once.
-private final class FakeCatalog: ArchiveCatalog, @unchecked Sendable {
+final class FakeCatalog: ArchiveCatalog, @unchecked Sendable {
     var shows: [ArchiveShow] = []
     var playback: ArchivePlayback?
     var failure: (any Error)?
@@ -42,7 +42,7 @@ private final class FakeCatalog: ArchiveCatalog, @unchecked Sendable {
 }
 
 @MainActor
-private final class FakePlayer: ArchivePlayer {
+final class FakePlayer: ArchivePlayer {
     var isPlayingArchive = false
     var isPlaying = false
     var archiveFileTime: TimeInterval = 0

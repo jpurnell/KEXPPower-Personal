@@ -2,10 +2,16 @@ import Foundation
 import Testing
 @testable import KEXPPowerExampleSwiftUI
 
-/// The registry's entry points for Siri and Shortcuts. They share static state, so they run one at a time.
-@Suite("AppModelRegistry intents", .serialized)
+/// The suites that touch `AppModelRegistry`'s shared static state. They are nested here so they run one at a time, not
+/// side by side: a `.serialized` trait on each suite only orders the tests inside it.
+@Suite("AppModelRegistry", .serialized)
+enum RegistrySuites {}
+
+/// The registry's entry points for Siri and Shortcuts.
+extension RegistrySuites {
+@Suite("Entry points")
 @MainActor
-struct AppModelRegistryIntentTests {
+struct IntentTests {
     /// Runs a body with the registry holding a model and an archive of their own, then puts it back.
     private func withRegistry(_ body: (ResultRetriever) async -> Void) async {
         let (savedModel, savedArchive) = (AppModelRegistry.model, AppModelRegistry.archive)
@@ -60,15 +66,17 @@ struct AppModelRegistryIntentTests {
         }
     }
 }
+}
 
 #if !os(macOS)
 import KEXPPower
 import StationKit
 
 /// Adding the song heard to the playlist, which the Mac cannot do.
-@Suite("AppModelRegistry add song", .serialized)
+extension RegistrySuites {
+@Suite("Add song")
 @MainActor
-struct AppModelRegistryAddSongTests {
+struct AddSongTests {
     private func savingModel(_ outcome: SaveOutcome) -> SongSavingModel {
         SongSavingModel(save: { _, _ in outcome }, confirm: { _, _ in outcome }, loadPlaylists: { [] })
     }
@@ -111,5 +119,6 @@ struct AppModelRegistryAddSongTests {
             #expect(said.hasSuffix("is held for review on your phone."))
         }
     }
+}
 }
 #endif
