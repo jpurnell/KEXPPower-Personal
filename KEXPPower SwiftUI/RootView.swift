@@ -175,24 +175,9 @@ struct SectionDestination: View {
             ReviewView(model: model)
         case .archive:
             ArchiveView(model: model, browser: archive)
-        case .playlists:
-            ComingSoonView(section: section)
         case .nowPlaying:
             nowPlaying
         }
-    }
-}
-
-/// The stand-in for a section that is not built yet.
-struct ComingSoonView: View {
-    let section: AppSection
-
-    var body: some View {
-        ContentUnavailableView(
-            section.title,
-            systemImage: section.systemImage,
-            description: Text(section.comingSoonMessage ?? "")
-        )
     }
 }
 

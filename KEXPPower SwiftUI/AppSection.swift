@@ -7,7 +7,6 @@
 enum AppSection: String, CaseIterable, Identifiable, Hashable {
     case live
     case archive
-    case playlists
     case review
     /// The player on its own screen: tvOS only, where a bar beside or beneath each section's content could not be
     /// reached from its list with the remote.
@@ -25,7 +24,7 @@ enum AppSection: String, CaseIterable, Identifiable, Hashable {
             switch section {
             case .review: canSaveToPlaylists
             case .nowPlaying: showsNowPlaying
-            case .live, .archive, .playlists: true
+            case .live, .archive: true
             }
         }
     }
@@ -37,7 +36,6 @@ enum AppSection: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .live: "Live"
         case .archive: "Archive"
-        case .playlists: "Playlists"
         case .review: "Review"
         case .nowPlaying: "Now Playing"
         }
@@ -48,20 +46,8 @@ enum AppSection: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .live: "dot.radiowaves.left.and.right"
         case .archive: "clock.arrow.circlepath"
-        case .playlists: "music.note.list"
         case .review: "tray.full"
         case .nowPlaying: "play.circle"
-        }
-    }
-
-    /// Whether the section is built yet.
-    var isAvailable: Bool { self != .playlists }
-
-    /// What to tell the listener about a section that is not built yet, or `nil` once it is.
-    var comingSoonMessage: String? {
-        switch self {
-        case .live, .archive, .review, .nowPlaying: nil
-        case .playlists: "Save the songs you hear to a KEXP playlist in Apple Music."
         }
     }
 }

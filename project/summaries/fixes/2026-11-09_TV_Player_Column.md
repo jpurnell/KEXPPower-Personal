@@ -24,3 +24,8 @@ The owner tried the column in DeviceHub and found it messy (a mostly empty third
 
 ## Then: grids and player spacing
 Owner feedback on DeviceHub: a cleaner Date grid, taller and better-spaced cards, and the Catch-up button's focus covering the scrub bar. Fixed with tvOS-only sizes in `ArchiveView` (5-column day grid, larger cards, count under the name, `.card` button style) and `ArchivePlayerBar` (row spacing, inset, a focus highlight on the timeline). Checked with sim-tap screenshots of each, focused.
+
+## Then: details, the lock, the icon, no Playlists
+- A details (ⓘ) button and sheet for each song on tvOS; Select on + adds instead of expanding the row.
+- The lock opens Settings (`SaveState.opensSettings`, test first); the Playlists placeholder is gone everywhere (tests updated first); Spinner TV's icon and Top Shelf generated from the visionOS layers.
+- An iPhone-simulator test run hung for 10 minutes before running a test (xcodebuild at 4 s of CPU); stopped and rerun, it passed in 65 s.

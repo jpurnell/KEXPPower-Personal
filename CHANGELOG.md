@@ -7,7 +7,7 @@
   - **Live:** the show and host, Now Playing with a Play/Pause button, the Previously list, live rewind.
   - **Archive:** by Date, Host, Show or Genre, with playback.
   - **Review**, with Add to Apple Music playlist (MusicKit's playlist calls exist on tvOS 16).
-  - **Playlists:** coming soon.
+  - ~~**Playlists:** coming soon~~ (removed 2026-11-09, below).
 
   It shares the iOS sources, except the menu commands, the widget views and CarPlay, and the bundle ID (`com.JPEnterprises.Spinner`, universal purchase).
 
@@ -22,6 +22,13 @@
   - the player has room between its rows, so a focused button no longer covers the timeline, and the focused timeline is highlighted (a progress bar has no focus effect of its own). The archive playlist is a full-size sheet (it collapsed to its title line), with each song's time on one line.
 
   Runs on the tvOS 27.2 simulator, driven with sim-tap's remote: the tabs, Play (the stream started and the KEXP Live bar appeared), the Archive's pickers and day strip, and the Apple Music permission prompt from Add to playlist (denied, which shows the lock button). Playing an archive show, its timeline (right +30 s, left −15 s), Pause, Back 15 and resuming were checked there too, as were the Now Playing tab, its playlist, and the remote's Play/Pause from a list row and from the tab bar. Not yet checked there: adding a song from Review, which needs a signed-in Apple Music account the simulator does not have (its empty state shows). No app icon yet. Proposal: `project/plans/proposals/TVApp.md`.
+
+### Removed
+- The Playlists section, a "coming soon" placeholder on every platform (the iPhone's tabs, the iPad's and Mac's sidebar, the TV's tabs). Nothing was built behind it; adding a song to a playlist is the + on each song, and the playlist of an archived show is in its player.
+
+### Changed
+- When Apple Music access has been refused, the lock on a song's add button opens Spinner's page in Settings, where access can be turned back on. Before, it asked again, and the system answered with the stored refusal, so it stayed locked. iPhone, iPad, Vision Pro and Apple TV; checked on the tvOS 27.2 simulator, where it opens Spinner's page at "Media & Apple Music: Never".
+- Spinner TV has an app icon and Top Shelf images: the iPhone icon's amber bars on its dark gradient, as a two-layer tvOS image stack (front: bars; back: gradient, the visionOS icon's own layers), with the App Store size and both Top Shelf banners. Generated from those layers, so the TV matches the other platforms.
 
 ### Fixed
 - On Spinner TV, Select on a song's add (+) button expanded the song's row instead of adding it to Apple Music. The row's tap gesture, there to expand it, also caught Select pressed on the button inside; tvOS rows cannot take focus, so the gesture is left out there. Each song instead has a details (ⓘ) button beside +, opening a sheet with the artwork, song, artist, album, release and label, and the DJ's notes, one focusable paragraph each so long notes scroll; Menu closes it. Expanding the row in place, as on the iPhone, made a row taller than the screen with nothing the remote could focus in it.
