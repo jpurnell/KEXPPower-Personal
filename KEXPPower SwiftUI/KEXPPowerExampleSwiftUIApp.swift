@@ -74,10 +74,13 @@ struct KEXPPowerExampleSwiftUIApp: App {
             RootView(model: model, archive: archive)
                 .environment(saving)
         }
+        #if !os(tvOS)
+        // tvOS has no menu bar.
         .commands {
             CommandGroup(replacing: .newItem) {}
             PlaybackCommands(model: model)
         }
+        #endif
         #endif
     }
 }

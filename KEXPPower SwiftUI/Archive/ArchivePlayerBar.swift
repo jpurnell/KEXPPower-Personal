@@ -14,15 +14,33 @@ struct ArchivePlayerBar: View {
     private var zone: TimeZone { ShowTimeZone.resolve(stored: storedZone).zone }
     let show: ArchiveShow
     let browser: ArchiveBrowserModel
+    /// Whether it offers to fold to its title line; not when it is a screen of its own (tvOS's Now Playing).
+    var canFold = true
     /// The scrubber's value while a finger is on it, so the clock does not fight the drag.
     @State private var dragFraction: Double?
     @State private var showingPlaylist = false
     /// Whether the scrubber and controls show, or only the title line; the bar stays over every section, so it can fold.
     @State private var isExpanded = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    #if os(tvOS)
+    @FocusState private var timelineFocused: Bool
+    #endif
+
+    /// Space between the title line, the timeline and the controls. tvOS lifts a focused button by about a tenth of
+    /// its size, and at 8 the lifted Catch-up button covered the timeline.
+    /// And the card's own inset, so a lifted button at its edge stays inside it.
+    #if os(tvOS)
+    private static let rowSpacing = 32.0
+    private static let inset = 32.0
+    private static let clockSpacing = 12.0
+    #else
+    private static let rowSpacing = 8.0
+    private static let inset = 16.0
+    private static let clockSpacing = 2.0
+    #endif
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: Self.rowSpacing) {
             HStack {
                 VStack(alignment: .leading) {
                     Text("Playing from the archive").font(.caption).foregroundStyle(.secondary)
@@ -47,11 +65,13 @@ struct ArchivePlayerBar: View {
                 .buttonStyle(.plain)
                 .foregroundStyle(.tint)
                 .accessibilityHint("Stops the archive and plays the live stream")
-                Button { withAnimation(reduceMotion ? nil : .default) { isExpanded.toggle() } } label: {
-                    Label(isExpanded ? "Show less" : "Show the player", systemImage: isExpanded ? "chevron.down" : "chevron.up")
-                        .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
+                if canFold {
+                    Button { withAnimation(reduceMotion ? nil : .default) { isExpanded.toggle() } } label: {
+                        Label(isExpanded ? "Show less" : "Show the player", systemImage: isExpanded ? "chevron.down" : "chevron.up")
+                            .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
             if isExpanded {
                 if let note = browser.truncationNote {
@@ -63,7 +83,7 @@ struct ArchivePlayerBar: View {
                 controls
             }
         }
-        .padding()
+        .padding(Self.inset)
         .background(.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
         .sheet(isPresented: $showingPlaylist) { ArchivePlaylistView(show: show, browser: browser) }
     }
@@ -75,7 +95,30 @@ struct ArchivePlayerBar: View {
             let fileTime = browser.fileTime
             let shown = dragFraction ?? transport.fraction(atFileTime: fileTime)
             let shownFileTime = transport.lowerBound + shown * transport.length
-            VStack(spacing: 2) {
+            VStack(spacing: Self.clockSpacing) {
+                #if os(tvOS)
+                // tvOS has no slider. Focus the bar and press left or right on the remote: the same moves as the skip
+                // buttons, back 15 seconds and forward 30.
+                ProgressView(value: shown)
+                    // A progress bar has no focus effect of its own; without this, nothing showed it was focused.
+                    .tint(timelineFocused ? Color.primary : Color.secondary)
+                    .scaleEffect(x: 1, y: timelineFocused ? 2 : 1)
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 16)
+                    .background(Capsule().fill(Color.primary.opacity(timelineFocused ? 0.18 : 0)))
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: timelineFocused)
+                    .focusable()
+                    .focused($timelineFocused)
+                    .onMoveCommand { direction in
+                        switch direction {
+                        case .left: Task { await browser.skip(by: -15) }
+                        case .right: Task { await browser.skip(by: 30) }
+                        default: break
+                        }
+                    }
+                    .accessibilityLabel("Position in the show")
+                    .accessibilityValue("\(transport.elapsedText(atFileTime: shownFileTime)) of \(ArchiveTiming.positionText(transport.length))")
+                #else
                 Slider(
                     value: Binding(get: { shown }, set: { dragFraction = $0 }),
                     in: 0...1
@@ -86,6 +129,7 @@ struct ArchivePlayerBar: View {
                 }
                 .accessibilityLabel("Position in the show")
                 .accessibilityValue("\(transport.elapsedText(atFileTime: shownFileTime)) of \(ArchiveTiming.positionText(transport.length))")
+                #endif
                 HStack {
                     Text(transport.elapsedText(atFileTime: shownFileTime))
                     Spacer()
@@ -155,6 +199,10 @@ private struct ArchivePlaylistView: View {
         .task(id: browser.nowPlayingShow?.id) { await browser.loadTracks() }
         #if os(macOS)
         .frame(minWidth: 420, minHeight: 480)
+        #elseif os(tvOS)
+        // A tvOS sheet is as large as its content, and a list has no size of its own: without this it was the title
+        // line and the top of the spinner.
+        .frame(width: 1200, height: 820)
         #endif
     }
 
@@ -223,11 +271,19 @@ private struct TrackRow: View {
     /// Whether the song is in the part of the show that was recorded; if not, it cannot be played.
     var isRecorded = true
 
+    /// Room for "12:03:14 AM EST" on one line; tvOS's caption type is about twice the size.
+    #if os(tvOS)
+    private static let clockWidth = 220.0
+    #else
+    private static let clockWidth = 96.0
+    #endif
+
     var body: some View {
         HStack(spacing: 12) {
             if let aired = track.airDate {
                 Text(ArchiveTiming.clock(aired, zone: zone)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
-                    .frame(width: 96, alignment: .leading)
+                    .lineLimit(1).minimumScaleFactor(0.8)
+                    .frame(width: Self.clockWidth, alignment: .leading)
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(track.title).font(.headline)
