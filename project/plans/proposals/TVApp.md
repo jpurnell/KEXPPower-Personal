@@ -96,7 +96,7 @@ This branch (`tvos-target`) starts from `6184370`. `swiftui_example` has uncommi
   - It is a checker limitation and is reported to the owner, not suppressed.
 - **Checked with sim-tap's tvOS driver (2026-11-08):** the four tabs, Play, the Archive's pickers and day strip, and the Apple Music prompt from Add to playlist.
 - **Found by that check, and fixed:** the TV app had no way to start live playback. The Now Playing section was compiled for iOS, visionOS and macOS only, so tvOS showed neither the play button nor the song on the air (the Previously list leaves it out), and the remote's Play/Pause reaches `MPRemoteCommandCenter` only once the app is already playing. tvOS now has its own Now Playing: a labelled Play/Pause button and the song's card. `PlaybackCommands.swift` is compiled into the TV target for `PlaybackMenuState`, with the menu itself behind `#if !os(tvOS)`.
-- **Not yet done:** ~~playing an archive show and moving its timeline~~ (done 2026-11-09, below), and adding a song from Review.
+- **Not yet done:** ~~playing an archive show and moving its timeline~~ (done 2026-11-09, below), and adding a song from Review (adding from Live is confirmed on a device, §15; Review with entries is not).
 - **Superseded:** the `unreachable` note above. It was a checker bug (one USR per module), fixed in quality-gate 3.8.0; the gate now passes here.
 
 ### 9. Player column (2026-11-09)
@@ -123,7 +123,7 @@ From the owner's DeviceHub screenshots:
 
 ### 12. Add to playlist from Live (2026-11-09)
 - **Found by the owner:** Select on a Live song's + expanded the row and saved nothing. `CombinedView`'s `.onTapGesture` (expand) on the row also fires for Select on the `SaveButton` in its overlay. tvOS rows are not focusable, so the gesture only ever fired by accident; it is now left out on tvOS, and rows there do not expand.
-- **Checked with sim-tap:** Select on the Now Playing + no longer expands the row and runs the save, which on the lab simulator stops at the lock (Apple Music access was denied there on 2026-11-08). A completed add still needs a real Apple TV signed in to Apple Music.
+- **Checked with sim-tap:** Select on the Now Playing + no longer expands the row and runs the save, which on the lab simulator stops at the lock (Apple Music access was denied there on 2026-11-08). ~~A completed add still needs a real Apple TV signed in to Apple Music.~~ Done on a device (§15).
 - **Details (owner request):** a ⓘ button beside + on each song. Tried first as the iPhone's in-place expansion: the expanded row was taller than the screen and held nothing focusable, so focus stuck on its buttons and the notes could not be scrolled to. Now a sheet (`PlayDetailsSheet`, tvOS only): artwork, song, artist, album, release · label, and the notes split into focusable paragraphs. Checked with sim-tap on an airbreak, and on Lou Reed's "Satellite of Love" with two paragraphs of notes; Menu closes it.
 - **The lock:** it means Apple Music access was denied (`needsPermission`); pressing it asks again, which tvOS answers from the stored decision. `xcrun simctl privacy <udid> reset media-library com.JPEnterprises.Spinner` brings the prompt back on a simulator. ~~There is no route from the lock to Settings yet.~~ Done (§13).
 
@@ -137,3 +137,8 @@ From the owner's DeviceHub screenshots:
 - Spinner TV now compiles `ListeningSettings.swift` and `ShowTimeZone.swift`, which the shared views use. **Gap:** tvOS has no way into Settings yet (the gear is iPhone and iPad only), so a TV uses the default stream and time zone.
 - Checked after the merge: every platform builds, 417 app tests pass, and on the tvOS simulator Live, the Archive (Show mode), an archived show in Now Playing and the Top Shelf all work.
 - **Merged with Siri and the live-rewind cushion (2026-11-09):** `Cushion.swift` (which also holds `LiveBolt`) is now compiled into Spinner TV, which the shared rewind controls and `SettingsView` use. The Siri and Shortcuts intents are not in the TV target.
+
+### 15. On a real Apple TV (2026-11-09)
+- Installed on the owner's Apple TV 4K (2nd generation), registered to the team for this; a Debug build with the Top Shelf extension, signed by automatic provisioning.
+- **Add to Apple Music works:** the owner added songs from Live with the + button and found them in Apple Music. This is the check the simulator could not make (no Apple Music account there).
+- Still to check on the device: Review with songs in it, the Top Shelf (Spinner in the top row), and the Siri Remote's Play/Pause.
