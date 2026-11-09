@@ -4,7 +4,7 @@
 
 ### Added
 - **Spinner TV**, a tvOS app target (tvOS 17) with the iPhone app's sections in a top tab bar:
-  - **Live:** the show and host, the Previously list, live rewind.
+  - **Live:** the show and host, Now Playing with a Play/Pause button, the Previously list, live rewind.
   - **Archive:** by Date, Host, Show or Genre, with playback.
   - **Review**, with Add to Apple Music playlist (MusicKit's playlist calls exist on tvOS 16).
   - **Playlists:** coming soon.
@@ -14,9 +14,10 @@
   On tvOS:
   - the timelines are focusable bars that the remote's left and right move back 15 seconds and forward 30;
   - web links are hidden;
-  - no `AVPlayerViewController` is created, so StationKit stays the only Now Playing writer (ADR-003).
+  - no `AVPlayerViewController` is created, so StationKit stays the only Now Playing writer (ADR-003);
+  - Now Playing is a "Now Playing" heading, a labelled Play/Pause button and the song's card, rather than the iPhone's player view, whose nested buttons have no sensible focus order.
 
-  Runs on the tvOS 27.2 simulator. Remote navigation, playback and Review are not yet checked there. No app icon yet. Proposal: `project/plans/proposals/TVApp.md`.
+  Runs on the tvOS 27.2 simulator, driven with sim-tap's remote: the tabs, Play (the stream started and the KEXP Live bar appeared), the Archive's pickers and day strip, and the Apple Music permission prompt from Add to playlist (denied, which shows the lock button). Not yet checked there: playing an archive show, the timeline, and adding a song from Review. No app icon yet. Proposal: `project/plans/proposals/TVApp.md`.
 
 ### Fixed
 - CarPlay crashed the moment the car connected. The app had no CarPlay scene entry in its Info.plist, and the project's generated scene manifest was replacing any entry added; CarPlay raised an exception while handing over its interface controller. The iOS target now uses its own manifest naming `CarPlaySceneDelegate`. Found from the crash reports on the phone (four identical reports, `-[CPTemplateApplicationScene _deliverInterfaceControllerToDelegate]`); verified on the CarPlay simulator.

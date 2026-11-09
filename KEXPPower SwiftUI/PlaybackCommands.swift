@@ -13,7 +13,9 @@ struct PlaybackMenuState: Equatable {
     var title: String { isPlaying ? "Pause" : "Play" }
 }
 
+#if !os(tvOS)
 /// The Playback menu: play or pause the stream from the keyboard, and on the Mac switch between the two windows.
+/// tvOS has no menu bar, so it has no commands; the TV compiles this file for ``PlaybackMenuState``.
 struct PlaybackCommands: Commands {
     let model: ResultRetriever
 
@@ -44,3 +46,4 @@ struct PlaybackCommands: Commands {
         }
     }
 }
+#endif

@@ -94,4 +94,7 @@ This branch (`tvos-target`) starts from `6184370`. `swiftui_example` has uncommi
   - Every checker but `unreachable` matches the base commit exactly. The one new finding (a material without a Reduce Transparency fallback) was fixed.
   - `unreachable` fails here and on the untouched base commit alike, because in a fresh worktree its result depends on which scheme was built last: sources shared across targets through `#if` look unreachable from whichever platform compiled last.
   - It is a checker limitation and is reported to the owner, not suppressed.
-- **Not yet done:** navigating the app with the remote and checking playback, the archive and Review on the simulator. That waits on sim-tap's tvOS remote input.
+- **Checked with sim-tap's tvOS driver (2026-11-08):** the four tabs, Play, the Archive's pickers and day strip, and the Apple Music prompt from Add to playlist.
+- **Found by that check, and fixed:** the TV app had no way to start live playback. The Now Playing section was compiled for iOS, visionOS and macOS only, so tvOS showed neither the play button nor the song on the air (the Previously list leaves it out), and the remote's Play/Pause reaches `MPRemoteCommandCenter` only once the app is already playing. tvOS now has its own Now Playing: a labelled Play/Pause button and the song's card. `PlaybackCommands.swift` is compiled into the TV target for `PlaybackMenuState`, with the menu itself behind `#if !os(tvOS)`.
+- **Not yet done:** playing an archive show and moving its timeline, and adding a song from Review.
+- **Superseded:** the `unreachable` note above. It was a checker bug (one USR per module), fixed in quality-gate 3.8.0; the gate now passes here.

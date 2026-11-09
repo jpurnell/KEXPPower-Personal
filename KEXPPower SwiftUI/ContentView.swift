@@ -48,6 +48,21 @@ struct ContentView: View {
                     CombinedView(play: resultsRetriever.play)
                 }.padding(.horizontal)
             #endif
+            #if os(tvOS)
+                // A labelled button rather than iOS's PlayerView, whose nested buttons have no sensible focus order:
+                // the remote moves to Play and selects it, and the card below shows what is on the air.
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text("Now Playing").fontWeight(.semibold)
+                        Spacer()
+                        Button(action: resultsRetriever.playerController.playOrPause) {
+                            Label(PlaybackMenuState(isPlaying: resultsRetriever.playerController.isPlaying).title,
+                                  systemImage: resultsRetriever.playerController.isPlaying ? "pause.fill" : "play.fill")
+                        }
+                    }
+                    CombinedView(play: resultsRetriever.play)
+                }.padding(.horizontal)
+            #endif
             #if os(iOS) || os(visionOS)
                 VStack(alignment: .leading) {
                     // The add button sits on the label line, so the row below keeps its whole width.

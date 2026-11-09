@@ -352,6 +352,7 @@
 		CD3FAA47BE008DE4EEA4DCDB /* LiveRewindProbeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A1FD84DDF69067C08CB3E3 /* LiveRewindProbeView.swift */; };
 		2BC893842D6EAE077C1C9358 /* LiveWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89A5556C6D46A570A910C62A /* LiveWindow.swift */; };
 		7E1A0C5D2B9F4E6A8C3D1F02 /* HeardPlays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A23BF996F3051A1DAA80560 /* HeardPlays.swift */; };
+		7E1A0C5D2B9F4E6A8C3D1F03 /* PlaybackCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFBE4378A2DAC76125F8B3C /* PlaybackCommands.swift */; };
 		B3A48529B5A8630256855E52 /* RewindWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA46F38BDB93670268A2B07F /* RewindWindow.swift */; };
 		8BD87DE300C9801F1C91E2CF /* LiveTimeShift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DB37A0F80E3387358760B70 /* LiveTimeShift.swift */; };
 		ED84803528870092B5020AD3 /* LiveRewindControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2704D4123F24F7E75DFC1B /* LiveRewindControls.swift */; };
@@ -1787,6 +1788,7 @@
 				CD3FAA47BE008DE4EEA4DCDB /* LiveRewindProbeView.swift in Sources */,
 				2BC893842D6EAE077C1C9358 /* LiveWindow.swift in Sources */,
 				7E1A0C5D2B9F4E6A8C3D1F02 /* HeardPlays.swift in Sources */,
+				7E1A0C5D2B9F4E6A8C3D1F03 /* PlaybackCommands.swift in Sources */,
 				B3A48529B5A8630256855E52 /* RewindWindow.swift in Sources */,
 				8BD87DE300C9801F1C91E2CF /* LiveTimeShift.swift in Sources */,
 				ED84803528870092B5020AD3 /* LiveRewindControls.swift in Sources */,
