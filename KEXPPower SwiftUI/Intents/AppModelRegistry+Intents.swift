@@ -73,4 +73,24 @@ extension AppModelRegistry {
         await player.rewindLive()
         return "Back \(minutes) minutes."
     }
+
+    #if !os(macOS)
+    /// Adds the song heard to the listener's playlist. A text match is held for review instead of asked about, as in the
+    /// car, because nobody can answer a prompt by voice.
+    static func addSong() async -> String {
+        guard let model, let saving else { return notReady }
+        if let archive, archive.nowPlayingShow != nil {
+            guard let track = archive.heardTrack, SongSavingModel.canSave(track) else { return noSongToAdd }
+            await saving.save(track, holdingGuesses: true)
+            return IntentSpeech.saved(saving.state(for: track), title: track.title)
+        }
+        let play = model.play
+        guard SongSavingModel.canSave(play) else { return noSongToAdd }
+        await saving.save(play, holdingGuesses: true)
+        return IntentSpeech.saved(saving.state(for: play), title: NowPlayingSummary(play).title)
+    }
+
+    /// Spoken when there is no song to add: between songs, or before the first of an archived show.
+    static let noSongToAdd = "No song is playing to add."
+    #endif
 }

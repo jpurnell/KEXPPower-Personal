@@ -61,6 +61,19 @@ struct RewindLiveIntent: AudioPlaybackIntent {
     }
 }
 
+#if !os(macOS)
+/// Adds the song heard to the playlist, without unlocking the phone: the car's button does the same.
+struct AddSongToPlaylistIntent: AppIntent {
+    static let title: LocalizedStringResource = "Add This Song"
+    static let description = IntentDescription("Adds the song playing on KEXP to your KEXP playlist in Apple Music.")
+
+    @MainActor
+    func perform() async throws -> some IntentResult & ProvidesDialog {
+        .result(dialog: IntentDialog(stringLiteral: await AppModelRegistry.addSong()))
+    }
+}
+#endif
+
 /// The phrases Siri understands with no setup. Each must contain the app's name.
 struct KEXPShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
@@ -76,6 +89,12 @@ struct KEXPShortcuts: AppShortcutsProvider {
             intent: PauseKEXPIntent(),
             phrases: ["Pause \(.applicationName)"],
             shortTitle: "Pause", systemImageName: "pause.fill")
+        #if !os(macOS)
+        AppShortcut(
+            intent: AddSongToPlaylistIntent(),
+            phrases: ["Add this song on \(.applicationName)", "Save this song on \(.applicationName)"],
+            shortTitle: "Add This Song", systemImageName: "plus.circle")
+        #endif
         AppShortcut(
             intent: BackToLiveIntent(),
             phrases: ["Back to live on \(.applicationName)"],

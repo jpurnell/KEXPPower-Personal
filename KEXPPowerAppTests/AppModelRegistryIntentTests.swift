@@ -60,3 +60,56 @@ struct AppModelRegistryIntentTests {
         }
     }
 }
+
+#if !os(macOS)
+import KEXPPower
+import StationKit
+
+/// Adding the song heard to the playlist, which the Mac cannot do.
+@Suite("AppModelRegistry add song", .serialized)
+@MainActor
+struct AppModelRegistryAddSongTests {
+    private func savingModel(_ outcome: SaveOutcome) -> SongSavingModel {
+        SongSavingModel(save: { _, _ in outcome }, confirm: { _, _ in outcome }, loadPlaylists: { [] })
+    }
+
+    private func withRegistry(saving: SongSavingModel?, _ body: () async -> Void) async {
+        let (savedModel, savedSaving, savedArchive) = (AppModelRegistry.model, AppModelRegistry.saving, AppModelRegistry.archive)
+        AppModelRegistry.model = ResultRetriever()
+        AppModelRegistry.saving = saving
+        AppModelRegistry.archive = nil
+        await body()
+        AppModelRegistry.model = savedModel
+        AppModelRegistry.saving = savedSaving
+        AppModelRegistry.archive = savedArchive
+    }
+
+    @Test("Without the app's saving model it says it is not ready")
+    func notReady() async {
+        await withRegistry(saving: nil) {
+            #expect(await AppModelRegistry.addSong() == AppModelRegistry.notReady)
+        }
+    }
+
+    @Test("The song on the air is added, and the sentence names the song and the playlist")
+    func addsLiveSong() async {
+        let wanted = CatalogSong(id: "cat-1", title: "Bleeding Blue", artist: "Cults")
+        let kexp = PlaylistSummary(id: "p-kexp", name: "KEXP")
+        let saving = savingModel(.finished(wanted, added: [kexp], failed: []))
+        await withRegistry(saving: saving) {
+            let title = NowPlayingSummary(AppModelRegistry.model?.play).title
+            #expect(await AppModelRegistry.addSong() == "Added \(title) to KEXP.")
+        }
+    }
+
+    @Test("A text match is left for the phone, not guessed at, and the sentence says so")
+    func leavesGuessesForThePhone() async {
+        let guess = CatalogSong(id: "cat-2", title: "Bleeding Blue (Live)", artist: "Cults")
+        let saving = savingModel(.needsConfirmation(guess))
+        await withRegistry(saving: saving) {
+            let said = await AppModelRegistry.addSong()
+            #expect(said.hasSuffix("is held for review on your phone."))
+        }
+    }
+}
+#endif
