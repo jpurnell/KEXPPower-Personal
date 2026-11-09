@@ -27,6 +27,13 @@ struct ArchivePlayerBar: View {
                 VStack(alignment: .leading) {
                     Text("Playing from the archive").font(.caption).foregroundStyle(.secondary)
                     Text(show.programName).font(.headline)
+                    // The song being heard, from the show's playlist against the playhead.
+                    if let song = browser.heardTrack {
+                        Text(song.displayArtist.isEmpty ? song.title : "\(song.title) · \(song.displayArtist)")
+                            .font(.subheadline)
+                            .lineLimit(1)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 Spacer()
                 if !isExpanded {

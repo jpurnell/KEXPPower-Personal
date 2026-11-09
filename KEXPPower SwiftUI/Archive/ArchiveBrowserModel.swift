@@ -176,6 +176,8 @@ final class ArchiveBrowserModel {
     /// The songs of the show being heard, in the order they aired; only those with an air time, since the rest
     /// cannot be placed in the show.
     private(set) var tracks: [Track] = []
+    /// The song being heard now, for the player bar; `nil` before the show's first song and while the songs are not here.
+    private(set) var heardTrack: Track?
     private(set) var tracksState: TracksState = .idle
     /// Something to tell the listener about the last attempt to play, or `nil`.
     private(set) var notice: String?
@@ -377,6 +379,8 @@ final class ArchiveBrowserModel {
     func announceCurrentSong() async {
         guard let show = nowPlayingShow, tracksState == .loaded else { return }
         let track = currentTrack(atFileTime: player.archiveFileTime)
+        // Assigned only on a change, so the player bar is not redrawn every few seconds for nothing.
+        if heardTrack?.id != track?.id { heardTrack = track }
         guard track?.id != announcedSongID else { return }
         guard let track else {
             await announce(show)
@@ -499,6 +503,7 @@ final class ArchiveBrowserModel {
     }
 
     private func clearTracks() {
+        heardTrack = nil
         tracks = []
         tracksState = .idle
     }

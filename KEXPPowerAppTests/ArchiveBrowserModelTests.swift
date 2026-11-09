@@ -769,6 +769,32 @@ struct ArchiveBrowserModelTests {
         }
     }
 
+    @Test("The song heard is kept for the player bar to show, and follows the playhead")
+    func keepsSongHeard() async throws {
+        let (model, player) = try await playingWithSongs()
+        #expect(model.heardTrack == nil)
+        player.archiveFileTime = 778 + 250
+        await model.announceCurrentSong()
+        #expect(model.heardTrack?.id == "b")
+        player.archiveFileTime = 778 + 3_000
+        await model.announceCurrentSong()
+        #expect(model.heardTrack?.id == "c")
+    }
+
+    @Test("Before the first song, and after going back to live, there is no song heard")
+    func noSongHeardOutsideSongs() async throws {
+        let (model, player) = try await playingWithSongs()
+        player.archiveFileTime = 778 + 250
+        await model.announceCurrentSong()
+        player.archiveFileTime = 778 + 10
+        await model.announceCurrentSong()
+        #expect(model.heardTrack == nil)
+        player.archiveFileTime = 778 + 250
+        await model.announceCurrentSong()
+        model.returnToLive()
+        #expect(model.heardTrack == nil)
+    }
+
     @Test("Before the show's first song the show is announced, not a song")
     func announcesShowBeforeFirstSong() async throws {
         let (model, player) = try await playingWithSongs()
