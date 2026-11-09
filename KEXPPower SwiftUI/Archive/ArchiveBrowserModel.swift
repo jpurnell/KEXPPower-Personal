@@ -188,22 +188,35 @@ final class ArchiveBrowserModel {
     @ObservationIgnored private let player: any ArchivePlayer
     @ObservationIgnored private let calendar: Calendar
     @ObservationIgnored private let now: @Sendable () -> Date
+    /// How often the song heard is checked while a show plays; `nil` leaves that to the caller.
+    @ObservationIgnored private let songCheckInterval: Duration?
+    @ObservationIgnored private var songWatch: Task<Void, Never>?
+    /// The id of the song last announced to the system, or `nil` while the show itself is announced.
+    @ObservationIgnored private var announcedSongID: String?
 
     /// - Parameters:
     ///   - catalog: The station's archive.
     ///   - player: The app's player.
     ///   - calendar: Decides where a day begins; the station's time zone.
     ///   - now: The current moment; injected so tests control the date.
+    ///   - songCheckInterval: How often to look up the song being heard while a show plays, so the lock screen and the
+    ///     car name it; `nil` for never.
     init(
         catalog: any ArchiveCatalog,
         player: any ArchivePlayer,
         calendar: Calendar,
-        now: @escaping @Sendable () -> Date = Date.init
+        now: @escaping @Sendable () -> Date = Date.init,
+        songCheckInterval: Duration? = .seconds(3)
     ) {
         self.catalog = catalog
         self.player = player
         self.calendar = calendar
         self.now = now
+        self.songCheckInterval = songCheckInterval
+    }
+
+    isolated deinit {
+        songWatch?.cancel()
     }
 
     /// The archived show being heard, or `nil` when the player is on the live stream.
@@ -359,6 +372,41 @@ final class ArchiveBrowserModel {
         return tracks.last { ($0.airDate?.timeIntervalSince(show.startTime) ?? .infinity) <= elapsed }
     }
 
+    /// Tells the lock screen and the car which song is being heard, when it has changed: the latest one that had aired
+    /// by this point in the show, or the show itself before its first song. Does nothing until the songs are here.
+    func announceCurrentSong() async {
+        guard let show = nowPlayingShow, tracksState == .loaded else { return }
+        let track = currentTrack(atFileTime: player.archiveFileTime)
+        guard track?.id != announcedSongID else { return }
+        guard let track else {
+            await announce(show)
+            return
+        }
+        announcedSongID = track.id
+        await player.updateNowPlaying(.track(track))
+    }
+
+    /// Fetches the songs, then keeps naming the one heard for as long as an archived show plays.
+    private func followSongs(every interval: Duration) async {
+        await loadTracks()
+        while !Task.isCancelled, nowPlayingShow != nil {
+            await announceCurrentSong()
+            try? await Task.sleep(for: interval)
+        }
+    }
+
+    private func startFollowingSongs() {
+        songWatch?.cancel()
+        songWatch = nil
+        guard let interval = songCheckInterval else { return }
+        songWatch = Task { [weak self] in await self?.followSongs(every: interval) }
+    }
+
+    private func stopFollowingSongs() {
+        songWatch?.cancel()
+        songWatch = nil
+    }
+
     /// Jumps to where a song aired in the show.
     /// - Parameter track: A song of the show being heard.
     func seek(to track: Track) async {
@@ -419,6 +467,7 @@ final class ArchiveBrowserModel {
         // After the state above, so the timeline announced with the show is this show's.
         await announce(show)
         armContinuation()
+        startFollowingSongs()
     }
 
     private func move(to target: ArchiveTransport.Target) async {
@@ -445,6 +494,7 @@ final class ArchiveBrowserModel {
         player.returnToLive()
         playing = nil
         playingOffset = nil
+        stopFollowingSongs()
         clearTracks()
     }
 
@@ -454,6 +504,7 @@ final class ArchiveBrowserModel {
     }
 
     private func announce(_ show: ArchiveShow) async {
+        announcedSongID = nil
         await player.updateNowPlaying(.program(ProgramInfo(
             title: show.programName,
             host: show.hostNames.isEmpty ? nil : ListFormatter.localizedString(byJoining: show.hostNames),
@@ -480,9 +531,11 @@ final class ArchiveBrowserModel {
             clearTracks()
             provideTransportControls()
             await announce(next)
+            startFollowingSongs()
         case .live:
             playing = nil
             playingOffset = nil
+            stopFollowingSongs()
             clearTracks()
             player.setTransportControls(nil)
         }

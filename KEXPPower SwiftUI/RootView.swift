@@ -9,8 +9,8 @@ import SwiftUI
 /// The app's frame: a sidebar you can show and hide on the Mac, iPad and Vision Pro, and tabs on the iPhone.
 struct RootView: View {
     let model: ResultRetriever
-    /// The archive's browser lives here rather than in its screen, so playback can be controlled from any section.
-    @State private var archive: ArchiveBrowserModel
+    /// The archive's browser is made once at launch, so playback can be controlled from any section and from the car.
+    let archive: ArchiveBrowserModel
 
     @Environment(SongSavingModel.self) private var saving
     @State private var selection: AppSection? = AppSection.defaultSection
@@ -18,13 +18,9 @@ struct RootView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
 
-    init(model: ResultRetriever) {
+    init(model: ResultRetriever, archive: ArchiveBrowserModel) {
         self.model = model
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = ArchiveTiming.stationTimeZone
-        calendar.locale = .current
-        _archive = State(initialValue: ArchiveBrowserModel(
-            catalog: KEXPArchiveCatalog(), player: model.playerController, calendar: calendar))
+        self.archive = archive
     }
 
     var body: some View {
@@ -99,6 +95,17 @@ struct RootView: View {
             }
         }
         #endif
+    }
+}
+
+extension ArchiveBrowserModel {
+    /// The archive of KEXP's own recordings, played through the app's player, with days kept in the station's time zone.
+    /// - Parameter player: The app's player.
+    static func standard(player: any ArchivePlayer) -> ArchiveBrowserModel {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = ArchiveTiming.stationTimeZone
+        calendar.locale = .current
+        return ArchiveBrowserModel(catalog: KEXPArchiveCatalog(), player: player, calendar: calendar)
     }
 }
 
@@ -192,6 +199,7 @@ struct SectionDestination: View {
 }
 
 #Preview {
-    RootView(model: ResultRetriever())
+    let model = ResultRetriever()
+    return RootView(model: model, archive: .standard(player: model.playerController))
         .environment(AppSongSaver.makeModel())
 }

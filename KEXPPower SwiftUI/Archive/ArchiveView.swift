@@ -85,6 +85,9 @@ struct ArchiveView: View {
             Button("Probe") { showingProbe = true }
             Button("Live") { showingLiveProbe = true }
             #endif
+            #if os(iOS)
+            SettingsButton(model: model)
+            #endif
         }
         .padding(.horizontal)
         .padding(.top)
@@ -312,6 +315,9 @@ private struct ShowListView: View {
 }
 
 private struct ShowRow: View {
+    @AppStorage(ShowTimeZone.storageKey) private var storedZone = ShowTimeZone.mine.rawValue
+    /// The zone times of day are drawn in, from Settings.
+    private var zone: TimeZone { ShowTimeZone.resolve(stored: storedZone).zone }
     let show: ArchiveShow
     let showsDay: Bool
     let isPlaying: Bool
@@ -324,7 +330,7 @@ private struct ShowRow: View {
                 if !show.hostNames.isEmpty {
                     Text(ListFormatter.localizedString(byJoining: show.hostNames)).font(.subheadline)
                 }
-                Text(showsDay ? ArchiveTiming.dayAndClock(show.startTime, zone: .autoupdatingCurrent) : ArchiveTiming.clock(show.startTime, zone: .autoupdatingCurrent))
+                Text(showsDay ? ArchiveTiming.dayAndClock(show.startTime, zone: zone) : ArchiveTiming.clock(show.startTime, zone: zone))
                     .font(.caption).foregroundStyle(.secondary)
                 if let tagline = show.tagline {
                     Text(tagline).font(.caption).foregroundStyle(.secondary).lineLimit(2)

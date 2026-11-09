@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import StationKit
 
 /// The words and button states CarPlay shows, kept apart from the CarPlay framework so they can be tested.
 ///
@@ -18,8 +19,47 @@ enum CarPlayContent {
     /// The station's name, shown when the show is not known.
     static let stationName = "KEXP 90.3 FM"
 
-    /// The archive row: present, so the Archive has a place, and honest that it is not built yet.
-    static let archiveRow = Row(title: "Archive", detail: "Coming soon")
+    /// A button on the system's Now Playing screen.
+    enum NowPlayingButton: Equatable {
+        /// Adds the song on the air to the listener's playlist.
+        case save
+        /// Goes back to the live stream.
+        case live
+    }
+
+    /// The live button's symbol: the bolt the phone uses for the same thing.
+    static let liveButtonSymbol = "bolt.fill"
+
+    /// The buttons for the Now Playing screen. An archived show gets the way back to live instead of the add button,
+    /// which would save the song on the air and not the one being heard.
+    static func nowPlayingButtons(isPlayingArchive: Bool) -> [NowPlayingButton] {
+        isPlayingArchive ? [.live] : [.save]
+    }
+
+    /// A day of the archive: "Today" or its weekday and date, over how many shows it holds.
+    static func dayRow(_ day: ArchiveDayTile) -> Row {
+        let title = day.isToday ? "Today" : "\(day.weekday) \(day.month.capitalized) \(day.dayNumber)"
+        let count = day.shows.count
+        let detail = switch count {
+        case 0: "No shows"
+        case 1: "1 show"
+        default: "\(count) shows"
+        }
+        return Row(title: title, detail: detail)
+    }
+
+    /// An archived show: its name over the time it began and its hosts.
+    /// - Parameter zone: The time zone to read the start in, from Settings.
+    static func archiveShowRow(_ show: ArchiveShow, zone: TimeZone) -> Row {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = zone
+        formatter.dateFormat = "h:mm a"
+        let start = formatter.string(from: show.startTime)
+        let hosts = show.hostNames.map(trimmed).filter { !$0.isEmpty }
+        let detail = hosts.isEmpty ? start : "\(start) · \(hosts.formatted(.list(type: .and)))"
+        return Row(title: show.programName, detail: detail)
+    }
 
     /// The show on the air and its host or hosts, such as "The Midday Show" over "Cheryl Waters".
     /// - Parameters:

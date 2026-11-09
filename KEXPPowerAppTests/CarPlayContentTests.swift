@@ -1,3 +1,4 @@
+import Foundation
 import KEXPPower
 import StationKit
 import Testing
@@ -37,9 +38,57 @@ struct CarPlayContentTests {
         #expect(airbreak == CarPlayContent.Row(title: "Airbreak", detail: "KEXP"))
     }
 
-    @Test("The archive is shown but not available yet, and says so")
-    func archiveRow() {
-        #expect(CarPlayContent.archiveRow == CarPlayContent.Row(title: "Archive", detail: "Coming soon"))
+    private var calendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/Los_Angeles") ?? .gmt
+        calendar.locale = Locale(identifier: "en_US")
+        return calendar
+    }
+
+    private func show(_ id: String, _ iso: String, hosts: [String] = ["John Richards"]) -> StationKit.ArchiveShow {
+        StationKit.ArchiveShow(
+            id: id, programName: "The Morning Show", hostNames: hosts, tagline: nil, imageURL: nil,
+            startTime: ISO8601DateFormatter().date(from: iso) ?? .distantPast, tags: [])
+    }
+
+    private func tiles() -> [ArchiveDayTile] {
+        let now = ISO8601DateFormatter().date(from: "2026-11-06T14:00:00-08:00") ?? .distantPast
+        let shows = [
+            show("1", "2026-11-06T07:00:00-08:00"), show("2", "2026-11-06T10:00:00-08:00"),
+            show("3", "2026-11-05T07:00:00-08:00"),
+        ]
+        return ArchiveDayTile.tiles(index: ArchiveIndex(shows: shows), now: now, calendar: calendar, count: 15)
+    }
+
+    @Test("A day in the archive reads as Today or its weekday and date, over how many shows it holds")
+    func dayRows() {
+        let days = tiles()
+        #expect(CarPlayContent.dayRow(days[0]) == CarPlayContent.Row(title: "Today", detail: "2 shows"))
+        #expect(CarPlayContent.dayRow(days[1]) == CarPlayContent.Row(title: "Thu Nov 5", detail: "1 show"))
+        #expect(CarPlayContent.dayRow(days[2]) == CarPlayContent.Row(title: "Wed Nov 4", detail: "No shows"))
+    }
+
+    @Test("An archived show is its name over its start time at the station and its hosts")
+    func archiveShowRow() {
+        let seattle = TimeZone(identifier: "America/Los_Angeles") ?? .gmt
+        let row = CarPlayContent.archiveShowRow(show("1", "2026-11-06T07:00:00-08:00"), zone: seattle)
+        #expect(row == CarPlayContent.Row(title: "The Morning Show", detail: "7:00 AM · John Richards"))
+        let hostless = CarPlayContent.archiveShowRow(show("1", "2026-11-06T13:30:00-08:00", hosts: []), zone: seattle)
+        #expect(hostless.detail == "1:30 PM")
+    }
+
+    @Test("The start time is read in the zone the listener chose")
+    func archiveShowRowZone() {
+        let utc = TimeZone(identifier: "UTC") ?? .gmt
+        let row = CarPlayContent.archiveShowRow(show("1", "2026-11-06T07:00:00-08:00"), zone: utc)
+        #expect(row.detail == "3:00 PM · John Richards")
+    }
+
+    @Test("The Now Playing screen offers the add button on the live stream, and the way back to live on an archived show")
+    func nowPlayingButtons() {
+        #expect(CarPlayContent.nowPlayingButtons(isPlayingArchive: false) == [.save])
+        #expect(CarPlayContent.nowPlayingButtons(isPlayingArchive: true) == [.live])
+        #expect(CarPlayContent.liveButtonSymbol == "bolt.fill")
     }
 
     @Test("The add button shows the save state: a symbol, selected once saved, off while saving")

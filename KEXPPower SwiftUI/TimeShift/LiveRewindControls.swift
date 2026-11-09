@@ -10,6 +10,9 @@ import SwiftUI
 ///
 /// It shows nothing unless live is playing through the recording, so a caller can place it unconditionally.
 struct LiveRewindControls: View {
+    @AppStorage(ShowTimeZone.storageKey) private var storedZone = ShowTimeZone.mine.rawValue
+    /// The zone times of day are drawn in, from Settings.
+    private var zone: TimeZone { ShowTimeZone.resolve(stored: storedZone).zone }
     let player: PlayerController
     /// Whether the row includes play and pause; the Live screen already has a large one of its own.
     var showsPlayButton = true
@@ -65,7 +68,7 @@ struct LiveRewindControls: View {
                 Spacer()
                 if !window.isLive {
                     // What the clock read when the music being heard was broadcast, for finding "the thing a minute ago".
-                    Text(ArchiveTiming.clock(Date().addingTimeInterval(-window.behindLive), zone: .autoupdatingCurrent))
+                    Text(ArchiveTiming.clock(Date().addingTimeInterval(-window.behindLive), zone: zone))
                     Spacer()
                     Button { Task { await player.catchUpToLive() } } label: {
                         Label("Catch up to live", systemImage: "bolt.fill")
