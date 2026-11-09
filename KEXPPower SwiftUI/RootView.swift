@@ -74,6 +74,11 @@ struct RootView: View {
                     .tag(section)
             }
         }
+        #if os(tvOS)
+        // The remote's Play/Pause button pauses and resumes from anywhere. Here rather than in a section, so it works
+        // while focus is in the tab bar, where it is when the app opens.
+        .onPlayPauseCommand { model.playerController.playOrPause() }
+        #endif
     }
 }
 
@@ -87,12 +92,22 @@ struct SectionDestination: View {
     #endif
 
     var body: some View {
+        #if os(tvOS)
+        // A column beside the content, not a strip beneath it: the remote moves focus by arrows, and Down in a list finds
+        // the next row before anything under the list, so a bar there was reached only past the last row. Right from any
+        // row reaches the column.
+        content
+            .safeAreaInset(edge: .trailing, spacing: 0) {
+                playerBar
+            }
+        #else
         content
             // Inside each section, not around the whole layout: a tab or split view does not pass the inset on, so a bar
             // there would float over the content instead of making room.
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 playerBar
             }
+        #endif
     }
 
     /// The bar for what is playing, on a solid background so it reads as a strip of its own beneath the content, not
@@ -103,21 +118,35 @@ struct SectionDestination: View {
             archiveShow: archive.nowPlayingShow, liveHasPlayed: model.playerController.hasPlayed,
             isTimeShifted: model.playerController.isTimeShifted, in: section)
         if kind != .none {
+            #if os(tvOS)
+            HStack(spacing: 0) {
+                Divider()
+                bar(for: kind)
+                    .padding()
+                    .frame(width: Self.tvBarWidth)
+                    .frame(maxHeight: .infinity, alignment: .top)
+            }
+            // One focus section, so Right reaches the column from a row at any height, not only from one level with it.
+            .focusSection()
+            // tvOS has no `.bar` style. A material, or a solid colour when the viewer has asked for less transparency.
+            .background(reduceTransparency ? AnyShapeStyle(Color.black) : AnyShapeStyle(.regularMaterial),
+                        ignoresSafeAreaEdges: [.vertical, .trailing])
+            #else
             VStack(spacing: 0) {
                 Divider()
                 bar(for: kind)
                     .padding(.horizontal)
                     .padding(.vertical, 6)
             }
-            #if os(tvOS)
-            // tvOS has no `.bar` style. A material, or a solid colour when the viewer has asked for less transparency.
-            .background(reduceTransparency ? AnyShapeStyle(Color.black) : AnyShapeStyle(.regularMaterial),
-                        ignoresSafeAreaEdges: .bottom)
-            #else
             .background(.bar, ignoresSafeAreaEdges: .bottom)
             #endif
         }
     }
+
+    #if os(tvOS)
+    /// The player column's width: room for the archive player's title line and its row of controls.
+    private static let tvBarWidth = 560.0
+    #endif
 
     @ViewBuilder
     private func bar(for kind: PlayerBarKind) -> some View {

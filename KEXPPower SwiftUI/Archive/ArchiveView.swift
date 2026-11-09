@@ -209,7 +209,8 @@ private struct DayTileView: View {
     var body: some View {
         VStack(spacing: 2) {
             Text(tile.month).font(.caption.weight(.semibold))
-            Text(tile.dayNumber).font(.title.weight(.bold))
+            // One line, shrinking if it must: a wide number ("30" on tvOS) wrapped a digit per line and made its tile taller.
+            Text(tile.dayNumber).font(.title.weight(.bold)).lineLimit(1).minimumScaleFactor(0.6)
             Text(tile.weekday).font(.caption)
         }
         .frame(maxWidth: .infinity, minHeight: 84)

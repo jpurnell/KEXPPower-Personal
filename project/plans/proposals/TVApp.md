@@ -96,5 +96,13 @@ This branch (`tvos-target`) starts from `6184370`. `swiftui_example` has uncommi
   - It is a checker limitation and is reported to the owner, not suppressed.
 - **Checked with sim-tap's tvOS driver (2026-11-08):** the four tabs, Play, the Archive's pickers and day strip, and the Apple Music prompt from Add to playlist.
 - **Found by that check, and fixed:** the TV app had no way to start live playback. The Now Playing section was compiled for iOS, visionOS and macOS only, so tvOS showed neither the play button nor the song on the air (the Previously list leaves it out), and the remote's Play/Pause reaches `MPRemoteCommandCenter` only once the app is already playing. tvOS now has its own Now Playing: a labelled Play/Pause button and the song's card. `PlaybackCommands.swift` is compiled into the TV target for `PlaybackMenuState`, with the menu itself behind `#if !os(tvOS)`.
-- **Not yet done:** playing an archive show and moving its timeline, and adding a song from Review.
+- **Not yet done:** ~~playing an archive show and moving its timeline~~ (done 2026-11-09, below), and adding a song from Review.
 - **Superseded:** the `unreachable` note above. It was a checker bug (one USR per module), fixed in quality-gate 3.8.0; the gate now passes here.
+
+### 9. Player column (2026-11-09)
+- **Checked with sim-tap:** an archive show plays, with the truncation note; the timeline moves right +30 s and left −15 s; Pause holds the position, Back 15 works while paused, and Play resumes. Review shows its empty state; a queue with entries needs a signed-in Apple Music account, so it is left for a real Apple TV.
+- **Found:** the player bar, at the bottom as §3 proposed, could be reached only past the last row of the list above it: the focus engine takes the next row before anything beneath the list. On a long day that was a dozen presses or more.
+- **Changed, departing from §3's "the player bar sits at the bottom, as elsewhere":** on tvOS the bar is a 560-point column on the right, one focus section, so Right from a row at any height reaches it, and Left returns. Checked: Right from the fifth show of Nov 7 landed on the timeline; Down then Right reached Back 15 and Pause.
+- **Added:** the remote's Play/Pause button calls `playOrPause()` from anywhere. It is on the `TabView`, not inside a section, because at launch focus is in the tab bar, outside every section; on the section it did nothing until focus moved into the content. Checked from a list row (paused and resumed an archive show) and from the tab bar at launch (started live).
+- **Also fixed:** two-digit days in the day strip wrapped a digit per line ("3" over "0"), which is why the Oct 25–30 tiles were taller; the number is now one line, shrinking if needed.
+- **Not changed:** the Oct 30 "That show is no longer available" was a station outage that day, not a bug.
