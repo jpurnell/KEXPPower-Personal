@@ -208,7 +208,7 @@ reason. Rejected.
 
 ## 16. Open Questions
 
-Answered by the owner on 2026-11-09: (1) **Yes** to add-to-playlist while the phone is locked. (2) **"Play a show on KEXP"** and Siri asks which: "we can't know all show titles ahead of time", so no per-program phrases. (3) **"That's good for airbreak"**: the show and host. Nothing is open. Original questions follow, as asked.
+Answered by the owner on 2026-11-09: (1) **Yes** to add-to-playlist while the phone is locked. (2) **"Play a show on KEXP"** and Siri asks which: "we can't know all show titles ahead of time", so no per-program phrases. (3) **"That's good for airbreak"**: the show and host. Nothing is open. **Corrections made when built:** the phrases say "Spinner", not "KEXP", because `\(.applicationName)` resolves to the app's name; and "Play a show on Spinner" is sometimes answered by Siri's own media handling before the app is asked, so the picker also answers "Find a show on Spinner" and "Listen to an archived show on Spinner". The picker in Shortcuts lists every archived show, not a short list. Original questions follow, as asked.
 
 1. **Locked phone.** May `AddSongToPlaylistIntent` run from a locked phone (Siri on a locked phone, CarPlay's voice), or
    should it require unlocking? *Recommendation:* allow it, because the car button already does and the listener may be

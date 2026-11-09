@@ -93,7 +93,7 @@ Build C, in phases, each ending in something that can be tried on a device.
   minutes, a scrubber over the window, pause and the bolt. Tested like `ArchiveTransport`.
 - **Phase 2 (built; checked in tests only):** the lock screen and CarPlay, through `NowPlayingPublishing.installTransportCommands` (done, StationKit
   0.11.0); the playlist and Now Playing text aligned to what is being heard instead of the live edge.
-- **Phase 3, if wanted (not built):** a setting for the cushion ("Stay 5 minutes behind live") that holds the playhead behind live
+- **Phase 3 (built 2026-11-09, as Part A only; `LiveRewindCushion.md`):** a setting for the cushion ("Stay 5 minutes behind live") that holds the playhead behind live
   once it is there.
 
 ## 5. Risks
