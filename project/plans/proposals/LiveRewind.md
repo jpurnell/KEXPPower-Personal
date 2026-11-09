@@ -1,6 +1,6 @@
 # Design Proposal: Pausing, rewinding and cushioning the live stream
 
-**Status:** DIRECTION AGREED 2026-11-07 (owner: "pause and resume and rewind if possible"; the use is a subway, with "a 5-10 minute cache"). APPROVED 2026-11-07 to build through Phase 0 (owner: "ok with the 10 minute window with the 5 minute rewind, and we should make that a setting"); §8 records the decisions. Earlier the same day it was PROPOSED, from the request for "catch up to live" in the style of ESPN's app, and from `ArchiveTransport.md` §5, which held live rewind back until a probe said whether KEXP's archive could do it. **It cannot; see §2.**
+**Status:** DIRECTION AGREED 2026-11-07 (owner: "pause and resume and rewind if possible"; the use is a subway, with "a 5-10 minute cache"). APPROVED 2026-11-07 to build through Phase 0 (owner: "ok with the 10 minute window with the 5 minute rewind, and we should make that a setting"); §8 records the decisions. Earlier the same day it was PROPOSED, from the request for "catch up to live" in the style of ESPN's app, and from `ArchiveTransport.md` §5, which held live rewind back until a probe said whether KEXP's archive could do it. **It cannot; see §2.** BUILT 2026-11-07/08, Phases 0 to 2 (see §4), with Settings (§10) shipped as `project/plans/upcoming/Settings.md`. Not yet checked on a device: skip and scrub on the lock screen, the song following in the car, and a dead zone on a subway. Phase 3 is unbuilt.
 **Date:** 2026-11-07
 **Master Plan Reference:** Roadmap, Phase 3 (Live rewind); `ArchiveTransport.md` §5 (superseded by this document).
 **Facts marked (live) were checked against `api.kexp.org` and `kexp.streamguys1.com` on 2026-11-07; (repo) in this repository or `KEXPPowerKit`. Anything not confirmed is marked *unverified*.**
@@ -85,15 +85,15 @@ StationKit release if the segmenter is to be reusable. Large, but each piece is 
 
 Build C, in phases, each ending in something that can be tried on a device.
 
-- **Phase 0, a spike (the risk is here, so it comes first):** the segmenter, tested first against a recorded stretch of
+- **Phase 0 (built, proven on a device 2026-11-07), a spike (the risk is here, so it comes first):** the segmenter, tested first against a recorded stretch of
   the stream; the local server; and `AVPlayer` playing live through them on Brawn. Then the two questions that decide
   whether C works at all, answered by trying them: does it keep recording with the screen locked, and does playback
   ride through airplane mode for as long as the cushion lasts and then jump the hole.
-- **Phase 1:** `LiveWindow` and the UI on the slim live bar and the Live screen: a "behind live" clock, back 15, back 5
+- **Phase 1 (built):** `LiveWindow` and the UI on the slim live bar and the Live screen: a "behind live" clock, back 15, back 5
   minutes, a scrubber over the window, pause and the bolt. Tested like `ArchiveTransport`.
-- **Phase 2:** the lock screen and CarPlay, through `NowPlayingPublishing.installTransportCommands` (done, StationKit
+- **Phase 2 (built; checked in tests only):** the lock screen and CarPlay, through `NowPlayingPublishing.installTransportCommands` (done, StationKit
   0.11.0); the playlist and Now Playing text aligned to what is being heard instead of the live edge.
-- **Phase 3, if wanted:** a setting for the cushion ("Stay 5 minutes behind live") that holds the playhead behind live
+- **Phase 3, if wanted (not built):** a setting for the cushion ("Stay 5 minutes behind live") that holds the playhead behind live
   once it is there.
 
 ## 5. Risks
@@ -148,6 +148,8 @@ early.
 3. **Asking KEXP about a live HLS stream first.** Not a blocker; it would simplify everything if they can. Open.
 
 ## 10. Settings
+
+**Built 2026-11-08; the design, its decisions and the order of work are in `project/plans/upcoming/Settings.md`. What follows is the original ask, kept as written.**
 
 The owner: "I think we are approaching a point where settings might start looking useful." The app has one setting today
 (stream quality, in Settings on macOS only). This feature needs the first one that matters on every platform, so it is

@@ -1,6 +1,6 @@
 # Archive Transport: scrubber, skip, catch up to live
 
-**Status:** APPROVED 2026-11-07 and built, steps 1 to 4 (the scrubber, play/pause, back 15, forward 30, catch up to live; then, on the owner's requests, the time of day at the scrubber, the show's playlist with jump and add-to-playlist, the player over every section, and the slim live bar). Step 3, the lock-screen and CarPlay controls, needed StationKit 0.11.0 and is checked in tests only, awaiting a device. Live rewind (§5) became its own proposal: `LiveRewind.md`. Follows `ArchiveBrowser.md` (the player that plays archived shows).
+**Status:** APPROVED 2026-11-07 and built, steps 1 to 4 (the scrubber, play/pause, back 15, forward 30, catch up to live; then, on the owner's requests, the time of day at the scrubber, the show's playlist with jump and add-to-playlist, the player over every section, and the slim live bar). Step 3, the lock-screen and CarPlay controls, needed StationKit 0.11.0 and is checked in tests only, awaiting a device. Live rewind (§5) became its own proposal, `LiveRewind.md`, and was built by recording the live stream rather than by rewinding into the archive. Follows `ArchiveBrowser.md` (the player that plays archived shows).
 
 ## 1. Problem
 
