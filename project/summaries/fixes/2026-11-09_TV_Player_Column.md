@@ -21,3 +21,6 @@ Checking the archive on the tvOS simulator with sim-tap: playback, the timeline,
 
 ## Revised the same day: Now Playing tab
 The owner tried the column in DeviceHub and found it messy (a mostly empty third of the screen, a cramped Host grid, a confusing Right from Live). Replaced with a Now Playing tab on tvOS; sections have no bar there. Also fixed the archive playlist sheet (collapsed to its title on tvOS), its wrapped time column, and the Host/Show/Genre cards (520-point columns on tvOS, even heights). `AppSection` gained `nowPlaying` and `visible(…, showsNowPlaying:)`, test first; `PlayerBarKind` gained a test for it. 377 app tests pass.
+
+## Then: grids and player spacing
+Owner feedback on DeviceHub: a cleaner Date grid, taller and better-spaced cards, and the Catch-up button's focus covering the scrub bar. Fixed with tvOS-only sizes in `ArchiveView` (5-column day grid, larger cards, count under the name, `.card` button style) and `ArchivePlayerBar` (row spacing, inset, a focus highlight on the timeline). Checked with sim-tap screenshots of each, focused.

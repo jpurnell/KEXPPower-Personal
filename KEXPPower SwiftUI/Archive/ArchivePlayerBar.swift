@@ -19,9 +19,25 @@ struct ArchivePlayerBar: View {
     /// Whether the scrubber and controls show, or only the title line; the bar stays over every section, so it can fold.
     @State private var isExpanded = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    #if os(tvOS)
+    @FocusState private var timelineFocused: Bool
+    #endif
+
+    /// Space between the title line, the timeline and the controls. tvOS lifts a focused button by about a tenth of
+    /// its size, and at 8 the lifted Catch-up button covered the timeline.
+    /// And the card's own inset, so a lifted button at its edge stays inside it.
+    #if os(tvOS)
+    private static let rowSpacing = 32.0
+    private static let inset = 32.0
+    private static let clockSpacing = 12.0
+    #else
+    private static let rowSpacing = 8.0
+    private static let inset = 16.0
+    private static let clockSpacing = 2.0
+    #endif
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: Self.rowSpacing) {
             HStack {
                 VStack(alignment: .leading) {
                     Text("Playing from the archive").font(.caption).foregroundStyle(.secondary)
@@ -64,7 +80,7 @@ struct ArchivePlayerBar: View {
                 controls
             }
         }
-        .padding()
+        .padding(Self.inset)
         .background(.secondary.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
         .sheet(isPresented: $showingPlaylist) { ArchivePlaylistView(show: show, browser: browser) }
     }
@@ -76,12 +92,20 @@ struct ArchivePlayerBar: View {
             let fileTime = browser.fileTime
             let shown = dragFraction ?? transport.fraction(atFileTime: fileTime)
             let shownFileTime = transport.lowerBound + shown * transport.length
-            VStack(spacing: 2) {
+            VStack(spacing: Self.clockSpacing) {
                 #if os(tvOS)
                 // tvOS has no slider. Focus the bar and press left or right on the remote: the same moves as the skip
                 // buttons, back 15 seconds and forward 30.
                 ProgressView(value: shown)
+                    // A progress bar has no focus effect of its own; without this, nothing showed it was focused.
+                    .tint(timelineFocused ? Color.primary : Color.secondary)
+                    .scaleEffect(x: 1, y: timelineFocused ? 2 : 1)
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 16)
+                    .background(Capsule().fill(Color.primary.opacity(timelineFocused ? 0.18 : 0)))
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: timelineFocused)
                     .focusable()
+                    .focused($timelineFocused)
                     .onMoveCommand { direction in
                         switch direction {
                         case .left: Task { await browser.skip(by: -15) }

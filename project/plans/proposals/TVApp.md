@@ -113,3 +113,10 @@ This branch (`tvos-target`) starts from `6184370`. `swiftui_example` has uncommi
 - **Also found by the owner:** the archive playlist sheet collapsed to its title line, because a tvOS sheet sizes to its content and a list has none; it is now 1200 × 820. Its time column (96 pt, a phone's width) wrapped "12:03:14 AM EST" over three lines; 220 on tvOS.
 - **Cards:** 520-point minimum columns on tvOS, names two lines at most, counts never wrapped, and each card as tall as its row.
 - **Checked with sim-tap:** Menu then Right ×4 reached Now Playing; Down reached the timeline, then Back 15, Pause, Forward 30 and Playlist in that order; the playlist opened full size. sim-tap's own scan for "Playlist" ran out of moves where the plain arrows worked, a sim-tap limitation to look at there.
+
+### 11. Grids and the player, tuned for focus (2026-11-09)
+From the owner's DeviceHub screenshots:
+- **Date:** the adaptive 84-point grid ran fifteen narrow tiles across the screen with an uneven tail. Now five fixed columns (three even rows), 180-point tiles, 40 points apart.
+- **Host, Show, Genre:** cards were too short and too close for the focus lift, which covered neighbours. Now 136 points tall at least, 24-point insets, 88-point pictures, 48 points apart; the show count moved beneath the name and the chevron is gone on tvOS, so a name has the card's width.
+- **Button style:** `.plain` on tvOS drew a focus platter around the tile's own background (a frame within a frame); tiles and cards now use `.card`, which lifts the tile.
+- **Player:** rows were 8 points apart, so the lifted Catch-up button covered the timeline; 32 on tvOS, a 32-point inset, 12 between the timeline and its clocks. The focusable timeline showed no focus at all; it now thickens and gets a highlight capsule.
