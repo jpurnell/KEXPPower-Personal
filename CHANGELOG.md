@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Added
+- **Spinner TV**, a tvOS app target (tvOS 17) with the iPhone app's sections in a top tab bar:
+  - **Live:** the show and host, the Previously list, live rewind.
+  - **Archive:** by Date, Host, Show or Genre, with playback.
+  - **Review**, with Add to Apple Music playlist (MusicKit's playlist calls exist on tvOS 16).
+  - **Playlists:** coming soon.
+
+  It shares the iOS sources, except the menu commands, the widget views and CarPlay, and the bundle ID (`com.JPEnterprises.Spinner`, universal purchase).
+
+  On tvOS:
+  - the timelines are focusable bars that the remote's left and right move back 15 seconds and forward 30;
+  - web links are hidden;
+  - no `AVPlayerViewController` is created, so StationKit stays the only Now Playing writer (ADR-003).
+
+  Runs on the tvOS 27.2 simulator. Remote navigation, playback and Review are not yet checked there. No app icon yet. Proposal: `project/plans/proposals/TVApp.md`.
+
 ### Fixed
 - CarPlay crashed the moment the car connected. The app had no CarPlay scene entry in its Info.plist, and the project's generated scene manifest was replacing any entry added; CarPlay raised an exception while handing over its interface controller. The iOS target now uses its own manifest naming `CarPlaySceneDelegate`. Found from the crash reports on the phone (four identical reports, `-[CPTemplateApplicationScene _deliverInterfaceControllerToDelegate]`); verified on the CarPlay simulator.
 - The car showed "Retrieving…" until a song was started, because the model fetched the show only when a window asked and CarPlay can launch the app with none. The car now asks for the fetch itself on connect.

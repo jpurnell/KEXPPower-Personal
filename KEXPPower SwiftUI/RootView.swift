@@ -14,7 +14,7 @@ struct RootView: View {
 
     @Environment(SongSavingModel.self) private var saving
     @State private var selection: AppSection? = AppSection.defaultSection
-    #if !os(macOS)
+    #if !os(macOS) && !os(tvOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
 
@@ -35,6 +35,9 @@ struct RootView: View {
     private var layout: some View {
         #if os(macOS)
         sidebarLayout
+        #elseif os(tvOS)
+        // A tab bar across the top is how tvOS apps are navigated with the remote.
+        tabLayout
         #else
         if horizontalSizeClass == .compact {
             tabLayout
@@ -64,7 +67,10 @@ struct RootView: View {
             ForEach(AppSection.visible(canSaveToPlaylists: AppSongSaver.canSaveToPlaylists)) { section in
                 SectionDestination(section: section, model: model, archive: archive)
                     .tabItem { Label(section.title, systemImage: section.systemImage) }
+                    #if !os(tvOS)
+                    // tvOS tabs take no badge; the Review section shows its own count.
                     .badge(section == .review ? (saving.reviewQueue?.count ?? 0) : 0)
+                    #endif
                     .tag(section)
             }
         }
@@ -76,6 +82,9 @@ struct SectionDestination: View {
     let section: AppSection
     let model: ResultRetriever
     let archive: ArchiveBrowserModel
+    #if os(tvOS)
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    #endif
 
     var body: some View {
         content
@@ -100,7 +109,13 @@ struct SectionDestination: View {
                     .padding(.horizontal)
                     .padding(.vertical, 6)
             }
+            #if os(tvOS)
+            // tvOS has no `.bar` style. A material, or a solid colour when the viewer has asked for less transparency.
+            .background(reduceTransparency ? AnyShapeStyle(Color.black) : AnyShapeStyle(.regularMaterial),
+                        ignoresSafeAreaEdges: .bottom)
+            #else
             .background(.bar, ignoresSafeAreaEdges: .bottom)
+            #endif
         }
     }
 

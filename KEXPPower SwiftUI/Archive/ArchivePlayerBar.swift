@@ -73,6 +73,21 @@ struct ArchivePlayerBar: View {
             let shown = dragFraction ?? transport.fraction(atFileTime: fileTime)
             let shownFileTime = transport.lowerBound + shown * transport.length
             VStack(spacing: 2) {
+                #if os(tvOS)
+                // tvOS has no slider. Focus the bar and press left or right on the remote: the same moves as the skip
+                // buttons, back 15 seconds and forward 30.
+                ProgressView(value: shown)
+                    .focusable()
+                    .onMoveCommand { direction in
+                        switch direction {
+                        case .left: Task { await browser.skip(by: -15) }
+                        case .right: Task { await browser.skip(by: 30) }
+                        default: break
+                        }
+                    }
+                    .accessibilityLabel("Position in the show")
+                    .accessibilityValue("\(transport.elapsedText(atFileTime: shownFileTime)) of \(ArchiveTiming.positionText(transport.length))")
+                #else
                 Slider(
                     value: Binding(get: { shown }, set: { dragFraction = $0 }),
                     in: 0...1
@@ -83,6 +98,7 @@ struct ArchivePlayerBar: View {
                 }
                 .accessibilityLabel("Position in the show")
                 .accessibilityValue("\(transport.elapsedText(atFileTime: shownFileTime)) of \(ArchiveTiming.positionText(transport.length))")
+                #endif
                 HStack {
                     Text(transport.elapsedText(atFileTime: shownFileTime))
                     Spacer()

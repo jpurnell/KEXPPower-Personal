@@ -33,6 +33,21 @@ struct LiveRewindControls: View {
     private func scrubber(_ window: LiveWindow) -> some View {
         let shown = dragFraction ?? window.fraction
         return VStack(spacing: 2) {
+            #if os(tvOS)
+            // tvOS has no slider. Focus the bar and press left or right on the remote: the same moves as the skip
+            // buttons, back 15 seconds and forward 30.
+            ProgressView(value: shown)
+                .focusable()
+                .onMoveCommand { direction in
+                    switch direction {
+                    case .left: Task { await player.skipLive(by: -PlayerController.skipBack) }
+                    case .right: Task { await player.skipLive(by: PlayerController.skipForward) }
+                    default: break
+                    }
+                }
+                .accessibilityLabel("Position in the last few minutes")
+                .accessibilityValue(window.isLive ? "Live" : "\(ArchiveTiming.positionText(window.behindLive)) behind live")
+            #else
             Slider(
                 value: Binding(get: { shown }, set: { dragFraction = $0 }),
                 in: 0...1
@@ -43,6 +58,7 @@ struct LiveRewindControls: View {
             }
             .accessibilityLabel("Position in the last few minutes")
             .accessibilityValue(window.isLive ? "Live" : "\(ArchiveTiming.positionText(window.behindLive)) behind live")
+            #endif
             HStack {
                 Text(window.behindText)
                     .foregroundStyle(window.isLive ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))

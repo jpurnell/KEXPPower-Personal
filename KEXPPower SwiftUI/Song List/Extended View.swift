@@ -22,6 +22,10 @@ struct ExtendedView: View {
         VStack {
             HStack {
                 VStack {
+                    #if os(tvOS)
+                    // Nothing on a TV opens a web link, so the title is not a button and the search links are left out.
+                    Text(play?.song ?? "Airbreak").fontWeight(.semibold)
+                    #else
                     Button {
                         if let appleMusicURL {
                             logger.debug("Opening \(appleMusicURL.absoluteString, privacy: .public)")
@@ -30,8 +34,10 @@ struct ExtendedView: View {
                     } label: {
                         Text(play?.song ?? "Airbreak").fontWeight(.semibold)
                     }
+                    #endif
                     Text(play?.artist ?? "").font(.caption)
                     Text(play?.album ?? "").font(.caption).foregroundColor(.gray)
+                    #if !os(tvOS)
                     HStack {
                         if let url = MusicLinks.spotifySearchURL(artist: play?.artist, track: play?.song) {
                             Link("Spotify", destination: url)
@@ -41,6 +47,7 @@ struct ExtendedView: View {
                         }
                     }
                     .font(.caption)
+                    #endif
                 }
 
             }
