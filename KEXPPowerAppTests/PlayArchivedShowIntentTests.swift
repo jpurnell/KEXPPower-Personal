@@ -76,6 +76,15 @@ struct PlayArchivedShowTests {
         }
     }
 
+    @Test("Suggestions are not cut short: Shortcuts shows every show the archive holds, so a listener can scroll to one")
+    func suggestionsHoldTheWholeArchive() async {
+        let many = (0..<40).map { show("s\($0)", "Show \($0)", hosts: ["Host"], day: 2 + $0 / 8, hour: ($0 % 8) * 3) }
+        await withArchive(many, loaded: true) { _, _, _ in
+            let found = await AppModelRegistry.suggestedShows()
+            #expect(found.count == 39)
+        }
+    }
+
     @Test("A list that failed to load, or is still loading, is loaded again before matching")
     func reloadsWhenNotLoaded() async {
         await withArchive(shows) { archive, _, catalog in

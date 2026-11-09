@@ -92,7 +92,9 @@ struct ShowEntityQuery: EntityStringQuery {
     @MainActor
     func entities(for identifiers: [String]) async throws -> [ShowEntity] {
         let wanted = Set(identifiers)
-        return await AppModelRegistry.archivedShows().filter { wanted.contains($0.id) }.map(ShowEntity.init)
+        let found = await AppModelRegistry.archivedShows().filter { wanted.contains($0.id) }.map(ShowEntity.init)
+        DiagnosticLog.app.record("Siri", "entities for \(identifiers.count) ids: \(found.count) found")
+        return found
     }
 
     @MainActor
@@ -102,7 +104,9 @@ struct ShowEntityQuery: EntityStringQuery {
 
     @MainActor
     func suggestedEntities() async throws -> [ShowEntity] {
-        await AppModelRegistry.suggestedShows().map(ShowEntity.init)
+        let found = await AppModelRegistry.suggestedShows().map(ShowEntity.init)
+        DiagnosticLog.app.record("Siri", "suggested entities: \(found.count)")
+        return found
     }
 }
 
@@ -116,7 +120,8 @@ struct PlayArchivedShowIntent: AudioPlaybackIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        .result(dialog: IntentDialog(stringLiteral: await AppModelRegistry.playShow(id: show.id)))
+        DiagnosticLog.app.record("Siri", "play archived show intent: \(show.id)")
+        return .result(dialog: IntentDialog(stringLiteral: await AppModelRegistry.playShow(id: show.id)))
     }
 }
 
@@ -156,7 +161,11 @@ struct KEXPShortcuts: AppShortcutsProvider {
         #endif
         AppShortcut(
             intent: PlayArchivedShowIntent(),
-            phrases: ["Play a show on \(.applicationName)", "Play an archived show on \(.applicationName)"],
+            // Not only "play": Siri's own media handling answers "play a show on <app>" before this does.
+            phrases: [
+                "Find a show on \(.applicationName)", "Listen to an archived show on \(.applicationName)",
+                "Play an archived show on \(.applicationName)", "Play a show on \(.applicationName)",
+            ],
             shortTitle: "Play a Show", systemImageName: "archivebox")
         AppShortcut(
             intent: BackToLiveIntent(),

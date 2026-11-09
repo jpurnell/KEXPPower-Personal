@@ -141,12 +141,13 @@ extension AppModelRegistry {
         return found
     }
 
-    /// The newest shows to offer when nothing has been said, without the one on the air, which is not an archive yet.
+    /// Every archived show, newest first, to offer when nothing has been said, without the one on the air, which is not an archive yet.
+    /// Shortcuts lists these in its picker, so a list cut at a handful would hide the show someone wants.
     static func suggestedShows() async -> [StationKit.ArchiveShow] {
         let shows = await loadedArchiveShows()
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = shownZone
-        let newest = ShowMatching.matches("", in: shows, limit: 6, calendar: calendar)
+        let newest = ShowMatching.matches("", in: shows, limit: shows.count, calendar: calendar)
         return Array(newest.dropFirst())
     }
 
