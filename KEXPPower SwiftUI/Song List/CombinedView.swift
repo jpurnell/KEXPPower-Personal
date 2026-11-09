@@ -15,6 +15,9 @@ struct CombinedView: View {
     var play: Play?
     var imageURL: String = "https://kexp.org/static/assets/img/kexp_logo.jpg"
     @State var small: Bool = true
+    #if os(tvOS)
+    @State private var showingDetails = false
+    #endif
 
     private let corner: CGFloat = 12
 
@@ -62,9 +65,29 @@ struct CombinedView: View {
         .frame(maxWidth: .infinity)
         .padding(8)
         .overlay(alignment: .topTrailing) {
+            #if os(tvOS)
+            // tvOS rows cannot take focus, so the details are a button of their own beside the save button.
+            HStack(spacing: 12) {
+                // A sheet rather than the row growing in place: an expanded row was taller than the screen and held nothing
+                // focusable, so the remote could neither scroll its notes into view nor move past it.
+                Button { showingDetails = true } label: {
+                    Label("Show details", systemImage: "info.circle")
+                        .labelStyle(.iconOnly)
+                        .font(.title2)
+                        .frame(minWidth: 44, minHeight: 44)
+                }
+                .buttonStyle(.plain)
+                if AppSongSaver.canSaveToPlaylists, let play, SongSavingModel.canSave(play) {
+                    SaveButton(play: play)
+                }
+            }
+            // Far enough in that a focused button's lift is not cut off by the row's rounded clip.
+            .padding(16)
+            #else
             if AppSongSaver.canSaveToPlaylists, let play, SongSavingModel.canSave(play) {
                 SaveButton(play: play).padding(4)
             }
+            #endif
             #if os(macOS)
             // MusicKit cannot add to a playlist on the Mac, so the button opens the song in Music instead.
             if let play, OpenInMusicModel.canOpen(artist: play.artist, track: play.song) {
@@ -79,7 +102,11 @@ struct CombinedView: View {
         // inside a Mac scroll view answered clicks only in its top half (measured: taps 31 and 63 pt down fired, 85 pt
         // and deeper did not); here it answers anywhere in the row. Links and buttons inside still take their own clicks.
         .contentShape(Rectangle())
+        #if !os(tvOS)
+        // Not on tvOS: there the row cannot take focus, and a tap gesture on it caught Select pressed on the save
+        // button inside, so the remote expanded the row instead of adding the song.
         .onTapGesture { small.toggle() }
+        #endif
         #if os(macOS)
         // A gesture is not a control, so the row asks for keyboard focus itself: Tab reaches it and Return expands it.
         // Space stays the Playback menu's play/pause.
@@ -93,6 +120,9 @@ struct CombinedView: View {
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("song-row")
         .accessibilityAction(named: small ? "Show details" : "Hide details") { small.toggle() }
+        #if os(tvOS)
+        .sheet(isPresented: $showingDetails) { PlayDetailsSheet(play: play ?? .fixture()) }
+        #endif
     }
 
     /// The artwork, blurred, under a material. Clipped to the row so it can never spill onto neighbouring views.
@@ -110,6 +140,45 @@ struct CombinedView: View {
         }
     }
 }
+
+#if os(tvOS)
+/// A play's details on a TV: the artwork beside the song, artist, album and the DJ's notes. Menu closes it.
+private struct PlayDetailsSheet: View {
+    let play: Play
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 60) {
+            ImageView(play: play)
+                .frame(width: 420, height: 420)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text(play.song ?? "Airbreak").font(.title2.weight(.semibold))
+                    if let artist = play.artist, !artist.isEmpty { Text(artist).font(.title3) }
+                    if let album = play.album, !album.isEmpty { Text(album).foregroundStyle(.secondary) }
+                    let released = [play.releaseDate, play.labels?.joined(separator: ", ")]
+                        .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ")
+                    if !released.isEmpty { Text(released).font(.callout).foregroundStyle(.secondary) }
+                    // One focusable paragraph at a time, so the remote can scroll through notes longer than the sheet;
+                    // text that cannot take focus cannot be scrolled to.
+                    ForEach(Array(paragraphs.enumerated()), id: \.offset) { _, paragraph in
+                        Text(MusicLinks.linkedComment(paragraph))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .focusable()
+                    }
+                }
+                .padding(.vertical)
+            }
+        }
+        .padding(60)
+        .frame(width: 1400, height: 800)
+    }
+
+    private var paragraphs: [String] {
+        (play.comment ?? "").split(whereSeparator: \.isNewline).map(String.init).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+    }
+}
+#endif
 
 #Preview(traits: .sizeThatFitsLayout) {
     CombinedView(play: .fixture())

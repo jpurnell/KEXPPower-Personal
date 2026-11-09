@@ -12,6 +12,8 @@ struct LivePlayerBar: View {
     let player: PlayerController
     /// Whether the bar has its own play and pause; the Live screen has a large one already.
     var showsPlayButton = true
+    /// Whether it offers to fold to its title line; not when it is a screen of its own (tvOS's Now Playing).
+    var canFold = true
     /// Whether the rewind controls show, or only the title line; the bar stays under every section, so it can fold.
     @State private var isExpanded = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -33,7 +35,7 @@ struct LivePlayerBar: View {
                     }
                     .buttonStyle(.plain)
                 }
-                if player.isTimeShifted {
+                if canFold, player.isTimeShifted {
                     Button { withAnimation(reduceMotion ? nil : .default) { isExpanded.toggle() } } label: {
                         Label(isExpanded ? "Show less" : "Show the controls", systemImage: isExpanded ? "chevron.down" : "chevron.up")
                             .labelStyle(.iconOnly).frame(minWidth: 44, minHeight: 44)

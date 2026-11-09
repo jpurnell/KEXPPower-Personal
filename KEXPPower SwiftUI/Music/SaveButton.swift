@@ -7,6 +7,9 @@ import KEXPPower
 import StationKit
 import StationKitAdapterKEXP
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// The button on a play that adds the song to the KEXP playlist: a tap adds it, and a press and hold offers another
 /// playlist to add it to as well, or a new one.
@@ -25,6 +28,7 @@ struct SaveButton: View {
     }
 
     @Environment(SongSavingModel.self) private var model
+    @Environment(\.openURL) private var openURL
     @State private var showingNewPlaylist = false
     @State private var newPlaylistName = ""
 
@@ -49,13 +53,13 @@ struct SaveButton: View {
                 .frame(minWidth: 44, minHeight: 44)
                 .contentShape(Rectangle())
         } primaryAction: {
-            save(alsoTo: nil)
+            if state.opensSettings { openSettings() } else { save(alsoTo: nil) }
         }
         .menuIndicator(.hidden)
         .buttonStyle(.plain)
         .disabled(track == nil || state == .saving)
         .accessibilityLabel(state.accessibilityLabel)
-        .accessibilityHint("Touch and hold to add to another playlist")
+        .accessibilityHint(state.opensSettings ? "Opens Settings to allow access" : "Touch and hold to add to another playlist")
         .alert("New Playlist", isPresented: $showingNewPlaylist) {
             TextField("Name", text: $newPlaylistName)
             Button("Create") {
@@ -87,6 +91,13 @@ struct SaveButton: View {
         Binding(
             get: { confirmingSong != nil },
             set: { if !$0, let track { model.dismissConfirmation(for: track) } })
+    }
+
+    /// Opens Spinner's page in Settings, where Apple Music access can be turned back on.
+    private func openSettings() {
+        #if canImport(UIKit)
+        if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+        #endif
     }
 
     private func save(alsoTo playlist: PlaylistSummary?) {

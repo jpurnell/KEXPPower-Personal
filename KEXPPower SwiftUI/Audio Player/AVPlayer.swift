@@ -70,7 +70,9 @@ import UniformTypeIdentifiers
         @ObservationIgnored private var queued: (item: AVPlayerItem, plan: ArchiveContinuation)?
         @ObservationIgnored private let endWatch = TaskHolder()
         @ObservationIgnored private var itemObservation: AnyCancellable?
-        #if !os(macOS)
+        // The system player view, for `VideoPlayer` on iOS and visionOS. tvOS has none: its player view always writes
+        // Now Playing itself, and the publisher must be the only writer (ADR-003).
+        #if os(iOS) || os(visionOS)
         let avPlayerViewController = AVPlayerViewController()
         #endif
 
@@ -121,7 +123,7 @@ import UniformTypeIdentifiers
             player.currentItem?.preferredForwardBufferDuration = 300
             self.player = player
 
-            #if !os(macOS)
+            #if os(iOS) || os(visionOS)
             avPlayerViewController.player = player
             avPlayerViewController.showsPlaybackControls = true
             // The publisher is the only writer of Now Playing state.
@@ -213,13 +215,15 @@ import UniformTypeIdentifiers
             guard snapshot.artworkURL == next.artworkURL, snapshot.title == next.title else { return }
 
             currentArtwork = artwork
-            #if !os(macOS)
+            // For the system player view, which tvOS does not use; there the property comes from AVKit, which the TV
+            // app never loads, so setting it crashes ("unrecognized selector").
+            #if os(iOS) || os(visionOS)
             player?.currentItem?.externalMetadata = externalMetadata(for: snapshot, artwork: artwork)
             #endif
             publisher.publish(snapshot, artwork: artwork)
         }
 
-        #if !os(macOS)
+        #if os(iOS) || os(visionOS)
         private func externalMetadata(for snapshot: NowPlayingSnapshot, artwork: CGImage?) -> [AVMetadataItem] {
             func item(_ identifier: AVMetadataIdentifier, _ value: NSCopying & NSObjectProtocol) -> AVMetadataItem {
                 let item = AVMutableMetadataItem()

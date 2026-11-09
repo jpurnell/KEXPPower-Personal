@@ -153,6 +153,16 @@ struct SongSavingModelTests {
         #expect(Set(states.map(\.accessibilityLabel)).count == states.count)
         #expect(SaveState.saved(playlists: ["KEXP"], failedPlaylists: []).accessibilityLabel.contains("KEXP"))
     }
+
+    @Test("Only a refused permission sends the button to Settings; asking again would get the same answer")
+    func opensSettings() {
+        #expect(SaveState.needsPermission.opensSettings)
+        let others: [SaveState] = [
+            .idle, .saving, .saved(playlists: [], failedPlaylists: []), .confirming(wanted),
+            .notFound, .unavailable, .heldForReview,
+        ]
+        #expect(others.allSatisfy { !$0.opensSettings })
+    }
 }
 
 @MainActor

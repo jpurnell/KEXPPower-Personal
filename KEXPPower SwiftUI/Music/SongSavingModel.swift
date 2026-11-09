@@ -42,6 +42,10 @@ enum SaveState: Equatable {
         }
     }
 
+    /// Whether the button opens the app's page in Settings instead of saving. Once access is refused, asking again gets
+    /// the stored answer, so Settings is the only place it can be given.
+    var opensSettings: Bool { self == .needsPermission }
+
     /// What VoiceOver says for the button.
     var accessibilityLabel: String {
         switch self {
