@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 3.4.0 - 2026-11-09
+
+The archive, live rewind (with a "stay behind live" cushion), Settings, CarPlay's Archive tab, Siri and Shortcuts, and the Spinner TV target. **Not yet checked on a device:** the cushion across a real dead zone, add-to-playlist by voice while the phone is locked, the archive's layout on iPad and Mac, and Siri's "Play a show on Spinner" wording (use "Find a show on Spinner").
 
 ### Added
 - **Spinner TV**, a tvOS app target (tvOS 17) with the iPhone app's sections in a top tab bar:
