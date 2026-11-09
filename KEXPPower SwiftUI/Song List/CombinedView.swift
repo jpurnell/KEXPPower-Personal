@@ -79,7 +79,11 @@ struct CombinedView: View {
         // inside a Mac scroll view answered clicks only in its top half (measured: taps 31 and 63 pt down fired, 85 pt
         // and deeper did not); here it answers anywhere in the row. Links and buttons inside still take their own clicks.
         .contentShape(Rectangle())
+        #if !os(tvOS)
+        // Not on tvOS: there the row cannot take focus, and a tap gesture on it caught Select pressed on the save
+        // button inside, so the remote expanded the row instead of adding the song.
         .onTapGesture { small.toggle() }
+        #endif
         #if os(macOS)
         // A gesture is not a control, so the row asks for keyboard focus itself: Tab reaches it and Return expands it.
         // Space stays the Playback menu's play/pause.

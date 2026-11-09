@@ -120,3 +120,7 @@ From the owner's DeviceHub screenshots:
 - **Host, Show, Genre:** cards were too short and too close for the focus lift, which covered neighbours. Now 136 points tall at least, 24-point insets, 88-point pictures, 48 points apart; the show count moved beneath the name and the chevron is gone on tvOS, so a name has the card's width.
 - **Button style:** `.plain` on tvOS drew a focus platter around the tile's own background (a frame within a frame); tiles and cards now use `.card`, which lifts the tile.
 - **Player:** rows were 8 points apart, so the lifted Catch-up button covered the timeline; 32 on tvOS, a 32-point inset, 12 between the timeline and its clocks. The focusable timeline showed no focus at all; it now thickens and gets a highlight capsule.
+
+### 12. Add to playlist from Live (2026-11-09)
+- **Found by the owner:** Select on a Live song's + expanded the row and saved nothing. `CombinedView`'s `.onTapGesture` (expand) on the row also fires for Select on the `SaveButton` in its overlay. tvOS rows are not focusable, so the gesture only ever fired by accident; it is now left out on tvOS, and rows there do not expand.
+- **Checked with sim-tap:** Select on the Now Playing + no longer expands the row and runs the save, which on the lab simulator stops at the lock (Apple Music access was denied there on 2026-11-08). A completed add still needs a real Apple TV signed in to Apple Music.
