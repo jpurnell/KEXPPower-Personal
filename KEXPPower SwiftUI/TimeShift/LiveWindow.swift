@@ -101,6 +101,48 @@ struct LiveWindow: Equatable, Sendable {
         return .within(landing)
     }
 
+    /// Where a skip lands when the listener keeps a cushion behind live: as `target(skipping:)`, except that a skip
+    /// forward from further behind than the cushion stops at the cushion and does not run on to live.
+    /// - Parameters:
+    ///   - seconds: How far to skip; negative to go back.
+    ///   - cushion: The seconds to stay behind live, or `nil` for none.
+    func target(skipping seconds: TimeInterval, cushion: TimeInterval?) -> Target {
+        let plain = target(skipping: seconds)
+        guard let hold = cushionPosition(cushion), seconds.isFinite, seconds > 0, position < hold else { return plain }
+        switch plain {
+        case .live: return .within(hold)
+        case .within(let landing): return .within(min(landing, hold))
+        }
+    }
+
+    /// Where "back to live" lands when the listener keeps a cushion: the cushion, not the newest audio. A listener
+    /// already at or nearer than the cushion stays where they are.
+    /// - Parameter cushion: The seconds to stay behind live, or `nil` for none.
+    func target(catchingUpWithCushion cushion: TimeInterval?) -> Target {
+        guard !isEmpty, let hold = cushionPosition(cushion) else { return .live }
+        return .within(max(position, hold))
+    }
+
+    /// Where "cushion now" lands: the cushion, from anywhere, including from live (which replays what was just heard).
+    /// - Parameter cushion: The seconds to stay behind live, or `nil` for none.
+    func target(atCushion cushion: TimeInterval?) -> Target {
+        guard let hold = cushionPosition(cushion) else { return .live }
+        return .within(hold)
+    }
+
+    /// Whether the listener is at their cushion, give or take the delay the stream always has.
+    /// - Parameter cushion: The seconds to stay behind live, or `nil` for none.
+    func isAtCushion(_ cushion: TimeInterval?) -> Bool {
+        guard let cushion, cushion.isFinite, cushion > 0 else { return false }
+        return abs(behindLive - cushion) < Self.liveSlack
+    }
+
+    /// The place on the player's clock that a cushion keeps the listener at, held to the oldest audio.
+    private func cushionPosition(_ cushion: TimeInterval?) -> TimeInterval? {
+        guard let cushion, cushion.isFinite, cushion > 0, !isEmpty else { return nil }
+        return max(start, end - cushion)
+    }
+
     /// Where a scrubber dragged to a fraction of the window lands.
     /// - Parameter fraction: 0 for the oldest audio, 1 for the newest; a value outside that is held to it, and one that is
     ///   not a number reads as the oldest.

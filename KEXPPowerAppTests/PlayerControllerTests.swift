@@ -339,6 +339,32 @@ struct PlayerControllerTests {
         #expect(abs(controller.rewindStep - 120) < 1e-9)
     }
 
+    @Test("The cushion in force is the setting held to half the window, and none when it is Off or there is no recording")
+    func cushionInForce() async throws {
+        let store = try #require(UserDefaults(suiteName: "cushionInForce-\(UUID().uuidString)"))
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.defaults = store
+        controller.liveShift = FakeShift(address: local, window: 600)
+        #expect(controller.cushion == nil)
+        store.set(Cushion.fiveMinutes.rawValue, forKey: Cushion.storageKey)
+        #expect(controller.cushion == 300)
+        controller.liveShift = FakeShift(address: local, window: 300)
+        #expect(controller.cushion == 150)
+        controller.liveShift = nil
+        #expect(controller.cushion == nil)
+    }
+
+    @Test("The cushion moves do nothing until live plays through the recording")
+    func cushionMovesNeedAWindow() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        await controller.catchUpToCushion()
+        await controller.cushionNow()
+        await controller.goFullyLive()
+        #expect(controller.liveWindow == nil)
+    }
+
     @Test("Once live plays through the time-shift, the lock screen is offered skip back 15, skip forward 30 and scrub")
     func liveOffersTransport() async {
         let publisher = FakePublisher()

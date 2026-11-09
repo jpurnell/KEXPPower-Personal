@@ -47,28 +47,60 @@ struct LiveRewindControls: View {
             .accessibilityLabel("Position in the last few minutes")
             .accessibilityValue(window.isLive ? "Live" : "\(ArchiveTiming.positionText(window.behindLive)) behind live")
             HStack {
-                Text(window.behindText)
+                Text(window.behindText + (window.isAtCushion(cushion) ? " · cushion" : ""))
                     .foregroundStyle(window.isLive ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary))
                 Spacer()
                 if !window.isLive {
                     // What the clock read when the music being heard was broadcast, for finding "the thing a minute ago".
                     Text(ArchiveTiming.clock(Date().addingTimeInterval(-window.behindLive), zone: zone))
                     Spacer()
-                    Button { Task { await player.catchUpToLive() } } label: {
-                        Label("Catch up to live", systemImage: "bolt.fill")
-                            .labelStyle(.iconOnly)
-                            .font(.title3)
-                            .frame(minWidth: 44, minHeight: 44)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.tint)
-                    .accessibilityHint("Skips ahead to the live broadcast")
                 }
+                bolt(for: LiveBolt.choose(window: window, cushion: cushion))
             }
             .font(.caption.monospacedDigit())
             .accessibilityHidden(true)
         }
     }
+
+    /// The bolt, drawn for what it does now: catch up, go back to the cushion, give the cushion up, or make one.
+    @ViewBuilder
+    private func bolt(for kind: LiveBolt) -> some View {
+        switch kind {
+        case .hidden:
+            EmptyView()
+        case .catchUpToLive:
+            boltButton("Catch up to live", symbol: "bolt.fill", hint: "Skips ahead to the live broadcast") {
+                await player.goFullyLive()
+            }
+        case .backToCushion:
+            boltButton("Back to your cushion", symbol: "bolt.fill", hint: "Skips ahead, but stays a few minutes behind live") {
+                await player.catchUpToCushion()
+            }
+        case .goFullyLive:
+            boltButton("Go fully live", symbol: "bolt.fill", hint: "Gives up your cushion and plays the live broadcast") {
+                await player.goFullyLive()
+            }
+        case .cushionNow:
+            boltButton("Cushion now", symbol: "gobackward", hint: "Goes back to your cushion, replaying the last few minutes") {
+                await player.cushionNow()
+            }
+        }
+    }
+
+    private func boltButton(_ title: String, symbol: String, hint: String, action: @escaping @MainActor () async -> Void) -> some View {
+        Button { Task { await action() } } label: {
+            Label(title, systemImage: symbol)
+                .labelStyle(.iconOnly)
+                .font(.title3)
+                .frame(minWidth: 44, minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.tint)
+        .accessibilityHint(hint)
+    }
+
+    /// The cushion in force, read at the moment the screen is drawn.
+    private var cushion: TimeInterval? { player.cushion }
 
     private var controls: some View {
         HStack(spacing: 28) {

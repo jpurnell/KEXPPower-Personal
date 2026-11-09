@@ -41,6 +41,8 @@ import UniformTypeIdentifiers
         private(set) var isPlayingArchive = false
         /// Records the live stream so it can be paused and rewound; `nil` when the rewind window is off.
         @ObservationIgnored var liveShift: (any LiveShifting)?
+        /// Where the listener's settings are read from; tests give it a store of their own.
+        @ObservationIgnored var defaults: UserDefaults = .standard
         /// Whether the live stream has been resolved to the time-shift's address or to the direct stream since live
         /// last began, and whether that is under way.
         private enum LiveSource { case unresolved, resolving, shifted, direct }
@@ -322,11 +324,17 @@ import UniformTypeIdentifiers
         /// How far the rewind button goes back: five minutes, or the whole window if it is shorter.
         var rewindStep: TimeInterval { LiveWindow.rewindStep(forWindow: liveShift?.window ?? .nan) }
 
-        /// Moves within the live window; a skip forward to the newest audio is live again.
+        /// How far behind live the listener asked to stay, held to what the window allows, or `nil` for none.
+        var cushion: TimeInterval? {
+            Cushion.resolve(stored: defaults.string(forKey: Cushion.storageKey)).effective(forWindow: liveShift?.window)
+        }
+
+        /// Moves within the live window; a skip forward from behind the cushion stops at it, and one to the newest
+        /// audio is live again.
         /// - Parameter seconds: How far to move; negative to go back.
         func skipLive(by seconds: TimeInterval) async {
             guard let window = liveWindow else { return }
-            await move(to: window.target(skipping: seconds), in: window)
+            await move(to: window.target(skipping: seconds, cushion: cushion), in: window)
         }
 
         /// Goes back by the rewind step.
@@ -340,10 +348,23 @@ import UniformTypeIdentifiers
             await move(to: window.target(fraction: fraction), in: window)
         }
 
-        /// Goes to the newest audio the recording holds.
-        func catchUpToLive() async {
+        /// Goes to the newest audio the recording holds, giving up any cushion.
+        func goFullyLive() async {
             guard let window = liveWindow else { return }
             await move(to: .live, in: window)
+        }
+
+        /// Goes ahead to the cushion from further behind, or to the newest audio when none is kept.
+        func catchUpToCushion() async {
+            guard let window = liveWindow else { return }
+            await move(to: window.target(catchingUpWithCushion: cushion), in: window)
+        }
+
+        /// Goes back to the cushion from wherever the listener is, live included. From live this replays what was just
+        /// heard, which is the price of being behind at once.
+        func cushionNow() async {
+            guard let window = liveWindow else { return }
+            await move(to: window.target(atCushion: cushion), in: window)
         }
 
         private func move(to target: LiveWindow.Target, in window: LiveWindow) async {

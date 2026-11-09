@@ -81,4 +81,16 @@ struct ListeningSettingsTests {
         #expect(ListeningSettings.qualityNote(for: .standard).contains("72 MB"))
         #expect(ListeningSettings.qualityNote(for: .dataSaver).contains("28.8 MB"))
     }
+
+    @Test("The cushion note says what the bolt does, and when the window holds the cushion shorter than the choice")
+    func cushionNote() {
+        let off = ListeningSettings.cushionNote(cushion: .off, window: .tenMinutes)
+        #expect(off.contains("live"))
+        let five = ListeningSettings.cushionNote(cushion: .fiveMinutes, window: .tenMinutes)
+        #expect(five.contains("5 minutes"))
+        #expect(!five.contains("shorter"))
+        let held = ListeningSettings.cushionNote(cushion: .fiveMinutes, window: .fiveMinutes)
+        #expect(held.contains("2.5 minutes"))
+        #expect(held.contains("shorter"))
+    }
 }

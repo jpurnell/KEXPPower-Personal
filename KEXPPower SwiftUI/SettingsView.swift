@@ -14,6 +14,7 @@ struct SettingsView: View {
     let model: ResultRetriever
     @AppStorage(StreamQuality.storageKey) private var storedQuality = StreamQuality.standard.rawValue
     @AppStorage(RewindWindow.storageKey) private var storedWindow = RewindWindow.tenMinutes.rawValue
+    @AppStorage(Cushion.storageKey) private var storedCushion = Cushion.off.rawValue
     @AppStorage(ShowTimeZone.storageKey) private var storedZone = ShowTimeZone.mine.rawValue
     /// The listening settings as they were when this screen appeared.
     @State private var opened = ListeningSettings.current()
@@ -50,6 +51,15 @@ struct SettingsView: View {
                 Text(ListeningSettings.windowNote(window: window, quality: quality))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                // A cushion needs a recording to be behind in, and changing it does not restart the stream.
+                if window != .off {
+                    Picker("Stay behind live", selection: $storedCushion) {
+                        ForEach(Cushion.allCases) { Text($0.label).tag($0.rawValue) }
+                    }
+                    Text(ListeningSettings.cushionNote(cushion: Cushion.resolve(stored: storedCushion), window: window))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
                 Picker("Stream quality", selection: $storedQuality) {
                     ForEach(StreamQuality.allCases) { Text($0.label).tag($0.rawValue) }
                 }

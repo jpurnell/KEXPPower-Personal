@@ -40,6 +40,24 @@ struct ListeningSettings: Equatable, Sendable {
         return "Keeps the last \(minutes) minutes so you can pause, go back and ride through a dead zone. Uses about \(size)."
     }
 
+    /// The line under the cushion picker: what the bolt does, and the length actually kept when the window is short.
+    static func cushionNote(cushion: Cushion, window: RewindWindow) -> String {
+        guard let kept = cushion.effective(forWindow: window.duration), let asked = cushion.duration else {
+            return "The bolt goes straight to live. Choose a cushion to stay a few minutes behind, so a tunnel does not stop the music."
+        }
+        let keptText = minutesText(kept)
+        guard kept < asked else {
+            return "The bolt returns to \(keptText) behind live, which a tunnel will not interrupt. Pausing or rewinding builds it; Cushion now makes it at once."
+        }
+        return "The window is shorter than that, so the cushion is held to \(keptText) to leave room to rewind."
+    }
+
+    private static func minutesText(_ seconds: TimeInterval) -> String {
+        // 5 reads "5" and 2.5 reads "2.5".
+        let minutes = (seconds / 60).formatted(.number.precision(.fractionLength(0...1)).locale(Locale(identifier: "en_US")))
+        return "\(minutes) minutes"
+    }
+
     /// The line under the quality picker: how much data an hour of listening uses.
     static func qualityNote(for quality: StreamQuality) -> String {
         "About \(byteText(3_600 * bytesPerSecond(of: quality))) an hour."
