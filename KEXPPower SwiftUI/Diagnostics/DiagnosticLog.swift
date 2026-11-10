@@ -51,6 +51,19 @@ struct DiagnosticLog: Sendable {
         journal?.record(EventRecord(time: .now, kind: category, fields: ["message": .string(message)]))
     }
 
+    /// Everything recorded so far, as entries for a shared diagnostic report: the category and the message as written.
+    ///
+    /// DiagnosticsKit's own rendering of a journal event is `key=value`, which would show every line as
+    /// `message="..."`; the report reads better with the plain text.
+    func reportEntries() -> [DiagnosticReport.LogEntry] {
+        guard let events = try? EventJournal.read(directory: directory, filePrefix: "spinner") else { return [] }
+        return events.map { event in
+            let message: String
+            if case .string(let text)? = event.fields["message"] { message = text } else { message = "" }
+            return DiagnosticReport.LogEntry(timestamp: event.time, category: event.kind, level: "info", message: message)
+        }
+    }
+
     /// Everything recorded so far, oldest first, one line per event; empty when nothing has been recorded.
     func contents() -> String {
         guard let events = try? EventJournal.read(directory: directory, filePrefix: "spinner") else { return "" }

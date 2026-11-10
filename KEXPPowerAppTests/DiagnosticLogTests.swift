@@ -78,4 +78,20 @@ struct DiagnosticLogTests {
         #expect(DiagnosticLog.app.directory.lastPathComponent == "journal")
         #expect(DiagnosticLog.app.directory.deletingLastPathComponent().lastPathComponent == "Diagnostics")
     }
+
+    @Test("Report entries keep the category and carry the message as written, not as a key=value pair")
+    func reportEntries() {
+        let log = makeLog()
+        log.record("Player", "back to live: audio moving after 1.6 s")
+        log.record("CarPlay", "scene requested")
+        let entries = log.reportEntries()
+        #expect(entries.map(\.category) == ["Player", "CarPlay"])
+        #expect(entries.map(\.message) == ["back to live: audio moving after 1.6 s", "scene requested"])
+        #expect(entries.allSatisfy { $0.level == "info" })
+    }
+
+    @Test("An empty log gives no report entries")
+    func noReportEntries() {
+        #expect(makeLog().reportEntries().isEmpty)
+    }
 }

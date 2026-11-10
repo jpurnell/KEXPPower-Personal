@@ -79,11 +79,7 @@ struct SettingsView: View {
             }
             #if !os(tvOS)
             Section {
-                DiagnosticShareButton(reportProvider: {
-                    try await DiagnosticReportCollector(subsystem: "com.JPEnterprises.Spinner")
-                        .collect(metadata: DiagnosticReportMetadata.current(), journal: DiagnosticLog.app.directory,
-                                 filePrefix: "spinner")
-                }) {
+                DiagnosticShareButton(reportProvider: { try await DiagnosticReportMetadata.report() }) {
                     Label("Send Diagnostics", systemImage: "square.and.arrow.up")
                 }
             } header: {
