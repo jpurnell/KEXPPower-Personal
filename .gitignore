@@ -77,3 +77,6 @@ CLAUDE.local.md
 
 # Editor config
 .vscode/
+
+# Emacs lock files
+.#*
