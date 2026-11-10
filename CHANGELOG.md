@@ -3,7 +3,7 @@
 ## 3.5.1 - 2026-11-09
 
 ### Fixed
-- **Send Diagnostics on the Mac** showed a sheet reading "Diagnostic report saved to: diagnostic-report.json" with no way to close it and no path, because the report was written to the app's sandbox temporary folder. It now opens the Save panel, so you choose where the file goes (SwiftDiagnosticsKit 2.3.1). iPhone and iPad are unchanged. Found by using 3.5.0 on the Mac the day it shipped.
+- **Send Diagnostics on the Mac** showed a sheet reading "Diagnostic report saved to: diagnostic-report.json" with no way to close it and no path, because the report was written to the app's sandbox temporary folder. It now opens the Save panel, so you choose where the file goes (SwiftDiagnosticsKit 2.3.1). The Mac app also needed the sandbox permission to write a file the person chooses (`com.apple.security.files.user-selected.read-write`): without it the Save panel's save went nowhere and Send Diagnostics spun and did nothing, which is what the first 3.5.1 build did. iPhone and iPad are unchanged. Found by using 3.5.0 on the Mac the day it shipped.
 
 ## 3.5.0 - 2026-11-09
 
