@@ -14,7 +14,10 @@ private struct RunStateTracking: ViewModifier {
             .onChange(of: scenePhase) { _, phase in
                 switch phase {
                 case .background: RunMarker.app.markBackground()
-                case .active: RunMarker.app.markActive()
+                case .active:
+                    RunMarker.app.markActive()
+                    // Whatever an earlier failure left waiting to be sent.
+                    FieldDiagnostics.shared.requestFlush()
                 default: break
                 }
             }

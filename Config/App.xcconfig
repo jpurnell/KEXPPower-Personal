@@ -1,0 +1,6 @@
+// Project-wide build settings that are not tied to one target.
+//
+// DIAGNOSTICS_INGEST_KEY is Spinner's key for the diagnostics hub. It comes from Config/Secrets.xcconfig, which is not in git
+// (this repository is public). The include is optional: a clone without the file builds, has no key, and sends nothing.
+DIAGNOSTICS_INGEST_KEY =
+#include? "Secrets.xcconfig"

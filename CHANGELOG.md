@@ -3,6 +3,19 @@
 ## Unreleased
 
 ### Added
+- **Health reports to the diagnostics hub** (iPhone, iPad, Mac, Apple TV; not yet the watch). Each launch sends one small typed event, how the last run ended (first launch, ended while in use, ended in the background, quit), and live rewind sends one when it could not be used and the stream played directly (no audio in time, the local server failed, the watch for live gave up). Every field is one of a fixed list of values: no show, song, station, setting, identifier or free text. The event is written to a queue on disk, sent in small batches over TLS to `diagnostics.roseclub.org`, and retried with a backoff if the hub cannot be reached. A Debug build sends nothing.
+- **A "Share anonymous health reports" switch** in Settings, on every platform, **on until you turn it off**; off sends and queues nothing. The footer says what is sent. The Problems footer was reworded: the file Send Diagnostics makes is only sent if you send it (the old "nothing is sent unless you send it" would no longer be true of the health reports).
+- `project/diagnostics/spinner-schema.json`: Spinner's schema, the source of truth for what it may send. A test checks every event the app can produce against it with the client library's own validator; the hub's apps file takes its Spinner entry from it.
+- `PrivacyInfo.xcprivacy` declares diagnostic data collected, not linked to the user and not used for tracking. The category and purpose names are not checked against Apple's current list; the App Privacy label and the EU's rules need a read before an App Store release.
+- **The ingest key is not in the repository** (it is public). `Config/Secrets.xcconfig` (untracked; copy `Config/Secrets.xcconfig.example`) sets `DIAGNOSTICS_INGEST_KEY`; each target's Info.plist carries it as `DiagnosticsIngestKey`; the app reads it from there. A clone without the file builds, has no key and sends nothing. The key still ships inside a built app, as any client-held key does.
+- Dependency: SwiftDiagnosticsClient (up to the next minor of its first release), which brings SwiftRedaction.
+- Tests: 16 new (`FieldEventTests`, `FieldDiagnosticsTests`), on iOS and the Mac; the iOS suite is 522 passing.
+
+### Not checked on a device
+- That an event from a phone reaches the hub, and that a TestFlight build resolves to the TestFlight channel (the receipt-name convention has not been seen in this project). Checked by hand after the next build is installed.
+- The first launch sends its event before anyone has seen the switch, because it is on by default, as the design in `DiagnosticsAndFeedback.md` decided. An App Store release needs the owner to settle that.
+
+### Added (earlier in this release)
 - **A header line for each launch in the diagnostic log**, on every platform (before, only the iPhone logged a launch): the version and build, the system and the hardware model, and how the previous run ended, such as `launched 3.5.1 (1) on iOS 27.3, iPhone16,1; previous run: ended while the app was in use`. The app records what it saw itself do (in use, in the background, quit) in one small file and claims no more: "ended while the app was in use" means a crash or a force-quit from the foreground, and the log cannot tell those apart; "ended in the background" is what the system does to an app it needs the memory from, and is normal. Tested (`RunMarkerTests`, `LaunchHeaderTests`).
 
 ## 3.5.1 - 2026-11-09

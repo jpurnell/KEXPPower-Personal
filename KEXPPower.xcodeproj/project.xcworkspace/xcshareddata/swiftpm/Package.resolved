@@ -1,5 +1,5 @@
 {
-  "originHash" : "d3cdf7deec833dfcc54659ddc2a0a21ff63332ad2979089b38c89432d3183abc",
+  "originHash" : "e330178e95d7f494fcca4227cba321d339e4e44784640be4ae4ed11e7e496b61",
   "pins" : [
     {
       "identity" : "kexppowerkit",
@@ -38,12 +38,30 @@
       }
     },
     {
+      "identity" : "swiftdiagnosticsclient",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jpurnell/SwiftDiagnosticsClient.git",
+      "state" : {
+        "revision" : "a446c7a2a5e6aa1d73ed402090aa8fc935181d7a",
+        "version" : "0.2.0"
+      }
+    },
+    {
       "identity" : "swiftdiagnosticskit",
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:jpurnell/SwiftDiagnosticsKit.git",
       "state" : {
         "revision" : "f2959bd8c14b1914e835775d56d192b7b5169144",
         "version" : "2.3.1"
+      }
+    },
+    {
+      "identity" : "swiftredaction",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jpurnell/SwiftRedaction.git",
+      "state" : {
+        "revision" : "384ab8735f359d2cbdb14761524598cf0f24ed46",
+        "version" : "0.1.1"
       }
     }
   ],

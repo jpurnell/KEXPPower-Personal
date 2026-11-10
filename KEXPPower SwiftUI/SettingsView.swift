@@ -17,6 +17,7 @@ struct SettingsView: View {
     @AppStorage(RewindWindow.storageKey) private var storedWindow = RewindWindow.tenMinutes.rawValue
     @AppStorage(Cushion.storageKey) private var storedCushion = Cushion.off.rawValue
     @AppStorage(ShowTimeZone.storageKey) private var storedZone = ShowTimeZone.mine.rawValue
+    @AppStorage(FieldDiagnosticsSetting.key) private var sharesHealthReports = true
     /// The listening settings as they were when this screen appeared.
     @State private var opened = ListeningSettings.current()
     #if os(iOS)
@@ -77,6 +78,13 @@ struct SettingsView: View {
                     ForEach(ShowTimeZone.allCases) { Text($0.label).tag($0.rawValue) }
                 }
             }
+            Section {
+                Toggle("Share anonymous health reports", isOn: $sharesHealthReports)
+            } header: {
+                Text("Diagnostics")
+            } footer: {
+                Text("When on, the app tells its developer that it started and how the last run ended, and when live rewind could not be used. Nothing about what you listen to, who you are or where you are is included, and nothing links one launch to the next. Turn it off and nothing is sent.")
+            }
             #if !os(tvOS)
             Section {
                 DiagnosticShareButton(reportProvider: { try await DiagnosticReportMetadata.report() }) {
@@ -85,7 +93,7 @@ struct SettingsView: View {
             } header: {
                 Text("Problems")
             } footer: {
-                Text("Makes one file of what the app recorded about itself, with the app version and these settings, and lets you choose where it goes. Nothing is sent unless you send it. It can include names of shows and songs the app was handling.")
+                Text("Makes one file of what the app recorded about itself, with the app version and these settings, and lets you choose where it goes. This file is only sent if you send it. It can include names of shows and songs the app was handling.")
             }
             #endif
         }

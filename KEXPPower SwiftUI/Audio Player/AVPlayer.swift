@@ -195,6 +195,7 @@ import UniformTypeIdentifiers
                 }
             }
             DiagnosticLog.app.record("Player", "back to live: gave up watching after 40 s")
+            FieldDiagnostics.shared.report(.rewindUnavailable(.gaveUpWatching))
         }
 
         // MARK: - Now Playing

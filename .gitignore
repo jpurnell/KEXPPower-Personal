@@ -80,3 +80,6 @@ CLAUDE.local.md
 
 # Emacs lock files
 .#*
+
+## Untracked build secrets (see Config/Secrets.xcconfig.example)
+Config/Secrets.xcconfig

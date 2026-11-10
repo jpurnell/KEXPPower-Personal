@@ -39,7 +39,11 @@ struct KEXPPowerExampleSwiftUIApp: App {
         AppModelRegistry.saving = saving
         AppModelRegistry.archive = archive
         // First in the log, on every platform: which build, what it runs on, and how the last run ended.
-        DiagnosticLog.app.record("App", LaunchHeader.current(previous: RunMarker.app.begin()))
+        let previousRun = RunMarker.app.begin()
+        DiagnosticLog.app.record("App", LaunchHeader.current(previous: previousRun))
+        // The same fact, as a typed health event for the diagnostics hub. It returns at once and sends nothing when the
+        // listener has turned reports off.
+        FieldDiagnostics.shared.report(.launch(previousRun: previousRun))
     }
 
     var body: some Scene {

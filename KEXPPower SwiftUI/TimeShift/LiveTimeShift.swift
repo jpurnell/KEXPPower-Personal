@@ -52,6 +52,7 @@ final class LiveTimeShift: LiveShifting {
         while await relay.bufferedDuration < firstAudio {
             guard Date() < deadline, !Task.isCancelled else {
                 DiagnosticLog.app.record("TimeShift", "no audio in time; playing the stream directly")
+                FieldDiagnostics.shared.report(.rewindUnavailable(.noAudioInTime))
                 await recorder.stop()
                 return nil
             }
@@ -64,6 +65,7 @@ final class LiveTimeShift: LiveShifting {
             return url
         } catch {
             DiagnosticLog.app.record("TimeShift", "server failed: \(error.localizedDescription); playing directly")
+            FieldDiagnostics.shared.report(.rewindUnavailable(.serverFailed))
             await recorder.stop()
             return nil
         }

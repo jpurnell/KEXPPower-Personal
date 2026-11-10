@@ -3,6 +3,7 @@
 **Status:** PROPOSED 2026-11-09, revised the same day after the owner settled the privacy line. Owner: "we want to make sure we can track down bugs as efficiently as possible, particularly in these TestFlight builds"; "I'd rather have them just sent to a server, automatically ingested and processed, so that we can surface issues in close to real time without a burden on the user"; agreed to the split by channel and a 30-day retention; "We would absolutely want to implement MetricKit". Pairs with `DiagnosticsHub.md` (the server this client talks to), `quality-gate-swift-project/plans/proposals/LoggingMetricKit.md` (the check that an app adopts MetricKit), and `SwiftReleaseKit/project/plans/proposals/MultiPlatformRelease.md` §4a and §4b.
 
 **Built 2026-11-09 (client, local part):** the local log is `DiagnosticsKit`'s `EventJournal` in `.written` durability behind the unchanged `DiagnosticLog.record` calls, and "Send Diagnostics" is `DiagnosticShareButton` in Settings. Still to build: the typed events and uploader (from `SwiftDiagnosticsHub`'s client library), the per-launch header and clean-exit marker, the channel resolver, and the MetricKit experiment.
+**Built 2026-11-10 (typed events and uploader, first slice):** see `FieldDiagnostics.md`.
 
 **Facts marked (repo) were read in this repository on 2026-11-09. Anything about Apple's services or frameworks that was not checked is marked *unverified*.**
 

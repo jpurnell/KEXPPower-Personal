@@ -1,0 +1,70 @@
+{
+  "app": "spinner",
+  "version": 2,
+  "kinds": [
+    {
+      "name": "launch",
+      "fields": [
+        {
+          "name": "previousRun",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "firstLaunch",
+              "endedWhileActive",
+              "endedInBackground",
+              "quit"
+            ]
+          },
+          "isRequired": true
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    },
+    {
+      "name": "streamFailed",
+      "fields": [
+        {
+          "name": "status",
+          "type": {
+            "type": "int",
+            "min": 100,
+            "max": 599
+          },
+          "isRequired": true
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    },
+    {
+      "name": "rewindUnavailable",
+      "fields": [
+        {
+          "name": "reason",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "noAudioInTime",
+              "serverFailed",
+              "gaveUpWatching"
+            ]
+          },
+          "isRequired": true
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    }
+  ]
+}

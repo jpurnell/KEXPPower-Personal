@@ -7,21 +7,42 @@
 ## Project Overview
 
 ### Mission
-A fast, friendly, native Apple-platform listener for KEXP 90.3 FM (Seattle): a live
-playlist, the live stream, and the tools to keep the music you hear. It is intended to be
-quicker and more pleasant to use than the existing KEXP app.
+KEXP 90.3 FM, the way I listen to it, wherever I happen to be. KEXPPower is a personal,
+native Apple-platform listener built around my own experience of music discovery: the live
+playlist and what is playing right now first, the stream, and the tools to keep the music I
+hear, so that it follows me from my phone to my wrist, my Mac, the living-room TV, a headset
+and the car, and answers when I ask for it by voice.
 
 ### Target Users
-- KEXP listeners on iPhone, iPad, Mac, and Apple Vision Pro (and in the car via CarPlay)
-  who want to see what is playing now, hear it, and save it.
+- Me first, and listeners like me: people who find music through KEXP and want to see what is
+  playing, hear it, and save it, on iPhone, iPad, Mac, Apple Watch, Apple TV and Apple Vision
+  Pro, and in the car via CarPlay.
+- Hands-free and ambient use through App Intents and Shortcuts: Siri, Shortcuts, widgets and
+  Control Center reach the same playback layer, with phrases for what is playing now, play
+  live, pause, back to live, rewind, add this song to a playlist (works from the lock screen;
+  not on the Mac), and playing an archived show by name or date.
 - Distribution: personal and open source, but built and reviewed to public-release
   standard. Privacy and KEXP branding are treated as approved.
 
 ### Key Differentiators
-- Live playlist and now-playing as the primary screen, not a station brochure.
+- Live playlist and now-playing as the primary screen.
 - One-tap save to a dedicated Apple Music playlist, and jump to the song in Apple Music.
-- Archive playback from an arbitrary point in time.
-- Native on every Apple platform it targets, sharing one playback layer.
+- Archive playback from an arbitrary point in time, on every platform that can play it,
+  including the CarPlay Archive tab.
+- Native on every Apple platform it targets (iOS, iPadOS, macOS, watchOS, tvOS, visionOS and
+  CarPlay), sharing one playback layer.
+- Voice and automation: App Intents and Shortcuts, so the app works without being looked at.
+
+### Provenance
+KEXPPower stands on earlier work. The library it builds on is the open-source KEXPPower
+package that also powers KEXP's own app; the repository's history begins in June 2019 with
+Dustin Bergman's commits, and the tags `0.1.0` through `2.0.0` are his, `3.0.0` is Jay Kardong's.
+Adam Bourn and Jeff Sorrentino also appear in the history. This app is a personal project on
+top of an in-repo fork of that library (ADR-001); my own commits begin in March 2022, and the
+recent 3.x releases are mine. Upstream changes worth having are ported by hand, and nothing
+here is sent back to the package behind KEXP's app. Author names in `git shortlog` repeat
+(several people appear under two spellings), so a count of names overstates how many people
+contributed: five, not eight.
 
 ---
 
@@ -118,6 +139,8 @@ api.kexp.org shows, plays, hosts, get_streaming_url ──> StationKitAdapterKEX
 - [x] Review section (iPhone, iPad, Vision Pro): text-guess Apple Music matches are held for the listener to check, instead of interrupting (`ReviewQueue.md`)
 - [x] Registered with the org judgement corpus, as are StationKit and the adapter (2026-11-07)
 
+- [x] **Health reports to the diagnostics hub**, 2026-11-10 (`project/plans/proposals/FieldDiagnostics.md`): typed `launch` and `rewindUnavailable` events from iPhone, iPad, Mac and Apple TV through the SwiftDiagnosticsClient uploader, a Settings switch (on by default), the schema as a file (`project/diagnostics/spinner-schema.json`) checked by a test; hub deployed and Spinner registered. Not yet seen arriving from a device.
+
 ### Known Problems
 - ~~`try!` crash on artwork fetch; artwork never reaches the system (Proposal 1, G1–G3)~~ fixed (`ArtworkLoader` in StationKit)
 - ~~Five independent writers to Now Playing state; `isPlaying` can drift (G4–G7)~~ fixed (one publisher; `isPlaying` mirrors `timeControlStatus`). It shipped without a view-level check: the iOS button did not follow `isPlaying` until `PlayerController` was made `@Observable` (see the changelog), and a `PlayerControllerTests` test now covers that path
@@ -131,6 +154,7 @@ api.kexp.org shows, plays, hosts, get_streaming_url ──> StationKitAdapterKEX
 - ~~Project still in Swift 5 language mode~~ now Swift 6 with strict concurrency on every target
 
 ### What's Next
+- [ ] Confirm one health event reaches the hub from a real install; then TestFlight session log lines (a first-launch disclosure, a `logChunk` kind), `streamFailed` once a code path holds a status, the watch app, MetricKit as an experiment.
 - [x] Playback hardening: `project/plans/completed/PlaybackHardening.md` (complete: interruption/route handling, session coordinator, Swift 6, ADR-003)
 - [x] Library extracted to `jpurnell/KEXPPowerKit` (ADR-002): Swift 6, `programImageURI`, 14-day lookback, UIKit removed, 34 tests
 - [x] App switched to the package (`jpurnell/KEXPPowerKit` 4.0.0, by URL; verified running on a physical iPhone); in-repo framework, podspec, UIKit example target, dead UI test targets removed; stale `origin` dropped (2026-11-02). Committed in 53f58e6.
@@ -205,4 +229,4 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 
 ---
 
-**Last Updated:** 2026-11-09 (3.5.1: Send Diagnostics uses the Mac Save panel; earlier the same day: 3.5.0: reconciled with the diagnostic log on `EventJournal` and Send Diagnostics; earlier the same day: reconciled with the live rewind cushion, Siri and Shortcuts, the archive bar's song title and the Mac right-click menu; LiveRewind.md and README brought up to date; earlier the same day: Spinner TV Top Shelf: the song on the air and recent covers, `TopShelf.md`; the Playlists placeholder removed on every platform; the add button's lock opens Settings; Spinner TV icon and Top Shelf. Spinner TV: the player became a Now Playing tab (a right-hand column was tried and dropped the same day), remote Play/Pause, wider archive cards, archive playback checked on the simulator; the stale "tvOS not built" note annotated) — 2026-11-08 (tvOS target built on `tvos-target`; reconciled with live rewind (Phases 0 to 2), the CarPlay Archive tab and Settings: What's Working, the time-zone known problem struck through, Roadmap items moved from proposed to built, ADR-010 for the local recording server; README, LiveRewind.md, CarPlayAudio.md and the Archive Transport note brought up to date. Earlier: 2026-11-07 (reconciled with the archive: browse, player, playlist, lock-screen controls; StationKit 0.11.0 and adapter 0.7.0; Review section; the async-`ArchiveManager` items struck through with the route actually taken; known problems for KEXP's damaged archive days and the day/time-zone mismatch; live rewind added as a proposal; registered with the org judgement corpus. Earlier: 2026-11-05 (proposals added for the watch widget, Control Center control and CarPlay Audio; Mac clean-up: keyboard access, Open in Music, UI test target; 3.3.0: reconciled widget, playlist, mini player and sidebar from proposed to shipped; next-up order recorded; 3.2.0: reconciled status with shipped code — Mac playback, watch app, app-owned player, fixed problems struck through; macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17))
+**Last Updated:** 2026-11-09 (health reports to the diagnostics hub, unreleased; reconciled: What's Working, What's Next; earlier: 3.5.1: Send Diagnostics uses the Mac Save panel; earlier the same day: 3.5.0: reconciled with the diagnostic log on `EventJournal` and Send Diagnostics; earlier the same day: reconciled with the live rewind cushion, Siri and Shortcuts, the archive bar's song title and the Mac right-click menu; LiveRewind.md and README brought up to date; earlier the same day: Spinner TV Top Shelf: the song on the air and recent covers, `TopShelf.md`; the Playlists placeholder removed on every platform; the add button's lock opens Settings; Spinner TV icon and Top Shelf. Spinner TV: the player became a Now Playing tab (a right-hand column was tried and dropped the same day), remote Play/Pause, wider archive cards, archive playback checked on the simulator; the stale "tvOS not built" note annotated) — 2026-11-08 (tvOS target built on `tvos-target`; reconciled with live rewind (Phases 0 to 2), the CarPlay Archive tab and Settings: What's Working, the time-zone known problem struck through, Roadmap items moved from proposed to built, ADR-010 for the local recording server; README, LiveRewind.md, CarPlayAudio.md and the Archive Transport note brought up to date. Earlier: 2026-11-07 (reconciled with the archive: browse, player, playlist, lock-screen controls; StationKit 0.11.0 and adapter 0.7.0; Review section; the async-`ArchiveManager` items struck through with the route actually taken; known problems for KEXP's damaged archive days and the day/time-zone mismatch; live rewind added as a proposal; registered with the org judgement corpus. Earlier: 2026-11-05 (proposals added for the watch widget, Control Center control and CarPlay Audio; Mac clean-up: keyboard access, Open in Music, UI test target; 3.3.0: reconciled widget, playlist, mini player and sidebar from proposed to shipped; next-up order recorded; 3.2.0: reconciled status with shipped code — Mac playback, watch app, app-owned player, fixed problems struck through; macOS target split out; filled from template by interview; evaluated upstream KEXP/KEXPPower 4.1.0 and decided to keep the fork, ADR-001; deployment target stays iOS 17))
