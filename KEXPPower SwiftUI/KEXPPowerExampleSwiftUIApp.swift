@@ -38,9 +38,8 @@ struct KEXPPowerExampleSwiftUIApp: App {
         AppModelRegistry.model = model
         AppModelRegistry.saving = saving
         AppModelRegistry.archive = archive
-        #if os(iOS)
-        DiagnosticLog.app.record("App", "launched")
-        #endif
+        // First in the log, on every platform: which build, what it runs on, and how the last run ended.
+        DiagnosticLog.app.record("App", LaunchHeader.current(previous: RunMarker.app.begin()))
     }
 
     var body: some Scene {
@@ -49,6 +48,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
         Window("Spinner", id: SceneID.main) {
             RootView(model: model, archive: archive)
                 .environment(saving)
+                .tracksRunState()
         }
         .defaultSize(width: 780, height: 900)
         .commands {
@@ -72,6 +72,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
         WindowGroup {
             RootView(model: model, archive: archive)
                 .environment(saving)
+                .tracksRunState()
         }
         #if !os(tvOS)
         // tvOS has no menu bar.

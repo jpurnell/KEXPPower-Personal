@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- **A header line for each launch in the diagnostic log**, on every platform (before, only the iPhone logged a launch): the version and build, the system and the hardware model, and how the previous run ended, such as `launched 3.5.1 (1) on iOS 27.3, iPhone16,1; previous run: ended while the app was in use`. The app records what it saw itself do (in use, in the background, quit) in one small file and claims no more: "ended while the app was in use" means a crash or a force-quit from the foreground, and the log cannot tell those apart; "ended in the background" is what the system does to an app it needs the memory from, and is normal. Tested (`RunMarkerTests`, `LaunchHeaderTests`).
+
 ## 3.5.1 - 2026-11-09
 
 ### Fixed
