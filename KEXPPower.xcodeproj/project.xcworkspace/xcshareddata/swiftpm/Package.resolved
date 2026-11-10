@@ -1,5 +1,5 @@
 {
-  "originHash" : "cd43d41ee430ef65746fb528b1d5669a164b456d61c43ac9df4877f2d7dac46c",
+  "originHash" : "d3cdf7deec833dfcc54659ddc2a0a21ff63332ad2979089b38c89432d3183abc",
   "pins" : [
     {
       "identity" : "kexppowerkit",
@@ -26,6 +26,24 @@
       "state" : {
         "revision" : "5d463bffda6d132e790373187d5a00f7a84a25e5",
         "version" : "0.7.0"
+      }
+    },
+    {
+      "identity" : "swift-log",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-log.git",
+      "state" : {
+        "revision" : "e3da04078777e6a1b72ce19981fbd6539b0847d8",
+        "version" : "1.17.0"
+      }
+    },
+    {
+      "identity" : "swiftdiagnosticskit",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:jpurnell/SwiftDiagnosticsKit.git",
+      "state" : {
+        "revision" : "31451b498ec3035cb0428cbab8e1254fb1fb1790",
+        "version" : "2.3.0"
       }
     }
   ],

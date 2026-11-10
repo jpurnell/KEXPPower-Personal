@@ -3,6 +3,7 @@
 //  KEXPPowerExampleSwiftUI
 //
 
+import DiagnosticsKit
 import SwiftUI
 
 /// App settings: how live is played and which time zone times are shown in. A window on the Mac (Cmd-comma), a sheet
@@ -76,6 +77,21 @@ struct SettingsView: View {
                     ForEach(ShowTimeZone.allCases) { Text($0.label).tag($0.rawValue) }
                 }
             }
+            #if !os(tvOS)
+            Section {
+                DiagnosticShareButton(reportProvider: {
+                    try await DiagnosticReportCollector(subsystem: "com.JPEnterprises.Spinner")
+                        .collect(metadata: DiagnosticReportMetadata.current(), journal: DiagnosticLog.app.directory,
+                                 filePrefix: "spinner")
+                }) {
+                    Label("Send Diagnostics", systemImage: "square.and.arrow.up")
+                }
+            } header: {
+                Text("Problems")
+            } footer: {
+                Text("Makes one file of what the app recorded about itself, with the app version and these settings, and lets you choose where it goes. Nothing is sent unless you send it. It can include names of shows and songs the app was handling.")
+            }
+            #endif
         }
         .onAppear { opened = ListeningSettings.current() }
         .onDisappear { Task { await applyChanges() } }

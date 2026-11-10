@@ -39,7 +39,6 @@ struct KEXPPowerExampleSwiftUIApp: App {
         AppModelRegistry.saving = saving
         AppModelRegistry.archive = archive
         #if os(iOS)
-        DiagnosticLog.app.trim()
         DiagnosticLog.app.record("App", "launched")
         #endif
     }

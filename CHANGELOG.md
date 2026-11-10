@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- **The diagnostic log is now kept by DiagnosticsKit's `EventJournal`** (SwiftDiagnosticsKit 2.3.0) instead of one hand-written file. Each line is still written to disk before `record` returns (the journal's `.written` durability, added for this), so a line recorded just before CarPlay ends the process survives it. What it adds: rotation by size and age, a 14-day retention, and owner-only permissions. The 45 places that record a line are unchanged. The log moved to its own folder (`Diagnostics/journal`); the old `spinner-log.txt` is not migrated. `DiagnosticLog.trim()` and `clear()` are gone: the journal rotates and prunes itself.
+
+### Added
+- **Send Diagnostics** in Settings (iPhone, iPad, Mac; not Apple TV, which has no share sheet): makes one report of what the app recorded about itself, with the app version and build and the listener's settings, and opens the share sheet so the listener chooses where it goes. Nothing is sent unless they send it. The report can include names of shows and songs the app was handling, and the note under the button says so. The metadata is a fixed set of fields, tested (`DiagnosticReportMetadataTests`): no name, account, identifier or free text.
+
 ## 3.4.0 - 2026-11-09
 
 The archive, live rewind (with a "stay behind live" cushion), Settings, CarPlay's Archive tab, Siri and Shortcuts, and the Spinner TV target. **Not yet checked on a device:** the cushion across a real dead zone, add-to-playlist by voice while the phone is locked, the archive's layout on iPad and Mac, and Siri's "Play a show on Spinner" wording (use "Find a show on Spinner").
