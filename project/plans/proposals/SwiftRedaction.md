@@ -2,6 +2,16 @@
 
 **Status:** PROPOSED 2026-11-09. Owner: one reusable package holding the shared patterns with the two policies on top, and any other project doing similar work migrated later. Written in the KEXPPower repository for review; **on approval it moves to the new sibling repository `SwiftRedaction`** (created from the development-guidelines template as a sibling directory, not nested). Nothing in any existing repository was modified to write this.
 
+**Decisions by the owner, 2026-11-09 (these settle §16; where the text below differs, this block wins):**
+1. **Shape:** a standalone shared package (`Tools/SwiftRedaction`), not fixes in place.
+2. **Engine:** Swift Regex is preferred. It still backtracks, so the input-length cap and a measurement on both macOS and Linux stay; the matcher stays behind a protocol so the engine can change if the measurement says so.
+3. **`.appLog` gets the `key=value` rule:** "better to be safe", accepting that it will also redact harmless text such as `token: expired`.
+4. **The app-specific-password (4-4-4-4) rule:** configurable, with the context required before it fires a policy setting; measure its false positives on real logs before choosing a default.
+5. **Dependencies between the owner's packages:** git URL.
+6. **Default line cap for `.appLog`:** accepted as proposed (SwiftDiagnosticsHub's scrubber is at 4,096 UTF-8 bytes today).
+7. **Git SHAs:** a 40-hex git SHA is **not** redacted (the build-to-commit link needs them); longer hex runs (keys, SHA-256 digests) still are.
+8. **Linux:** no host right now; the geo-audit host on fly.io is a possible later one.
+
 **Facts marked (repo) were read on 2026-11-09. Anything about code I did not open, about hosts, or about runtime behavior I did not measure is marked *unverified*.** One measurement was taken (§9): a throwaway script in the session scratchpad, outside every repo.
 
 ---

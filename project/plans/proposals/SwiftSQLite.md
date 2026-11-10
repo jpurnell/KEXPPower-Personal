@@ -2,6 +2,14 @@
 
 **Status:** PROPOSED 2026-11-09. Owner: wants one reusable package extracted from the best of the hand-written SQLite wrappers in the portfolio, with each project migrated onto it later. Written in the KEXPPower repository for review; **on approval it moves to the new sibling repository `SwiftSQLite`** (created from the development-guidelines template as a sibling directory, not nested). No existing repository was modified and nothing was built for this survey.
 
+**Decisions by the owner, 2026-11-09 (these settle §16; where the text below differs, this block wins):**
+1. **Home:** a sibling repository `Tools/SwiftSQLite`; public is acceptable.
+2. **Defaults:** "do it right": WAL with `synchronous = FULL`, as proposed in §7.
+3. **Time storage:** the owner leans to REAL seconds without a reason. *Recommendation, for the owner to confirm:* **INTEGER milliseconds since the epoch** as the package default, because integers compare and sort exactly, cannot gain rounding error from a float, and the hubs' stores already use them; REAL seconds stays available as an explicit choice for a store that wants it (FleetWatch). Open until the owner confirms.
+4. **Linux:** do it now. It is a goal, with a Linux test pass; the CI host is to be decided (the owner named the geo-audit host on fly.io as a possibility).
+5. **Fix the live bugs now, in place, in their own repositories** (VaultMCP partial rows; the 0600 window; no busy timeout in the hubs), ahead of the migration. Tracked in the checklists of each repo.
+6. **Minimum SQLite version:** "very recent, given security concerns". The package checks `sqlite3_libversion_number()` at open and refuses to open below a floor, so a stale system library fails closed; the floor's value is set from the current release and the versions each target OS ships (to be read, not recited) when the package is built, and is a single constant with a test. **Parent directories:** in scope (created 0700). **Migration order:** any, so long as it happens; the plan stands (SwiftDiagnosticsHub first, VaultMCP last).
+
 **Facts marked (repo) were read on 2026-11-09 from the files named. Anything about Linux, SQLite's behavior, toolchains or code that was not read is marked *unverified*.**
 
 ---
