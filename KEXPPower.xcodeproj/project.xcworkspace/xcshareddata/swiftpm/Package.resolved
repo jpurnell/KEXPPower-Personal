@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:jpurnell/SwiftDiagnosticsKit.git",
       "state" : {
-        "revision" : "31451b498ec3035cb0428cbab8e1254fb1fb1790",
-        "version" : "2.3.0"
+        "revision" : "f2959bd8c14b1914e835775d56d192b7b5169144",
+        "version" : "2.3.1"
       }
     }
   ],

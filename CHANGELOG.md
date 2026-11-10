@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.5.1 - 2026-11-09
+
+### Fixed
+- **Send Diagnostics on the Mac** showed a sheet reading "Diagnostic report saved to: diagnostic-report.json" with no way to close it and no path, because the report was written to the app's sandbox temporary folder. It now opens the Save panel, so you choose where the file goes (SwiftDiagnosticsKit 2.3.1). iPhone and iPad are unchanged. Found by using 3.5.0 on the Mac the day it shipped.
+
 ## 3.5.0 - 2026-11-09
 
 The diagnostic log moves onto a maintained package and gains a way to share it. **Not yet checked on a device:** a line recorded just before CarPlay ends the process still being on disk afterwards (the journal's `.written` mode does it in tests), and the share sheet on iPhone, iPad and Mac.
