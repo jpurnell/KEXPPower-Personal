@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:jpurnell/KEXPPowerKit.git",
       "state" : {
-        "revision" : "d1ffa308f39a8e6b48bb991f92007d20fa3f1cba",
-        "version" : "4.1.0"
+        "revision" : "bcac4ccb157c9cd5a9d6f12f88f2e06a75fea421",
+        "version" : "4.2.0"
       }
     },
     {

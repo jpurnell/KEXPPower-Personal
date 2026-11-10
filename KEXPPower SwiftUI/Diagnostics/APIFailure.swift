@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import KEXPPower
 import StationKitAdapterKEXP
 
 /// Which of KEXP's services a failed call was made to.
@@ -37,10 +38,15 @@ struct APIFailure: Sendable, Equatable {
 
     /// What an error means for a report, or `nil` when it is not a failure at all (a cancelled request).
     ///
-    /// The live poll does not look at the HTTP status: an error page fails to decode and arrives here as ``Outcome/badResponse``
-    /// with no status. The archive does look, and arrives as ``Outcome/badStatus`` with one.
+    /// Both services report an HTTP error as ``Outcome/badStatus`` with its status: the archive always did, and the live poll
+    /// does since KEXPPowerKit 4.2 (before, an error page failed to decode and arrived here as ``Outcome/badResponse`` with no
+    /// status; that outcome remains for a body that is not what was asked for).
     static func classify(_ error: any Error) -> APIFailure? {
         if error is CancellationError { return nil }
+        if let live = error as? KEXPNetworkError {
+            guard case .badStatus(let code) = live else { return APIFailure(outcome: .other, status: nil) }
+            return APIFailure(outcome: .badStatus, status: (400...599).contains(code) ? code : nil)
+        }
         if let archive = error as? KEXPArchiveError {
             guard case .badStatus(let code) = archive else { return APIFailure(outcome: .other, status: nil) }
             return APIFailure(outcome: .badStatus, status: (400...599).contains(code) ? code : nil)

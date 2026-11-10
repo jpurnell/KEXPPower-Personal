@@ -1,4 +1,5 @@
 import Foundation
+import KEXPPower
 import os
 import StationKitAdapterKEXP
 import SwiftDiagnosticsClient
@@ -14,6 +15,17 @@ struct APIFailureTests {
     func badStatus() {
         let failure = APIFailure.classify(KEXPArchiveError.badStatus(522))
         #expect(failure == APIFailure(outcome: .badStatus, status: 522))
+    }
+
+    @Test("An HTTP error from the live poll keeps its status: the library reports it since 4.2")
+    func liveBadStatus() {
+        #expect(APIFailure.classify(KEXPNetworkError.badStatus(522)) == APIFailure(outcome: .badStatus, status: 522))
+        #expect(APIFailure.classify(KEXPNetworkError.badStatus(404)) == APIFailure(outcome: .badStatus, status: 404))
+    }
+
+    @Test("A live status outside the range an HTTP error can have is reported without one")
+    func liveStatusOutOfRange() {
+        #expect(APIFailure.classify(KEXPNetworkError.badStatus(304)) == APIFailure(outcome: .badStatus, status: nil))
     }
 
     @Test("A status outside the range an HTTP error can have is reported without one")
