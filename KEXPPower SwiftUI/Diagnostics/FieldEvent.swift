@@ -26,17 +26,33 @@ enum FieldEvent: Sendable, Equatable {
     case launch(previousRun: PreviousRun)
     /// A live rewind could not be used and the stream was played directly.
     case rewindUnavailable(RewindReason)
+    /// A call to KEXP's API failed.
+    case apiFailed(APIEndpoint, APIFailure)
+
+    /// What makes two failures the same one, for ``FieldEventCoalescer``; `nil` for events that are never held back.
+    var coalescingKey: String? {
+        switch self {
+        case .apiFailed(let endpoint, let failure):
+            "apiFailed.\(endpoint.rawValue).\(failure.outcome.rawValue).\(failure.status.map(String.init) ?? "-")"
+        case .launch, .rewindUnavailable:
+            nil
+        }
+    }
 
     /// The event as the client library sends it: a kind, a severity and typed fields.
     var record: EventRecord {
         switch self {
         case .launch(let previous):
             // A run that ended while the app was in use is a crash or a force-quit; every other ending is routine.
-            EventRecord(
+            return EventRecord(
                 kind: "launch", severity: previous == .endedWhileActive ? .warning : .info, at: Date(),
                 fields: ["previousRun": .code(previous.rawValue)])
         case .rewindUnavailable(let reason):
-            EventRecord(kind: "rewindUnavailable", severity: .warning, at: Date(), fields: ["reason": .code(reason.rawValue)])
+            return EventRecord(kind: "rewindUnavailable", severity: .warning, at: Date(), fields: ["reason": .code(reason.rawValue)])
+        case .apiFailed(let endpoint, let failure):
+            var fields: [String: FieldValue] = ["endpoint": .code(endpoint.rawValue), "outcome": .code(failure.outcome.rawValue)]
+            if let status = failure.status { fields["status"] = .int(status) }
+            return EventRecord(kind: "apiFailed", severity: .warning, at: Date(), fields: fields)
         }
     }
 }

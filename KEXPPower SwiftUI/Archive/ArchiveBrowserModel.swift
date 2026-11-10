@@ -251,6 +251,7 @@ final class ArchiveBrowserModel {
             genres = loaded.genres
             phase = .loaded
         } catch {
+            FieldDiagnostics.shared.reportFailure(of: error, endpoint: .archive)
             phase = .failed("The archive could not be reached. Check your connection and try again.")
         }
     }
@@ -265,6 +266,7 @@ final class ArchiveBrowserModel {
             }
             await start(show, file: playback.url, at: playback.offset)
         } catch {
+            FieldDiagnostics.shared.reportFailure(of: error, endpoint: .archive)
             notice = "That show could not be started. Check your connection and try again."
         }
     }
@@ -310,6 +312,7 @@ final class ArchiveBrowserModel {
             guard let playback = try await catalog.playback(for: next) else { return .live }
             return .show(next, playback.url)
         } catch {
+            FieldDiagnostics.shared.reportFailure(of: error, endpoint: .archive)
             return .live
         }
     }
@@ -348,6 +351,7 @@ final class ArchiveBrowserModel {
             tracks = fetched.filter { $0.airDate != nil }
             tracksState = .loaded
         } catch {
+            FieldDiagnostics.shared.reportFailure(of: error, endpoint: .archive)
             guard playing?.id == show.id else { return }
             tracksState = .failed
         }

@@ -53,14 +53,18 @@ enum FieldDiagnosticsSetting {
 /// a Debug build. Nothing here throws or waits for the network, so a hub that is down never touches the app.
 struct FieldDiagnostics: Sendable {
     private let uploader: DiagnosticsUploader?
+    private let coalescer: FieldEventCoalescer
 
     /// A sender over an uploader; tests give it one over a fake transport.
-    init(uploader: DiagnosticsUploader) {
+    /// - Parameter coalescer: Holds back a failure that repeats; the default allows each one once in ten minutes.
+    init(uploader: DiagnosticsUploader, coalescer: FieldEventCoalescer = FieldEventCoalescer()) {
         self.uploader = uploader
+        self.coalescer = coalescer
     }
 
     private init() {
         uploader = nil
+        coalescer = FieldEventCoalescer()
     }
 
     /// The running app's sender. If the endpoint cannot be formed, or this build has no key, it sends nothing.
@@ -77,10 +81,12 @@ struct FieldDiagnostics: Sendable {
             transport: URLSessionTransport(), enabled: { FieldDiagnosticsSetting.isOn() }))
     }()
 
-    /// Queues an event and sends what is waiting; says what became of it.
+    /// Queues an event and sends what is waiting; says what became of it, or `nil` when the event was held back because the
+    /// same failure was reported moments ago.
     @discardableResult
-    func send(_ event: FieldEvent) async -> SendOutcome {
+    func send(_ event: FieldEvent) async -> SendOutcome? {
         guard let uploader else { return .notSent(.disabled) }
+        guard coalescer.allows(event) else { return nil }
         return await uploader.send(event.record)
     }
 
@@ -94,6 +100,12 @@ struct FieldDiagnostics: Sendable {
     /// Reports an event without waiting for it: the caller carries on at once.
     func report(_ event: FieldEvent) {
         Task(priority: .utility) { await send(event) }
+    }
+
+    /// Reports that a call to KEXP's API failed with this error, unless the error is only a cancelled request.
+    func reportFailure(of error: any Error, endpoint: APIEndpoint) {
+        guard let failure = APIFailure.classify(error) else { return }
+        report(.apiFailed(endpoint, failure))
     }
 
     /// Tries to send what an earlier failure left on disk, without waiting for it.

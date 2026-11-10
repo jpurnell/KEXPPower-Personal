@@ -83,7 +83,7 @@ struct SettingsView: View {
             } header: {
                 Text("Diagnostics")
             } footer: {
-                Text("When on, the app tells its developer that it started and how the last run ended, and when live rewind could not be used. Nothing about what you listen to, who you are or where you are is included, and nothing links one launch to the next. Turn it off and nothing is sent.")
+                Text("When on, the app tells its developer that it started and how the last run ended, when live rewind could not be used, and when KEXP's service could not be reached. Nothing about what you listen to, who you are or where you are is included, and nothing links one launch to the next. Turn it off and nothing is sent.")
             }
             #if !os(tvOS)
             Section {

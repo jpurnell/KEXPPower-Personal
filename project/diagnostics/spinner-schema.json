@@ -1,6 +1,6 @@
 {
   "app": "spinner",
-  "version": 2,
+  "version": 3,
   "kinds": [
     {
       "name": "launch",
@@ -58,6 +58,50 @@
             ]
           },
           "isRequired": true
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    },
+    {
+      "name": "apiFailed",
+      "fields": [
+        {
+          "name": "endpoint",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "live",
+              "archive"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "outcome",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "badStatus",
+              "badResponse",
+              "offline",
+              "timeout",
+              "other"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "status",
+          "type": {
+            "type": "int",
+            "min": 400,
+            "max": 599
+          },
+          "isRequired": false
         }
       ],
       "channels": [

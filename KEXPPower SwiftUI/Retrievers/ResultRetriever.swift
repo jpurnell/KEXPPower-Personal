@@ -126,6 +126,7 @@ public class ResultRetriever {
 			await widgetPublisher.update(play: latestPlays.first, show: show, isPlaying: publishedPlaying)
 		} catch {
 			logger.error("Refresh failed: \(error.localizedDescription, privacy: .public)")
+			FieldDiagnostics.shared.reportFailure(of: error, endpoint: .live)
 			// A failed poll must not let the widget's playing flag go stale while the stream is still playing.
 			await widgetPublisher.updatePlayState(isPlaying: publishedPlaying)
 		}
