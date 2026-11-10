@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 3.5.0 - 2026-11-09
+
+The diagnostic log moves onto a maintained package and gains a way to share it. **Not yet checked on a device:** a line recorded just before CarPlay ends the process still being on disk afterwards (the journal's `.written` mode does it in tests), and the share sheet on iPhone, iPad and Mac.
 
 ### Changed
 - **The diagnostic log is now kept by DiagnosticsKit's `EventJournal`** (SwiftDiagnosticsKit 2.3.0) instead of one hand-written file. Each line is still written to disk before `record` returns (the journal's `.written` durability, added for this), so a line recorded just before CarPlay ends the process survives it. What it adds: rotation by size and age, a 14-day retention, and owner-only permissions. The 45 places that record a line are unchanged. The log moved to its own folder (`Diagnostics/journal`); the old `spinner-log.txt` is not migrated. `DiagnosticLog.trim()` and `clear()` are gone: the journal rotates and prunes itself.
