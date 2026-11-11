@@ -83,3 +83,7 @@ CLAUDE.local.md
 
 ## Untracked build secrets (see Config/Secrets.xcconfig.example)
 Config/Secrets.xcconfig
+
+## App Store Connect API identifiers: release.private.json is release.json plus apiKeyID and apiIssuerID.
+## Use it for uploads: release-pipeline export --config release.private.json --target all --upload
+release.private.json

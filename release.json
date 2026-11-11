@@ -13,5 +13,50 @@
   "notaryProfile": "fleetwatch-notary",
   "bundleIdentifier": "com.JPEnterprises.Spinner",
   "deviceConfiguration": "Debug",
-  "deviceBuildPath": "build/device"
+  "deviceBuildPath": "build/device",
+  "targets": [
+    {
+      "name": "ios",
+      "platform": "ios",
+      "scheme": "KEXPPowerExampleSwiftUI (iOS)",
+      "appName": "KEXPPowerExampleSwiftUI.app",
+      "bundleIdentifier": "com.JPEnterprises.Spinner",
+      "expectedInfoKeys": [
+        "CFBundleDisplayName"
+      ]
+    },
+    {
+      "name": "macos",
+      "platform": "macos",
+      "scheme": "Spinner Mac",
+      "appName": "Spinner.app",
+      "bundleIdentifier": "com.JPEnterprises.Spinner",
+      "exportMethod": "app-store-connect",
+      "expectedInfoKeys": [
+        "CFBundleDisplayName"
+      ]
+    },
+    {
+      "name": "tvos",
+      "platform": "tvos",
+      "scheme": "Spinner TV",
+      "appName": "Spinner TV.app",
+      "bundleIdentifier": "com.JPEnterprises.Spinner",
+      "expectedInfoKeys": [
+        "CFBundleDisplayName"
+      ]
+    },
+    {
+      "name": "visionos",
+      "platform": "visionos",
+      "scheme": "KEXPPowerExampleSwiftUI (iOS)",
+      "appName": "KEXPPowerExampleSwiftUI.app",
+      "bundleIdentifier": "com.JPEnterprises.Spinner",
+      "expectedInfoKeys": [
+        "CFBundleDisplayName"
+      ]
+    }
+  ],
+  "version": "3.6.0",
+  "build": "1"
 }
