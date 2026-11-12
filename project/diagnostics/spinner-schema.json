@@ -1,6 +1,6 @@
 {
   "app": "spinner",
-  "version": 3,
+  "version": 4,
   "kinds": [
     {
       "name": "launch",
@@ -100,6 +100,452 @@
             "type": "int",
             "min": 400,
             "max": 599
+          },
+          "isRequired": false
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    },
+    {
+      "name": "crash",
+      "fields": [
+        {
+          "name": "exceptionType",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "EXC_BAD_ACCESS",
+              "EXC_BAD_INSTRUCTION",
+              "EXC_ARITHMETIC",
+              "EXC_SOFTWARE",
+              "EXC_BREAKPOINT",
+              "EXC_CRASH",
+              "EXC_RESOURCE",
+              "EXC_GUARD",
+              "other"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "signal",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "SIGSEGV",
+              "SIGABRT",
+              "SIGILL",
+              "SIGBUS",
+              "SIGTRAP",
+              "SIGFPE",
+              "SIGKILL",
+              "other"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "terminationNamespace",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "signal",
+              "dyld",
+              "codesigning",
+              "watchdog",
+              "other"
+            ]
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame0",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame1",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame2",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame3",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame4",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame5",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame6",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame7",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    },
+    {
+      "name": "hang",
+      "fields": [
+        {
+          "name": "durationBucket",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "2s",
+              "4s",
+              "8s",
+              "16s",
+              "over"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "frame0",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame1",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame2",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame3",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame4",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame5",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame6",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame7",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    },
+    {
+      "name": "cpuException",
+      "fields": [
+        {
+          "name": "cpuBucket",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "10s",
+              "60s",
+              "300s",
+              "900s",
+              "over"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "frame0",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame1",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame2",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame3",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame4",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame5",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame6",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame7",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    },
+    {
+      "name": "diskWriteException",
+      "fields": [
+        {
+          "name": "writeBucket",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "1GB",
+              "2GB",
+              "4GB",
+              "8GB",
+              "over"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "frame0",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame1",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame2",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame3",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame4",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame5",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame6",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        },
+        {
+          "name": "frame7",
+          "type": {
+            "type": "identifier",
+            "maxLength": 72
+          },
+          "isRequired": false
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    },
+    {
+      "name": "dailyMetrics",
+      "fields": [
+        {
+          "name": "launchBucket",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "lt1s",
+              "1to2s",
+              "2to4s",
+              "over4s"
+            ]
+          },
+          "isRequired": false
+        },
+        {
+          "name": "hangBucket",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "none",
+              "lt10s",
+              "10to60s",
+              "over60s"
+            ]
+          },
+          "isRequired": false
+        },
+        {
+          "name": "memoryBucket",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "lt100mb",
+              "100to250mb",
+              "250to500mb",
+              "500mbto1gb",
+              "over1gb"
+            ]
+          },
+          "isRequired": false
+        },
+        {
+          "name": "abnormalExits",
+          "type": {
+            "type": "int",
+            "min": 0,
+            "max": 999
           },
           "isRequired": false
         }

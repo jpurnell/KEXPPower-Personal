@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import SwiftDiagnosticsClient
 
 /// The first line of each launch in the diagnostic log: which build this is, what it is running on, and how the last run
 /// ended, so a log read later says what produced it.

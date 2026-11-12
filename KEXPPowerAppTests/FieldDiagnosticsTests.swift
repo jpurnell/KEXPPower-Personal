@@ -110,16 +110,80 @@ struct FieldDiagnosticsTests {
         #expect(await rig.transport.requests.count == 2)
     }
 
-    @Test("The setting is on when it was never set, off once turned off, on again once turned on")
-    func settingDefaults() throws {
-        let suite = "field-setting-\(UUID().uuidString)"
-        let defaults = try #require(UserDefaults(suiteName: suite))
-        defer { defaults.removePersistentDomain(forName: suite) }
-        #expect(FieldDiagnosticsSetting.isOn(defaults))
-        defaults.set(false, forKey: FieldDiagnosticsSetting.key)
-        #expect(!FieldDiagnosticsSetting.isOn(defaults))
-        defaults.set(true, forKey: FieldDiagnosticsSetting.key)
-        #expect(FieldDiagnosticsSetting.isOn(defaults))
+    // MARK: Consent
+
+    private func makeConsented(consent: DiagnosticsConsent, transport: RecordingTransport, folder: URL) throws -> FieldDiagnostics {
+        let endpoint = try #require(URL(string: "https://diagnostics.example/v1/ingest"))
+        let identity = AppIdentity(app: "spinner", platform: .ios, appVersion: "3.6.0", build: "1", osVersion: "27.2", deviceClass: "iPhone")
+        return FieldDiagnostics.make(
+            endpoint: endpoint, appKey: "test-key-0123456789abcdef", identity: identity, channel: .appStore, queue: DiskQueue(directory: folder),
+            transport: transport, consent: consent)
+    }
+
+    private func freshConsent() -> DiagnosticsConsent {
+        let suite = "spinner-consent-\(UUID().uuidString)"
+        UserDefaults(suiteName: suite)?.removePersistentDomain(forName: suite)
+        return DiagnosticsConsent(suiteName: suite)
+    }
+
+    private func scratchFolder() -> URL {
+        FileManager.default.temporaryDirectory.appendingPathComponent("field-consent-\(UUID().uuidString)", isDirectory: true)
+    }
+
+    @Test("Built on the person's consent, the sender sends nothing until they opt in, and then sends")
+    func consentGatesTheSender() async throws {
+        let consent = freshConsent()
+        let transport = RecordingTransport()
+        let diagnostics = try makeConsented(consent: consent, transport: transport, folder: scratchFolder())
+        _ = await diagnostics.send(.launch(previousRun: .quit))
+        _ = await diagnostics.flush()
+        #expect(await transport.requests.isEmpty)
+        consent.record(.optedIn)
+        _ = await diagnostics.send(.launch(previousRun: .quit))
+        #expect(await transport.requests.count == 1)
+    }
+
+    @Test("After the person opts out again, it stops at once")
+    func optOutStops() async throws {
+        let consent = freshConsent()
+        consent.record(.optedIn)
+        let transport = RecordingTransport()
+        let diagnostics = try makeConsented(consent: consent, transport: transport, folder: scratchFolder())
+        _ = await diagnostics.send(.launch(previousRun: .quit))
+        #expect(await transport.requests.count == 1)
+        consent.record(.optedOut)
+        _ = await diagnostics.send(.rewindUnavailable(.serverFailed))
+        #expect(await transport.requests.count == 1)
+    }
+
+    @Test("Clearing the queue deletes what was waiting, on disk")
+    func clearQueue() async throws {
+        let consent = freshConsent()
+        consent.record(.optedIn)
+        let transport = RecordingTransport()
+        await transport.set(.retryLater)
+        let folder = scratchFolder()
+        let diagnostics = try makeConsented(consent: consent, transport: transport, folder: folder)
+        _ = await diagnostics.send(.launch(previousRun: .quit))
+        #expect(await DiskQueue(directory: folder).count == 1)
+        await diagnostics.clearQueue()
+        #expect(await DiskQueue(directory: folder).count == 0)
+    }
+
+    @Test("Events from the operating system go through the same gate, and are sent as they are")
+    func osRecordsAreGated() async throws {
+        let consent = freshConsent()
+        let transport = RecordingTransport()
+        let diagnostics = try makeConsented(consent: consent, transport: transport, folder: scratchFolder())
+        let crash = EventRecord(
+            kind: "crash", severity: .fatal, at: Date(timeIntervalSince1970: 1_800_000_000),
+            fields: ["exceptionType": .code("EXC_BAD_ACCESS"), "signal": .code("SIGSEGV")])
+        await diagnostics.send(records: [crash])
+        #expect(await transport.requests.isEmpty)
+        consent.record(.optedIn)
+        await diagnostics.send(records: [crash])
+        let request = try #require(await transport.requests.first)
+        #expect(try decode(request).events == [crash])
     }
 
     @Test("The identity is the bundle's version and build, with tokens for the platform and the device class")

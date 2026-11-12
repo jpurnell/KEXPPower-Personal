@@ -4,6 +4,7 @@
 //
 
 import DiagnosticsKit
+import SwiftDiagnosticsConsentUI
 import SwiftUI
 
 /// App settings: how live is played and which time zone times are shown in. A window on the Mac (Cmd-comma), a sheet
@@ -17,7 +18,6 @@ struct SettingsView: View {
     @AppStorage(RewindWindow.storageKey) private var storedWindow = RewindWindow.tenMinutes.rawValue
     @AppStorage(Cushion.storageKey) private var storedCushion = Cushion.off.rawValue
     @AppStorage(ShowTimeZone.storageKey) private var storedZone = ShowTimeZone.mine.rawValue
-    @AppStorage(FieldDiagnosticsSetting.key) private var sharesHealthReports = true
     /// The listening settings as they were when this screen appeared.
     @State private var opened = ListeningSettings.current()
     #if os(iOS)
@@ -78,13 +78,7 @@ struct SettingsView: View {
                     ForEach(ShowTimeZone.allCases) { Text($0.label).tag($0.rawValue) }
                 }
             }
-            Section {
-                Toggle("Share anonymous health reports", isOn: $sharesHealthReports)
-            } header: {
-                Text("Diagnostics")
-            } footer: {
-                Text("When on, the app tells its developer that it started and how the last run ended, when live rewind could not be used, and when KEXP's service could not be reached. Nothing about what you listen to, who you are or where you are is included, and nothing links one launch to the next. Turn it off and nothing is sent.")
-            }
+            DiagnosticsSettingsSection(model: FieldConsent.model, appName: "Spinner")
             #if !os(tvOS)
             Section {
                 DiagnosticShareButton(reportProvider: { try await DiagnosticReportMetadata.report() }) {

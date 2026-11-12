@@ -1,5 +1,6 @@
 import Foundation
 import SwiftDiagnosticsClient
+import SwiftDiagnosticsMetricKit
 import Testing
 @testable import KEXPPowerExampleSwiftUI
 
@@ -98,6 +99,31 @@ struct FieldEventTests {
             for field in kind.fields {
                 if case .text = field.type { Issue.record("\(kind.name).\(field.name) is free text") }
             }
+        }
+    }
+
+    @Test("The schema file carries every kind the MetricKit mapping can emit, exactly, so the hub accepts what the operating system reports")
+    func schemaHasMetricKitKinds() throws {
+        let schema = try loadSchema()
+        #expect(schema.version == 4)
+        for kind in MetricKitMapping.kinds { #expect(schema.kinds.contains(kind), "\(kind.name)") }
+    }
+
+    @Test("What the mapping produces passes the schema file on every channel")
+    func metricKitEventsPass() throws {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        var events = MetricKitMapping.events(crashes: [CrashReport(exceptionType: 1, signal: 11, terminationReason: "Namespace SIGNAL", callStackTreeJSON: nil)], now: now)
+        events += MetricKitMapping.events(hangs: [HangReport(durationSeconds: 9, callStackTreeJSON: nil)], now: now)
+        events += MetricKitMapping.events(cpuExceptions: [CPUExceptionReport(totalCPUSeconds: 20, callStackTreeJSON: nil)], now: now)
+        events += MetricKitMapping.events(diskWrites: [DiskWriteReport(bytesWritten: 3_000_000_000, callStackTreeJSON: nil)], now: now)
+        events += MetricKitMapping.events(daily: DailyMetricsReport(launchSeconds: 1.2, hangSeconds: 3, peakMemoryBytes: 200_000_000, abnormalExits: 1), now: now)
+        let validator = SchemaValidator(schema: try loadSchema())
+        for channel in Channel.allCases {
+            let envelope = Envelope(
+                app: "spinner", platform: .ios, appVersion: "3.6.0", build: "1", osVersion: "27.2", deviceClass: "iPhone", channel: channel,
+                launchID: "launch-1", sentAt: now, events: events)
+            let result = validator.validate(envelope)
+            #expect(result.rejected.isEmpty && result.accepted.count == events.count, "\(channel)")
         }
     }
 }

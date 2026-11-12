@@ -6,6 +6,7 @@
 //  Copyright © 2022 KEXP. All rights reserved.
 //
 
+import SwiftDiagnosticsClient
 import SwiftUI
 
 /// The ids of the app's windows, used to open one and close the other.
@@ -39,11 +40,13 @@ struct KEXPPowerExampleSwiftUIApp: App {
         AppModelRegistry.saving = saving
         AppModelRegistry.archive = archive
         // First in the log, on every platform: which build, what it runs on, and how the last run ended.
-        let previousRun = RunMarker.app.begin()
+        let previousRun = RunMarker.standard.begin()
         DiagnosticLog.app.record("App", LaunchHeader.current(previous: previousRun))
-        // The same fact, as a typed health event for the diagnostics hub. It returns at once and sends nothing when the
-        // listener has turned reports off.
+        // The same fact, as a typed health event for the diagnostics hub. It returns at once, and it sends nothing unless the listener
+        // has opted in: diagnostics are off until they say yes, and no connection to our servers is made before then.
         FieldDiagnostics.shared.report(.launch(previousRun: previousRun))
+        // If they have already said yes, listen for the operating system's crash and hang reports too; otherwise this does nothing.
+        FieldConsent.resume()
     }
 
     var body: some Scene {
@@ -53,6 +56,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
             RootView(model: model, archive: archive)
                 .environment(saving)
                 .tracksRunState()
+                .asksAboutDiagnostics()
         }
         .defaultSize(width: 780, height: 900)
         .commands {
@@ -77,6 +81,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
             RootView(model: model, archive: archive)
                 .environment(saving)
                 .tracksRunState()
+                .asksAboutDiagnostics()
         }
         #if !os(tvOS)
         // tvOS has no menu bar.

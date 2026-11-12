@@ -7,6 +7,11 @@ import Testing
 @testable import KEXPPowerExampleSwiftUI
 
 /// What the app reports when a call to KEXP's API fails, and how often.
+/// The package's coalescer asks for a key; Spinner's events name theirs, so the tests ask with the event.
+private extension EventCoalescer {
+    func allows(_ event: FieldEvent) -> Bool { allows(key: event.coalescingKey) }
+}
+
 @Suite("API failures")
 struct APIFailureTests {
     // MARK: Classifying an error
@@ -100,7 +105,7 @@ struct APIFailureTests {
     @Test("The same failure is allowed once, then not again until the window has passed")
     func coalescing() {
         let clock = TestClock(start: Date(timeIntervalSince1970: 1_000))
-        let coalescer = FieldEventCoalescer(window: 600, now: { clock.now })
+        let coalescer = EventCoalescer(window: 600, now: { clock.now })
         let event = FieldEvent.apiFailed(.live, APIFailure(outcome: .badStatus, status: 522))
         #expect(coalescer.allows(event))
         #expect(!coalescer.allows(event))
@@ -112,7 +117,7 @@ struct APIFailureTests {
 
     @Test("A different endpoint, outcome or status is a different failure")
     func distinctFailures() {
-        let coalescer = FieldEventCoalescer(window: 600, now: { Date(timeIntervalSince1970: 1_000) })
+        let coalescer = EventCoalescer(window: 600, now: { Date(timeIntervalSince1970: 1_000) })
         #expect(coalescer.allows(.apiFailed(.live, APIFailure(outcome: .badStatus, status: 522))))
         #expect(coalescer.allows(.apiFailed(.archive, APIFailure(outcome: .badStatus, status: 522))))
         #expect(coalescer.allows(.apiFailed(.live, APIFailure(outcome: .badStatus, status: 503))))
@@ -121,7 +126,7 @@ struct APIFailureTests {
 
     @Test("Events that are not repeated failures are never held back")
     func otherEventsPass() {
-        let coalescer = FieldEventCoalescer(window: 600, now: { Date(timeIntervalSince1970: 1_000) })
+        let coalescer = EventCoalescer(window: 600, now: { Date(timeIntervalSince1970: 1_000) })
         for _ in 0..<3 {
             #expect(coalescer.allows(.launch(previousRun: .quit)))
             #expect(coalescer.allows(.rewindUnavailable(.serverFailed)))
@@ -137,7 +142,7 @@ struct APIFailureTests {
             endpoint: endpoint, appKey: "test-key-0123456789abcdef",
             identity: AppIdentity(app: "spinner", platform: .ios, appVersion: "3.5.1", build: "14", osVersion: "27.2", deviceClass: "iPhone"),
             channel: .appStore, queue: DiskQueue(directory: folder), transport: transport, enabled: { true })
-        let diagnostics = FieldDiagnostics(uploader: uploader, coalescer: FieldEventCoalescer(window: 600, now: { Date() }))
+        let diagnostics = FieldDiagnostics(uploader: uploader, coalescer: EventCoalescer(window: 600, now: { Date() }))
         for _ in 0..<69 {
             await diagnostics.send(.apiFailed(.live, APIFailure(outcome: .badResponse, status: nil)))
         }
