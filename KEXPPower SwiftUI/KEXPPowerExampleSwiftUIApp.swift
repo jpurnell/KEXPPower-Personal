@@ -7,6 +7,7 @@
 //
 
 import SwiftDiagnosticsClient
+import SwiftDiagnosticsConsentUI
 import SwiftUI
 
 /// The ids of the app's windows, used to open one and close the other.
@@ -56,7 +57,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
             RootView(model: model, archive: archive)
                 .environment(saving)
                 .tracksRunState()
-                .asksAboutDiagnostics()
+                .asksAboutDiagnostics(model: FieldConsent.model, appName: "Spinner")
         }
         .defaultSize(width: 780, height: 900)
         .commands {
@@ -81,7 +82,7 @@ struct KEXPPowerExampleSwiftUIApp: App {
             RootView(model: model, archive: archive)
                 .environment(saving)
                 .tracksRunState()
-                .asksAboutDiagnostics()
+                .asksAboutDiagnostics(model: FieldConsent.model, appName: "Spinner")
         }
         #if !os(tvOS)
         // tvOS has no menu bar.

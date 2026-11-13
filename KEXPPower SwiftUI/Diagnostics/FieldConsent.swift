@@ -55,20 +55,3 @@ enum FieldConsent {
         #endif
     }
 }
-
-/// Shows the question until the person has answered it. It cannot be swiped away: there are two equal buttons, and either is an answer.
-private struct DiagnosticsDisclosure: ViewModifier {
-    func body(content: Content) -> some View {
-        content.sheet(isPresented: Binding(get: { FieldConsent.model.needsToAsk }, set: { _ in })) {
-            DiagnosticsDisclosureView(model: FieldConsent.model, appName: "Spinner")
-                .interactiveDismissDisabled()
-        }
-    }
-}
-
-extension View {
-    /// Asks the person about anonymous diagnostics the first time, and not again once they have answered.
-    func asksAboutDiagnostics() -> some View {
-        modifier(DiagnosticsDisclosure())
-    }
-}

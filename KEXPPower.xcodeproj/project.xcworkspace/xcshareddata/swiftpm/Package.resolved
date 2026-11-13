@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jpurnell/SwiftDiagnosticsClient.git",
       "state" : {
-        "revision" : "1ec700f5500f10e98ec0899b9f7ca876a3a3ec70",
-        "version" : "0.3.0"
+        "revision" : "8959a23a757608f60fb3ffc493fd88ed7b58ad52",
+        "version" : "0.3.1"
       }
     },
     {
