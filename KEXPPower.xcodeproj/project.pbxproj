@@ -2261,7 +2261,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = macOS/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Radio";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Spinner adds the songs you pick from the KEXP playlist to your Apple Music library.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -2271,7 +2271,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
 				PRODUCT_MODULE_NAME = KEXPPowerExampleSwiftUI;
 				PRODUCT_NAME = Spinner;
@@ -2299,7 +2299,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.topshelf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -2325,13 +2325,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Spinner TV/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Radio";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Spinner adds the songs you pick from the KEXP playlist to your Apple Music library.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -2376,11 +2376,11 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Spinner Watch/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Radio";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.JPEnterprises.Spinner;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -2405,13 +2405,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Spinner TV/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Radio";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Spinner adds the songs you pick from the KEXP playlist to your Apple Music library.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -2464,7 +2464,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -2485,6 +2485,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=xr*]" = visionOSAppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "KEXPPowerExampleSwiftUI (iOS).entitlements";
@@ -2494,7 +2495,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "KEXPPowerExampleSwiftUI--iOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Radio";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Spinner adds the songs you pick from the KEXP playlist to your Apple Music library.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -2505,7 +2506,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
 				PRODUCT_NAME = KEXPPowerExampleSwiftUI;
 				SDKROOT = iphoneos;
@@ -2525,6 +2526,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=xr*]" = visionOSAppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CODE_SIGN_ENTITLEMENTS = "KEXPPowerExampleSwiftUI (iOS).entitlements";
@@ -2534,7 +2536,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "KEXPPowerExampleSwiftUI--iOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Radio";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Spinner adds the songs you pick from the KEXP playlist to your Apple Music library.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -2545,7 +2547,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
 				PRODUCT_NAME = KEXPPowerExampleSwiftUI;
 				SDKROOT = iphoneos;
@@ -2762,7 +2764,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.topshelf;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -2797,7 +2799,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -2827,11 +2829,11 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Spinner Watch/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Radio";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.JPEnterprises.Spinner;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -2880,7 +2882,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = macOS/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Spinner;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spinner Radio";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Spinner adds the songs you pick from the KEXP playlist to your Apple Music library.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -2890,7 +2892,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner;
 				PRODUCT_MODULE_NAME = KEXPPowerExampleSwiftUI;
 				PRODUCT_NAME = Spinner;
@@ -2920,7 +2922,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.watchkitapp.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -2953,7 +2955,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 3.5.1;
+				MARKETING_VERSION = 3.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.JPEnterprises.Spinner.watchkitapp.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
