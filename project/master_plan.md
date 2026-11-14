@@ -139,7 +139,7 @@ api.kexp.org shows, plays, hosts, get_streaming_url ──> StationKitAdapterKEX
 - [x] Review section (iPhone, iPad, Vision Pro): text-guess Apple Music matches are held for the listener to check, instead of interrupting (`ReviewQueue.md`)
 - [x] Registered with the org judgement corpus, as are StationKit and the adapter (2026-11-07)
 
-- [x] **Health reports to the diagnostics hub**, 2026-11-10 (`project/plans/proposals/FieldDiagnostics.md`): typed `launch` and `rewindUnavailable` events from iPhone, iPad, Mac and Apple TV through the SwiftDiagnosticsClient uploader, a Settings switch (on by default), the schema as a file (`project/diagnostics/spinner-schema.json`) checked by a test; hub deployed and Spinner registered. Not yet seen arriving from a device.
+- [x] **Health reports to the diagnostics hub**, 2026-11-10 (`project/plans/proposals/FieldDiagnostics.md`): typed `launch` and `rewindUnavailable` events from iPhone, iPad, Mac and Apple TV through the SwiftDiagnosticsClient uploader, a Settings switch (**on by default then; since 2026-11-12 off until the person agrees**, see the opt-in item under What's Next), the schema as a file (`project/diagnostics/spinner-schema.json`) checked by a test; hub deployed and Spinner registered. Not yet seen arriving from a device.
 
 ### Known Problems
 - ~~`try!` crash on artwork fetch; artwork never reaches the system (Proposal 1, G1–G3)~~ fixed (`ArtworkLoader` in StationKit)

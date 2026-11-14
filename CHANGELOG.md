@@ -21,7 +21,7 @@
 
 ### Not checked on a device
 - That an event from a phone reaches the hub, and that a TestFlight build resolves to the TestFlight channel (the receipt-name convention has not been seen in this project). Checked by hand after the next build is installed.
-- The first launch sends its event before anyone has seen the switch, because it is on by default, as the design in `DiagnosticsAndFeedback.md` decided. An App Store release needs the owner to settle that.
+- ~~The first launch sends its event before anyone has seen the switch, because it is on by default, as the design in `DiagnosticsAndFeedback.md` decided. An App Store release needs the owner to settle that.~~ Settled 2026-11-12: diagnostics are off in every build until the person agrees, so nothing is sent or contacted on the first launch (see the opt-in change above). What is still not checked on a device: an event arriving at the hub from a real opted-in install.
 
 ### Added (earlier in this release)
 - **A header line for each launch in the diagnostic log**, on every platform (before, only the iPhone logged a launch): the version and build, the system and the hardware model, and how the previous run ended, such as `launched 3.5.1 (1) on iOS 27.3, iPhone16,1; previous run: ended while the app was in use`. The app records what it saw itself do (in use, in the background, quit) in one small file and claims no more: "ended while the app was in use" means a crash or a force-quit from the foreground, and the log cannot tell those apart; "ended in the background" is what the system does to an app it needs the memory from, and is normal. Tested (`RunMarkerTests`, `LaunchHeaderTests`).
