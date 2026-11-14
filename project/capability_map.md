@@ -2,49 +2,16 @@
 
 **Purpose:** Scannable inventory of what this project can do — feature areas, key types, external interfaces, and application domains.
 
-**Last reviewed:** [Date of last full review]
+**Last reviewed:** 2026-11-14. **Partial:** only the Diagnostics area below has been mapped. Playback, the archive, Live Rewind, CarPlay, widgets, the watch app, Siri and Shortcuts and the Mac and TV targets are not yet described here; see `project/master_plan.md` ("What's Working") for those until they are.
 
 > **Format reference:** See `development-guidelines/rules/capability_map.md` for field definitions,
 > naming conventions, and maintenance rules.
 
 ---
 
-<!-- 
-  Instructions:
-  - One H2 section per feature area
-  - Feature areas are domain-oriented ("Forecasting") not code-oriented ("HoltWinters Module")
-  - Keep each section to 3–5 lines
-  - Remove this comment block after filling in your first capability areas
--->
+## Diagnostics (opt-in health reports)
 
-## [Feature Area 1]
-
-**Key types:** `TypeA`, `TypeB`
-**Interfaces:** [MCP tools, API endpoints, CLI commands, or "internal only"]
-**Applications:** [Plain-language use cases this area enables]
-
-## [Feature Area 2]
-
-**Key types:** `TypeC`, `TypeD`, `TypeE`
-**Interfaces:** [interface names]
-**Applications:** [Use cases]
-**Dependencies:** [External packages or services, if any]
-
-<!-- 
-  Add more feature areas as needed. Common categories for libraries:
-
-  - Core domain logic
-  - Data transformation / ETL
-  - Analysis / computation engines
-  - Visualization / reporting
-  - Integration / adapters
-  - Configuration / administration
-  
-  Common categories for applications:
-  
-  - User-facing features
-  - Background processing
-  - Data storage / persistence
-  - External service integrations
-  - Administration / ops tooling
--->
+**Key types:** `FieldConsent`, `FieldDiagnostics`, `DiagnosticsSettingsSection`, `MetricKitSubscriber` (consent and views from `SwiftDiagnosticsConsentUI`, mapping from `SwiftDiagnosticsMetricKit`, both in the SwiftDiagnosticsClient package)
+**Interfaces:** the first-launch question (an ordinary iOS sheet, asked once), Settings > Diagnostics, and an upload to the owner's diagnostics hub (`POST /v1/ingest`, `X-Diagnostics-Key`). Nothing is sent, and no connection to the hub is made, until the person agrees; turning it off stops sending at once and deletes any report still waiting on the device.
+**Applications:** the owner learns that the app is crashing, hanging or failing its network requests, and how stable each build is, without any identifying information leaving the device. A report carries the app version, the system version, the kind of device and a random number that is new each launch. Kinds: launch and rewind health, coalesced API failures, and (iPhone, iPad, Mac, Vision Pro, not Apple TV) the operating system's crash, hang, CPU and disk-write reports and a few coarse daily numbers through MetricKit.
+**Dependencies:** SwiftDiagnosticsClient 0.3.1 (consent, wire contract, queue, MetricKit mapping); the hub's apps file must register schema version 4 (`project/diagnostics/spinner-schema.json`); an ingest key in `Config/Secrets.xcconfig` (never committed; `Secrets.xcconfig.example` carries a decoy key that alerts the owner if anyone uses it).
