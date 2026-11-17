@@ -147,6 +147,30 @@ struct LiveStartRunnerTests {
         #expect(reports.isEmpty)
     }
 
+    @Test("A start journals when its item became ready, when the player reported playing and when audio moved, so the direct start can be broken down")
+    func phasesAreJournaled() async {
+        let host = ScriptedHost()
+        func step(item: Int, control: Int, moving: Bool = false) -> LiveStartSnapshot {
+            LiveStartSnapshot(
+                audioMoving: moving, evidence: .unavailable, controlStatus: control, itemStatus: item, waitingReason: "none")
+        }
+        host.script = [step(item: 0, control: 1), step(item: 1, control: 1), step(item: 1, control: 1), step(item: 1, control: 2), step(item: 1, control: 2, moving: true)]
+        _ = await run(host: host)
+        #expect(host.lines.contains("live start: phases item ready at 1.0 s, playing at 2.0 s, audio at 2.5 s"))
+    }
+
+    @Test("A phase that was never seen is said to be missing, not guessed")
+    func missingPhase() async {
+        let host = ScriptedHost()
+        host.script = [.silent, .moving]
+        _ = await run(host: host)
+        #expect(host.lines.contains("live start: phases item ready at 1.0 s, playing at 1.0 s, audio at 1.0 s"))
+        let never = ScriptedHost()
+        never.script = [LiveStartSnapshot(audioMoving: true, evidence: .unavailable, controlStatus: 1, itemStatus: 0, waitingReason: "none")]
+        _ = await run(host: never)
+        #expect(never.lines.contains("live start: phases item ready at n/a, playing at n/a, audio at 0.5 s"))
+    }
+
     @Test("The environment the start runs in (app state, route, what the item's own logs say) is written once at the first look and with every two-second line")
     func environmentIsJournaled() async {
         let host = ScriptedHost()

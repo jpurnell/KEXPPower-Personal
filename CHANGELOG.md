@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Changed
+- **Live is played through the recording only where the phone is the source of the sound (ExternalSurfaces).** `PlaybackSource` sorts the route into phone (speaker, headphones, Bluetooth, CarPlay), receiver (AirPlay or external playback) or unknown, and `LivePlan` chooses the recording or the stream from it: **a receiver, or a route the app does not know, plays the stream**, which works from anywhere. The recording's controls (`PlaybackCapabilities`) are decided with the plan, before the item is swapped, so they no longer change mid-start. If the sound moves from the phone to a receiver while the recording plays, the stream takes over at the live edge, once; a move back to the phone is not switched back on its own. Every live start journals its phases (item ready, player playing, audio moving) so the direct start can be measured and tuned. Replaces the AirPlay-only route check. 15 new tests.
+
 ### Fixed
 - **A receiver now gets the track's title and artwork.** The title and artwork for an AirPlay receiver (the home display) come from the *item* being played, and the app attached them only to whichever item existed when a track arrived; every live start makes a new item, so the display showed no art, title or artist (the phone's lock screen, which reads the system's Now Playing info, was fine). Live items now carry the current track's metadata when they are made. The journal records what became of each track's artwork (none offered, host not allowed, not loaded, or loaded with its size).
 - **The journal records each audio-session action and route change with its reason.** Switching an AirPlay receiver to "iPhone Speaker" pauses both devices (an output device removed, which the app follows as it does unplugged headphones). That is the system's model, as Apple News shows, so it is accepted and recorded, not worked around.

@@ -363,6 +363,88 @@ struct PlayerControllerTests {
         #expect(shift.starts == 0)
     }
 
+    @Test("When the sound moves from the phone to a receiver while the recording plays, the stream takes over at the live edge, once")
+    func routeMovesToAReceiver() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .speaker }
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        controller.playPlayer()
+        #expect(await eventually { itemURL(controller) == local })
+        controller.outputRoute = { .airPlay }
+        controller.routeDidChange()
+        #expect(await eventually { itemURL(controller) == direct })
+        #expect(!controller.capabilities.canRewind)
+        let after = controller.player?.currentItem
+        controller.routeDidChange()
+        try? await Task.sleep(for: .milliseconds(100))
+        #expect(controller.player?.currentItem === after)
+    }
+
+    @Test("When the sound moves back to the phone, nothing is switched on its own: the next play plans again")
+    func routeMovesBackToThePhone() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .airPlay }
+        controller.liveShift = FakeShift(address: local)
+        controller.playPlayer()
+        #expect(await eventually { itemURL(controller) == direct })
+        let before = controller.player?.currentItem
+        controller.outputRoute = { .speaker }
+        controller.routeDidChange()
+        try? await Task.sleep(for: .milliseconds(100))
+        #expect(controller.player?.currentItem === before)
+    }
+
+    @Test("A route change while an archived show plays leaves it alone")
+    func routeChangeDuringArchive() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .airPlay }
+        controller.liveShift = FakeShift(address: local)
+        let before = controller.player?.currentItem
+        controller.routeDidChange()
+        try? await Task.sleep(for: .milliseconds(100))
+        #expect(controller.player?.currentItem === before)
+    }
+
+    @Test("A route this app does not know plays the stream: it could be a receiver, and the stream works from anywhere")
+    func unknownRoutePlaysDirectly() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .other }
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        #expect(itemURL(controller) == direct)
+        #expect(shift.starts == 0)
+        #expect(!controller.capabilities.canRewind)
+    }
+
+    @Test("An item handed to external playback makes the destination a receiver, whatever the route says")
+    func externalPlaybackIsAReceiver() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .speaker }
+        controller.externalPlaybackActive = { true }
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        #expect(itemURL(controller) == direct)
+        #expect(shift.starts == 0)
+    }
+
+    @Test("The recording's controls are decided with the plan, before the item is swapped")
+    func capabilitiesFollowThePlan() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .speaker }
+        controller.liveShift = FakeShift(address: local)
+        await controller.playLive()
+        #expect(controller.capabilities.canRewind)
+    }
+
     @Test("On a route the phone plays to itself (speaker, CarPlay, Bluetooth) live still plays through the recording")
     func otherRoutesUseTheRecording() async {
         for route in [OutputRoute.speaker, .carPlay, .bluetooth, .headphones] {

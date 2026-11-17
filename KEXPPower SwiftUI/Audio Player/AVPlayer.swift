@@ -63,6 +63,15 @@ import UniformTypeIdentifiers
         /// How the phone is connected and where the sound is going, asked when live is requested; tests replace them.
         @ObservationIgnored var networkKind: @Sendable () -> NetworkKind = { NetworkPathObserver.shared.kind }
         @ObservationIgnored var outputRoute: @MainActor () -> OutputRoute = { OutputRoute.current() }
+        /// Whether the player has handed the item to an external destination; set when the player is made, and a seam for tests.
+        @ObservationIgnored var externalPlaybackActive: @MainActor () -> Bool = { false }
+        /// What the listener may do under the plan chosen for live; decided before the item is swapped, so the controls do not change mid-start.
+        private(set) var capabilities = PlaybackCapabilities(canRewind: false)
+
+        /// Where the sound is going now.
+        func playbackSource() -> PlaybackSource {
+            PlaybackSource(route: outputRoute(), externalPlayback: externalPlaybackActive())
+        }
         /// Told how each live start ended; the app passes it on to the diagnostics hub.
         @ObservationIgnored var onLiveStart: @MainActor (LiveStart) -> Void = { FieldDiagnostics.shared.report(.liveStart($0)) }
         /// Whether a live start gave up and the listener has not paused since, so audio is still wanted when the network returns.
@@ -179,6 +188,9 @@ import UniformTypeIdentifiers
             #endif
             sessionCoordinator.observe { [weak self] action in self?.handle(sessionAction: action) }
 
+            #if !os(macOS)
+            externalPlaybackActive = { [weak self] in self?.player?.isExternalPlaybackActive ?? false }
+            #endif
             watchNetwork()
 
             publisher.installCommands(
@@ -257,13 +269,25 @@ import UniformTypeIdentifiers
         private func watchRouteChanges() {
             routeObservation = NotificationCenter.default.publisher(for: AVAudioSession.routeChangeNotification)
                 .receive(on: DispatchQueue.main)
-                .sink { note in
+                .sink { [weak self] note in
                     let reason = (note.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt).map(String.init) ?? "none"
                     let outputs = AVAudioSession.sharedInstance().currentRoute.outputs.map { $0.portType.rawValue }.joined(separator: ",")
                     DiagnosticLog.app.record("Player", "route changed, reason \(reason), outputs \(outputs)")
+                    MainActor.assumeIsolated { self?.routeDidChange() }
                 }
         }
         #endif
+
+        /// The sound's route changed: if the recording is playing and the sound has moved to something that fetches the stream itself (or that is not known),
+        /// the stream takes over at the live edge, once. The other way is not followed: the system pauses a move back to the phone, and the next play plans
+        /// again, so the item never flips back and forth on its own.
+        func routeDidChange() {
+            guard liveSource == .shifted, !isPlayingArchive, wantsPlayback else { return }
+            guard case .direct(let reason) = LivePlan.choose(source: playbackSource(), recordingAvailable: true) else { return }
+            capabilities = PlaybackCapabilities(plan: .direct(reason))
+            DiagnosticLog.app.record("Player", "live plan: direct (\(reason.rawValue)), the route changed while the recording played")
+            itemTask.task = Task { [weak self] in _ = await self?.playLiveDirectly(because: reason) }
+        }
 
         // MARK: - What a start runs in
 
@@ -430,8 +454,9 @@ import UniformTypeIdentifiers
         }
 
         /// Drops the recording and plays the live stream itself.
-        private func playLiveDirectly() async -> AVPlayerItem? {
+        private func playLiveDirectly(because reason: DirectReason = .evidenceFallBack) async -> AVPlayerItem? {
             guard let player, !isPlayingArchive, let liveLink else { return nil }
+            capabilities = PlaybackCapabilities(plan: .direct(reason))
             shiftTask.task?.cancel()
             stopWatchingLag()
             if liveSource == .shifted { setTransportControls(nil) }
@@ -601,9 +626,12 @@ import UniformTypeIdentifiers
                 if liveSource != .resolving { player.play() }
                 return
             }
-            // An AirPlay receiver fetches the item itself, and the recording's address is the phone's own loopback: it cannot be reached from there, and the
-            // start would sit silent until the fall-back. The stream's public address works from anywhere, so on that route live is played directly.
-            guard let liveShift, outputRoute() != .airPlay else {
+            // The recording is at the phone's own loopback address, so it plays only where the phone renders the sound; a receiver fetches the item itself and
+            // cannot reach it, and a route not known here might be one. The stream's public address works from anywhere. The controls are decided with the plan.
+            let plan = LivePlan.choose(source: playbackSource(), recordingAvailable: liveShift != nil)
+            capabilities = PlaybackCapabilities(plan: plan)
+            guard case .recording = plan, let liveShift else {
+                if case .direct(let reason) = plan { DiagnosticLog.app.record("Player", "live plan: direct (\(reason.rawValue))") }
                 liveSource = .direct
                 player.play()
                 if let item = player.currentItem { measureLiveStart(of: item) }

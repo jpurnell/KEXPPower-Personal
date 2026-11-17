@@ -109,15 +109,21 @@ final class LiveStartRunner {
         let requested = host.now()
         host.record("live start: requested\(recovering ? " (network is back)" : "")")
         var watch = LiveStartWatch()
+        // When the item first reads ready and the player first reads playing, to the half second the looks allow: the start broken into its parts.
+        var itemReadyAt: String?
+        var playingAt: String?
         for look in 1...Self.maximumLooks {
             await host.sleep(milliseconds: Self.lookInterval)
             guard !Task.isCancelled, let snapshot = host.snapshot() else { return }
             let elapsed = host.now().timeIntervalSince(requested)
             let seconds = elapsed.formatted(.number.precision(.fractionLength(1)))
+            if itemReadyAt == nil, snapshot.itemStatus == 1 { itemReadyAt = "\(seconds) s" }
+            if playingAt == nil, snapshot.controlStatus == 2 { playingAt = "\(seconds) s" }
             if look == 1, !snapshot.environment.isEmpty { host.record("live start: environment \(snapshot.environment)") }
             switch watch.observe(elapsed: elapsed, audioMoving: snapshot.audioMoving, evidence: snapshot.evidence) {
             case .started:
                 host.record("live start: audio moving after \(seconds) s")
+                host.record("live start: phases item ready at \(itemReadyAt ?? "n/a"), playing at \(playingAt ?? "n/a"), audio at \(seconds) s")
                 let outcome = recovering && watch.outcome == .started ? LiveStartOutcome.recoveredOnNetwork : watch.outcome
                 onStarted()
                 report(LiveStart(outcome: outcome, took: StartDuration(seconds: elapsed), network: network, route: route))
