@@ -729,6 +729,96 @@
         "testFlight",
         "appStore"
       ]
+    },
+    {
+      "name": "streamOutage",
+      "fields": [
+        {
+          "name": "took",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "under2",
+              "from2to5",
+              "from5to15",
+              "from15to40",
+              "from40to120",
+              "from120to300",
+              "over300"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "ahead",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "none",
+              "under30",
+              "from30to120",
+              "from120to300",
+              "over300"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "network",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "none",
+              "wifi",
+              "cellular",
+              "wired",
+              "other"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "route",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "carPlay",
+              "airPlay",
+              "bluetooth",
+              "headphones",
+              "speaker",
+              "other"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "outcome",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "covered",
+              "stalled",
+              "unfinished"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "attempts",
+          "type": {
+            "type": "int",
+            "min": 0,
+            "max": 50
+          },
+          "isRequired": true
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
     }
   ]
 }

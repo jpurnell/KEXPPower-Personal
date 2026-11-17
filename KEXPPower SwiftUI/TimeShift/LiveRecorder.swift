@@ -68,6 +68,7 @@ actor LiveRecorder {
     private let backoff = ReconnectBackoff()
     private let sleep: @Sendable (TimeInterval) async -> Void
     private let report: @Sendable (String) -> Void
+    private let onEvent: @Sendable (RecorderEvent) -> Void
     private var task: Task<Void, Never>?
 
     /// - Parameters:
@@ -75,14 +76,17 @@ actor LiveRecorder {
     ///   - relay: Where it goes.
     ///   - sleep: Waits for a number of seconds; a test passes one that returns at once.
     ///   - report: Told what the recorder is doing, in words, for a log.
+    ///   - onEvent: Told when a connection that had been delivering audio is lost, tried again, and back.
     init(
         source: any LiveByteSource, relay: LiveRelay,
         sleep: @escaping @Sendable (TimeInterval) async -> Void = { seconds in
             try? await Task.sleep(for: .seconds(seconds))
         },
-        report: @escaping @Sendable (String) -> Void = { _ in }
+        report: @escaping @Sendable (String) -> Void = { _ in },
+        onEvent: @escaping @Sendable (RecorderEvent) -> Void = { _ in }
     ) {
         self.report = report
+        self.onEvent = onEvent
         self.source = source
         self.relay = relay
         self.sleep = sleep
@@ -96,17 +100,27 @@ actor LiveRecorder {
         let backoff = backoff
         let sleep = sleep
         let report = report
+        let onEvent = onEvent
         task = Task {
             var failures = 0
             var attempt = 0
+            // Whether the stream has delivered audio and is not known to be down, and whether it ever has: a loss is only a loss after an arrival.
+            var up = false
+            var everUp = false
             while !Task.isCancelled {
                 var received = false
                 var bytes = 0
                 attempt += 1
                 report("connecting (attempt \(attempt))")
+                if everUp, !up { onEvent(.attempting) }
                 do {
                     for try await chunk in source.chunks() {
-                        if !received { report("first bytes of attempt \(attempt)") }
+                        if !received {
+                            report("first bytes of attempt \(attempt)")
+                            if everUp, !up { onEvent(.restored) }
+                            up = true
+                            everUp = true
+                        }
                         received = true
                         bytes += chunk.count
                         await relay.ingest(chunk)
@@ -120,6 +134,10 @@ actor LiveRecorder {
                     report("connection failed after \(bytes) bytes: \(error.localizedDescription)")
                 }
                 guard !Task.isCancelled else { break }
+                if up {
+                    up = false
+                    onEvent(.lost)
+                }
                 await relay.streamBroke()
                 // Audio since the last attempt means the stream was up, so the wait starts over.
                 failures = received ? 1 : failures + 1

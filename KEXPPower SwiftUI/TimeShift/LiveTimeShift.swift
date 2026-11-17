@@ -18,6 +18,8 @@ protocol LiveShifting: AnyObject {
     func reserve() async -> URL?
     /// What the local server has handed out so far: how many playlists and segments.
     var served: ServedCounts { get }
+    /// The stream's connection going down and coming back, once it has been delivering audio.
+    var connectionEvents: AsyncStream<RecorderEvent> { get }
     /// Stops recording and serving, and forgets what was kept.
     func stop() async
 }
@@ -33,6 +35,7 @@ final class LiveTimeShift: LiveShifting {
     private let timeout: TimeInterval
     private var address: URL?
     let window: TimeInterval
+    let connectionEvents: AsyncStream<RecorderEvent>
 
     /// - Parameters:
     ///   - source: Where the live stream comes from.
@@ -42,8 +45,11 @@ final class LiveTimeShift: LiveShifting {
     init(source: any LiveByteSource, window: TimeInterval, firstAudio: TimeInterval = 4, timeout: TimeInterval = 15) {
         let relay = LiveRelay(windowDuration: window)
         self.relay = relay
+        let (events, continuation) = AsyncStream<RecorderEvent>.makeStream(bufferingPolicy: .bufferingNewest(32))
+        connectionEvents = events
         recorder = LiveRecorder(
-            source: source, relay: relay, report: { DiagnosticLog.app.record("TimeShift", "recorder: \($0)") })
+            source: source, relay: relay, report: { DiagnosticLog.app.record("TimeShift", "recorder: \($0)") },
+            onEvent: { continuation.yield($0) })
         server = LocalHLSServer(relay: relay)
         self.window = window
         self.firstAudio = firstAudio

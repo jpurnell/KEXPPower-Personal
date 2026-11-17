@@ -14,7 +14,7 @@ struct StallRunnerTests {
         var lines: [String] = []
         var reports: [PlaybackStall] = []
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("stallrunner-\(UUID().uuidString)", isDirectory: true)
-        var marker: OutageMarker { OutageMarker(directory: directory) }
+        var marker: OutageMarker<OpenOutage> { OutageMarker<OpenOutage>(directory: directory) }
 
         init(_ samples: [StallSample?]) { self.samples = samples }
 

@@ -181,50 +181,60 @@ struct StallObserver: Sendable {
     }
 }
 
-/// Keeps the stall in progress in one small file, so that if the app is stopped before it ends it is reported at the next launch as `unfinished`.
+/// Keeps an outage in progress in one small file, so that if the app is stopped before it ends it is reported at the next launch as `unfinished`.
 /// Without this an outage that ends the app (a dead zone that outlasts the process) would never be counted, and every estimate of how long
-/// outages last would lean short.
-struct OutageMarker: Sendable {
+/// outages last would lean short. One marker per kind of outage: ``OpenOutage`` for a stall, ``OpenStreamOutage`` for the connection.
+struct OutageMarker<Payload: Codable & Sendable>: Sendable {
     private let file: URL
 
-    /// - Parameter directory: Where the file lives; made when it is first written.
-    init(directory: URL) {
-        file = directory.appendingPathComponent("outage-marker.json")
+    /// - Parameters:
+    ///   - directory: Where the file lives; made when it is first written.
+    ///   - fileName: The file's name, one for each kind of outage.
+    init(directory: URL, fileName: String = "outage-marker.json") {
+        file = directory.appendingPathComponent(fileName)
     }
 
-    /// The app's marker, beside its other diagnostics.
-    static let app = OutageMarker(
-        directory: URL.applicationSupportDirectory.appendingPathComponent("Diagnostics", isDirectory: true))
-
-    /// Writes the stall in progress, replacing an earlier marker.
-    func write(_ open: OpenOutage) {
+    /// Writes the outage in progress, replacing an earlier marker.
+    func write(_ open: Payload) {
         do {
             try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
             try JSONEncoder().encode(open).write(to: file, options: .atomic)
         } catch {
-            DiagnosticLog.app.record("Field", "could not write the outage marker: \(error.localizedDescription)")
+            DiagnosticLog.app.record("Field", "could not write an outage marker: \(error.localizedDescription)")
         }
     }
 
-    /// Removes the marker: the stall ended, or was reported.
+    /// Removes the marker: the outage ended, or was reported.
     func clear() {
         guard FileManager.default.fileExists(atPath: file.path) else { return }
         do {
             try FileManager.default.removeItem(at: file)
         } catch {
-            DiagnosticLog.app.record("Field", "could not remove the outage marker: \(error.localizedDescription)")
+            DiagnosticLog.app.record("Field", "could not remove an outage marker: \(error.localizedDescription)")
         }
     }
 
     /// The marker left by an earlier run, once: it is removed as it is read. A file that is not a marker is removed and ignored.
-    func takeUnfinished() -> OpenOutage? {
+    func takeUnfinished() -> Payload? {
         guard let data = FileManager.default.contents(atPath: file.path) else { return nil }
         defer { clear() }
         do {
-            return try JSONDecoder().decode(OpenOutage.self, from: data)
+            return try JSONDecoder().decode(Payload.self, from: data)
         } catch {
-            DiagnosticLog.app.record("Field", "the outage marker was not readable and was removed")
+            DiagnosticLog.app.record("Field", "an outage marker was not readable and was removed")
             return nil
         }
     }
+}
+
+private let diagnosticsDirectory = URL.applicationSupportDirectory.appendingPathComponent("Diagnostics", isDirectory: true)
+
+extension OutageMarker where Payload == OpenOutage {
+    /// The app's marker for a stall, beside its other diagnostics.
+    static var app: OutageMarker<OpenOutage> { OutageMarker(directory: diagnosticsDirectory) }
+}
+
+extension OutageMarker where Payload == OpenStreamOutage {
+    /// The app's marker for a connection outage.
+    static var app: OutageMarker<OpenStreamOutage> { OutageMarker(directory: diagnosticsDirectory, fileName: "stream-outage-marker.json") }
 }

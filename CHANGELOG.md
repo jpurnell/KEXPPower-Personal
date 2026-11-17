@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### The stream's connection outages are observed, heard or not (Part 3 of `LiveRecovery.md`)
+- **A `streamOutage` event per outage of the stream's connection.** The recorder now says when a connection that had been delivering audio is lost, tried again, and back. The app turns that into one event per outage: how long from the loss until audio came back (steps with edges at 120 and 300 seconds), **how much audio the player had recorded ahead at the moment of the loss**, the network and output at the loss, how many times the recorder tried again, and whether a stall followed (`covered`, `stalled`) or the app was stopped first (`unfinished`, reported at the next launch from a small marker file). It exists because a stall is only the audible part of an outage: the first real dead-zone test lost the connection for 33 seconds, the player had 17 seconds recorded, and 18 seconds were heard as silence. Outages the buffer absorbs never became stalls, so stalls alone cannot say how many a cushion would have covered. Observes only. A connection that never delivered anything (a start with no coverage) is not an outage here: it has its own report.
+- Schema version 6 also carries `streamOutage`; the hub tries it provisionally.
+- Tests: 610 on iOS (12 more).
+
 ### Playback stalls are observed (Part 3 of `LiveRecovery.md`)
 - **A stall is written down and reported.** When audio has played and the player then waits, longer than a second, with the listener wanting it, the app records it: why (`networkLost`, `bufferEmpty`, `itemFailed`), how long (steps with edges at 120 and 300 seconds, the lengths of a cushion), how much audio was buffered ahead when it began (a fact about playback, not the cushion setting), the network, the output, and how it ended (`resumed`, `listenerPaused`, `unfinished`). One typed `playbackStall` event per stall, codes and one bounded number. It observes only; nothing about what the player does has changed.
 - **The journal records every player status change** (status, waiting reason, item status, network), which it did not before: the system log did, and a shared report could not say what the player did through a dropped connection.

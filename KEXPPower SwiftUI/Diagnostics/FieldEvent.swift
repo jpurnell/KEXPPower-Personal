@@ -33,13 +33,16 @@ enum FieldEvent: Sendable, Equatable {
     /// Playback stopped moving while the listener wanted it, and what became of that: why, how long, what was buffered, over what network and to
     /// what output.
     case playbackStall(PlaybackStall)
+    /// The stream's connection was lost and came back, whether or not it was heard: how long, how much audio the player had at the loss, over what
+    /// network and to what output, and whether a stall followed.
+    case streamOutage(StreamOutage)
 
     /// What makes two failures the same one, for ``FieldEventCoalescer``; `nil` for events that are never held back.
     var coalescingKey: String? {
         switch self {
         case .apiFailed(let endpoint, let failure):
             "apiFailed.\(endpoint.rawValue).\(failure.outcome.rawValue).\(failure.status.map(String.init) ?? "-")"
-        case .launch, .rewindUnavailable, .liveStart, .playbackStall:
+        case .launch, .rewindUnavailable, .liveStart, .playbackStall, .streamOutage:
             nil
         }
     }
@@ -70,6 +73,13 @@ enum FieldEvent: Sendable, Equatable {
                     "reason": .code(stall.reason.rawValue), "took": .code(stall.took.rawValue), "ahead": .code(stall.ahead.rawValue),
                     "network": .code(stall.network.rawValue), "route": .code(stall.route.rawValue), "outcome": .code(stall.outcome.rawValue),
                     "cycles": .int(stall.cycles),
+                ])
+        case .streamOutage(let outage):
+            return EventRecord(
+                kind: "streamOutage", severity: outage.outcome == .covered ? .info : .warning, at: Date(),
+                fields: [
+                    "took": .code(outage.took.rawValue), "ahead": .code(outage.ahead.rawValue), "network": .code(outage.network.rawValue),
+                    "route": .code(outage.route.rawValue), "outcome": .code(outage.outcome.rawValue), "attempts": .int(outage.attempts),
                 ])
         case .liveStart(let start):
             let severity: Severity = switch start.outcome {

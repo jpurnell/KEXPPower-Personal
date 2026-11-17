@@ -40,7 +40,9 @@ import UniformTypeIdentifiers
         /// Whether the player holds an archived show's file instead of the live stream.
         private(set) var isPlayingArchive = false
         /// Records the live stream so it can be paused and rewound; `nil` when the rewind window is off.
-        @ObservationIgnored var liveShift: (any LiveShifting)?
+        @ObservationIgnored var liveShift: (any LiveShifting)? {
+            didSet { watchConnection() }
+        }
         /// Where the listener's settings are read from; tests give it a store of their own.
         @ObservationIgnored var defaults: UserDefaults = .standard
         /// Whether the live stream has been resolved to the time-shift's address or to the direct stream since live
@@ -79,6 +81,11 @@ import UniformTypeIdentifiers
         /// Set while a live start is being watched, which has its own report.
         @ObservationIgnored private var liveStartRunning = false
         @ObservationIgnored private var lastStatusLine = ""
+        /// Called with each outage of the stream's connection that ended, heard or not; the app passes it on to the diagnostics hub.
+        @ObservationIgnored var onStreamOutage: @MainActor (StreamOutage) -> Void = { FieldDiagnostics.shared.report(.streamOutage($0)) }
+        @ObservationIgnored private var outageObserver = StreamOutageObserver()
+        @ObservationIgnored private let outageTask = TaskHolder()
+        @ObservationIgnored private var outageMarkerWrittenAt: TimeInterval = 0
         /// How far from the end of an archived file the next item is lined up, so it is loaded before it is needed.
         static let handoffLead: TimeInterval = 30
         /// How far the system's skip buttons move: a short rewind and a longer skip forward.
@@ -229,6 +236,52 @@ import UniformTypeIdentifiers
             if !Task.isCancelled { liveStartRunning = false }
         }
 
+        // MARK: - The stream's connection
+
+        /// Follows the recording's connection to the stream for as long as there is one. Replaced when the recording is.
+        private func watchConnection() {
+            outageTask.task?.cancel()
+            outageObserver = StreamOutageObserver()
+            guard let events = liveShift?.connectionEvents else { return }
+            outageTask.task = Task { [weak self] in await self?.followConnection(events) }
+        }
+
+        private func followConnection(_ events: AsyncStream<RecorderEvent>) async {
+            for await event in events {
+                guard !Task.isCancelled else { return }
+                handle(event)
+            }
+        }
+
+        /// An outage of the connection is watched whether or not it is heard: the part the player's buffer covers is seen here and nowhere else.
+        private func handle(_ event: RecorderEvent) {
+            guard !isPlayingArchive else { return }
+            let now = Date().timeIntervalSince1970
+            switch event {
+            case .lost:
+                outageObserver.lost(at: now, aheadSeconds: aheadSeconds(), network: networkKind(), route: outputRoute())
+                if let open = outageObserver.openOutage {
+                    DiagnosticLog.app.record("Player", "stream outage: began, ahead \(open.ahead.rawValue), network \(open.network.rawValue)")
+                    OutageMarker<OpenStreamOutage>.app.write(open)
+                    outageMarkerWrittenAt = now
+                }
+            case .attempting:
+                outageObserver.attempted()
+                outageObserver.heard(at: now)
+                // The marker is kept current every few seconds while the connection is down, so an outage that ends the app is counted for as long as it was seen.
+                if let open = outageObserver.openOutage, now - outageMarkerWrittenAt >= StallRunner.markerEvery {
+                    OutageMarker<OpenStreamOutage>.app.write(open)
+                    outageMarkerWrittenAt = now
+                }
+            case .restored:
+                guard let outage = outageObserver.restored(at: now) else { return }
+                DiagnosticLog.app.record(
+                    "Player", "stream outage: ended, \(outage.outcome.rawValue) after \(outage.took.rawValue), ahead \(outage.ahead.rawValue), attempts \(outage.attempts)")
+                OutageMarker<OpenStreamOutage>.app.clear()
+                onStreamOutage(outage)
+            }
+        }
+
         // MARK: - Stalls
 
         /// Seconds of audio buffered ahead of the playhead: the recording ahead of it when live plays through the recording, else what the item has loaded.
@@ -255,7 +308,7 @@ import UniformTypeIdentifiers
                 sample: { [weak self] in self?.stallSample() },
                 sleep: { milliseconds in try? await Task.sleep(for: .milliseconds(milliseconds)) },
                 now: { Date().timeIntervalSince1970 }, record: { DiagnosticLog.app.record("Player", $0) },
-                report: { [weak self] in self?.onStall($0) }, marker: .app)
+                report: { [weak self] in self?.onStall($0) }, marker: .app, onBegan: { [weak self] in self?.outageObserver.stallBegan() })
             stallTask.task = Task { [weak self] in await self?.runStallWatch(runner) }
         }
 

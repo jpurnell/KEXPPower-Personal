@@ -22,7 +22,8 @@ final class StallRunner {
     private let now: @MainActor () -> TimeInterval
     private let record: @MainActor (String) -> Void
     private let report: @MainActor (PlaybackStall) -> Void
-    private let marker: OutageMarker
+    private let marker: OutageMarker<OpenOutage>
+    private let onBegan: @MainActor () -> Void
     private let maxLooks: Int
 
     /// - Parameters:
@@ -32,11 +33,13 @@ final class StallRunner {
     ///   - record: Writes a line to the app's own journal.
     ///   - report: Called once with the stall when it ends.
     ///   - marker: Where the stall in progress is kept.
+    ///   - onBegan: Called once when a stall begins, so an outage of the connection that is open can say it was heard.
     ///   - maxLooks: The most seconds to watch.
     init(
         sample: @escaping @MainActor () -> StallSample?, sleep: @escaping @MainActor (Int) async -> Void,
         now: @escaping @MainActor () -> TimeInterval, record: @escaping @MainActor (String) -> Void,
-        report: @escaping @MainActor (PlaybackStall) -> Void, marker: OutageMarker, maxLooks: Int = StallRunner.defaultLooks
+        report: @escaping @MainActor (PlaybackStall) -> Void, marker: OutageMarker<OpenOutage>, onBegan: @escaping @MainActor () -> Void = {},
+        maxLooks: Int = StallRunner.defaultLooks
     ) {
         self.sample = sample
         self.sleep = sleep
@@ -44,6 +47,7 @@ final class StallRunner {
         self.record = record
         self.report = report
         self.marker = marker
+        self.onBegan = onBegan
         self.maxLooks = maxLooks
     }
 
@@ -68,6 +72,7 @@ final class StallRunner {
                 if !began {
                     began = true
                     record("stall: began, \(Self.words(open.reason)), ahead \(open.ahead.rawValue), network \(open.network.rawValue)")
+                    onBegan()
                 }
                 if open.lastSeenAt - open.startedAt >= Self.markerAfter, time - markerWrittenAt >= Self.markerEvery {
                     marker.write(open)

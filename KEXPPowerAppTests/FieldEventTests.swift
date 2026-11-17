@@ -141,6 +141,45 @@ struct FieldEventTests {
         #expect(validator.validate(envelope([tooMany])).rejected.count == 1)
     }
 
+    @Test("A stream outage carries how long, what was buffered at the loss, the network, the output, whether a stall followed and how many retries: codes and one bounded number")
+    func streamOutageRecord() {
+        let outage = StreamOutage(took: .from15to40, ahead: .under30, network: .wifi, route: .speaker, outcome: .stalled, attempts: 7)
+        let record = FieldEvent.streamOutage(outage).record
+        #expect(record.kind == "streamOutage")
+        #expect(record.fields == [
+            "took": .code("from15to40"), "ahead": .code("under30"), "network": .code("wifi"), "route": .code("speaker"),
+            "outcome": .code("stalled"), "attempts": .int(7),
+        ])
+        #expect(FieldEvent.streamOutage(outage).coalescingKey == nil)
+        #expect(record.severity == .warning)
+        #expect(FieldEvent.streamOutage(StreamOutage(took: .under2, ahead: .none, network: .wifi, route: .speaker, outcome: .covered, attempts: 0)).record.severity == .info)
+    }
+
+    @Test("Every value a stream outage can carry passes the schema file on every channel, and an attempt count past the cap does not")
+    func everyStreamOutagePasses() throws {
+        let validator = SchemaValidator(schema: try loadSchema())
+        var events: [EventRecord] = []
+        for took in OutageDuration.allCases {
+            for ahead in AheadBucket.allCases {
+                for network in NetworkKind.allCases {
+                    for route in OutputRoute.allCases {
+                        for outcome in StreamOutageOutcome.allCases {
+                            events.append(FieldEvent.streamOutage(StreamOutage(took: took, ahead: ahead, network: network, route: route, outcome: outcome, attempts: 3)).record)
+                        }
+                    }
+                }
+            }
+        }
+        for channel in Channel.allCases {
+            for chunk in stride(from: 0, to: events.count, by: 100) {
+                let result = validator.validate(envelope(Array(events[chunk..<min(chunk + 100, events.count)]), channel: channel))
+                #expect(result.rejected.isEmpty, "\(channel): \(result.rejected.prefix(1))")
+            }
+        }
+        let past = FieldEvent.streamOutage(StreamOutage(took: .under2, ahead: .none, network: .none, route: .other, outcome: .covered, attempts: 51)).record
+        #expect(validator.validate(envelope([past])).rejected.count == 1)
+    }
+
     @Test("No event holds free text, a number or a boolean: every field is a code")
     func onlyCodes() {
         var events: [FieldEvent] = RewindReason.allCases.map { .rewindUnavailable($0) }

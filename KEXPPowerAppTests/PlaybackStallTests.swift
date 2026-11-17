@@ -141,7 +141,7 @@ struct OutageMarkerTests {
 
     @Test("A marker written is read back once, and then it is gone")
     func roundTrip() throws {
-        let marker = OutageMarker(directory: folder())
+        let marker = OutageMarker<OpenOutage>(directory: folder())
         let open = OpenOutage(startedAt: 10, lastSeenAt: 70, reason: .networkLost, ahead: .under30, network: .none, route: .carPlay)
         marker.write(open)
         #expect(marker.takeUnfinished() == open)
@@ -151,7 +151,7 @@ struct OutageMarkerTests {
     @Test("Clearing removes it, and a marker that is not one is ignored and removed")
     func clearAndJunk() throws {
         let directory = folder()
-        let marker = OutageMarker(directory: directory)
+        let marker = OutageMarker<OpenOutage>(directory: directory)
         marker.write(OpenOutage(startedAt: 1, lastSeenAt: 2, reason: .unknown, ahead: .none, network: .wifi, route: .speaker))
         marker.clear()
         #expect(marker.takeUnfinished() == nil)
@@ -164,7 +164,7 @@ struct OutageMarkerTests {
     @Test("The marker holds codes and seconds and nothing else")
     func holdsNoNames() throws {
         let directory = folder()
-        let marker = OutageMarker(directory: directory)
+        let marker = OutageMarker<OpenOutage>(directory: directory)
         marker.write(OpenOutage(startedAt: 10, lastSeenAt: 70, reason: .networkLost, ahead: .under30, network: .none, route: .carPlay))
         let text = String(decoding: try Data(contentsOf: directory.appendingPathComponent("outage-marker.json")), as: UTF8.self)
         for key in ["startedAt", "lastSeenAt", "reason", "ahead", "network", "route"] { #expect(text.contains(key), "\(key)") }
