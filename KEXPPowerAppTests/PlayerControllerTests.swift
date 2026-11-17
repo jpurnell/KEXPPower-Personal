@@ -59,6 +59,7 @@ private final class FakeShift: LiveShifting {
         return Task.isCancelled ? nil : address
     }
     func stop() async { stops += 1 }
+    func reserve() async -> URL? { address }
 }
 
 @MainActor

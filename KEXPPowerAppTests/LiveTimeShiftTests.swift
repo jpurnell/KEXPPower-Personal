@@ -65,4 +65,22 @@ struct LiveTimeShiftTests {
         await shift.stop()
         #expect(again != nil)
     }
+
+    @Test("Serving again gives a new, working address while the recording carries on, for a player whose address went dead")
+    func reserveGivesAWorkingAddress() async throws {
+        let shift = LiveTimeShift(source: SteadySource(), window: 600, firstAudio: 3, timeout: 5)
+        let first = try #require(await shift.start())
+        let second = try #require(await shift.reserve())
+        let (playlist, status) = try await fetch(second)
+        await shift.stop()
+        #expect(second != first)
+        #expect(status == 200)
+        #expect(String(decoding: playlist, as: UTF8.self).hasPrefix("#EXTM3U"))
+    }
+
+    @Test("There is nothing to serve again before the recording has started")
+    func reserveNeedsARecording() async {
+        let shift = LiveTimeShift(source: SteadySource(), window: 600, firstAudio: 3, timeout: 5)
+        #expect(await shift.reserve() == nil)
+    }
 }

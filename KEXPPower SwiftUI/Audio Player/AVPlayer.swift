@@ -58,6 +58,16 @@ import UniformTypeIdentifiers
         @ObservationIgnored private let shiftTask = TaskHolder()
         /// Watches how long going back to live takes; replaced each time, so only the latest request is measured.
         @ObservationIgnored private let liveTimer = TaskHolder()
+        /// How the phone is connected and where the sound is going, asked when live is requested; tests replace them.
+        @ObservationIgnored var networkKind: @Sendable () -> NetworkKind = { NetworkPathObserver.shared.kind }
+        @ObservationIgnored var outputRoute: @MainActor () -> OutputRoute = { OutputRoute.current() }
+        /// Told how each live start ended; the app passes it on to the diagnostics hub.
+        @ObservationIgnored var onLiveStart: @MainActor (LiveStart) -> Void = { FieldDiagnostics.shared.report(.liveStart($0)) }
+        /// Whether a live start gave up and the listener has not paused since, so audio is still wanted when the network returns.
+        @ObservationIgnored private var awaitingNetwork = false
+        /// Whether the live start under way is the retry after the network came back.
+        @ObservationIgnored private var startIsRecovery = false
+        @ObservationIgnored private let networkTask = TaskHolder()
         /// How far from the end of an archived file the next item is lined up, so it is loaded before it is needed.
         static let handoffLead: TimeInterval = 30
         /// How far the system's skip buttons move: a short rewind and a longer skip forward.
@@ -150,6 +160,8 @@ import UniformTypeIdentifiers
                 }
             }
 
+            watchNetwork()
+
             publisher.installCommands(
                 play: { [weak self] in self?.playPlayer() },
                 pause: { [weak self] in self?.pausePlayer() },
@@ -169,33 +181,111 @@ import UniformTypeIdentifiers
             publisher.publish(snapshot, artwork: currentArtwork)
         }
 
-        /// Records how long it takes, after a request to go back to live, for the new item's clock to start moving, which
-        /// is when audio is heard, along with the player's state every two seconds until then.
+        /// Watches a live start: records how long it takes for the item's clock to start moving, which is when audio is heard, and helps it
+        /// along when it does not. Eight seconds in, the item is rebuilt (the local stream is served again); at eighteen, the stream is played
+        /// directly; at forty-five the start is given up on, and tried again when the network returns. How it ended is reported either way.
         private func measureLiveStart(of item: AVPlayerItem) {
             liveTimer.task?.cancel()
-            liveTimer.task = Task { [weak self] in await self?.watchLiveStart(of: item, requestedAt: Date()) }
+            let recovering = startIsRecovery
+            startIsRecovery = false
+            liveTimer.task = Task { [weak self] in await self?.watchLiveStart(of: item, requestedAt: Date(), recovering: recovering) }
         }
 
-        private func watchLiveStart(of item: AVPlayerItem, requestedAt requested: Date) async {
-            DiagnosticLog.app.record("Player", "back to live: requested")
-            for tick in 1...80 {
+        private func watchLiveStart(of first: AVPlayerItem, requestedAt requested: Date, recovering: Bool) async {
+            DiagnosticLog.app.record("Player", "live start: requested\(recovering ? " (network is back)" : "")")
+            let network = networkKind()
+            let route = outputRoute()
+            var watch = LiveStartWatch()
+            var item = first
+            // The watch gives up at forty-five seconds, so a minute of half-second ticks is more than it can use.
+            for tick in 1...120 {
                 try? await Task.sleep(for: .milliseconds(500))
                 guard !Task.isCancelled, let player, player.currentItem === item else { return }
-                let seconds = Date().timeIntervalSince(requested).formatted(.number.precision(.fractionLength(1)))
+                let elapsed = Date().timeIntervalSince(requested)
+                let seconds = elapsed.formatted(.number.precision(.fractionLength(1)))
                 let position = player.currentTime().seconds
-                if position.isFinite, position > 0.1 {
-                    DiagnosticLog.app.record("Player", "back to live: audio moving after \(seconds) s")
+                let moving = position.isFinite && position > 0.1
+                switch watch.observe(elapsed: elapsed, audioMoving: moving) {
+                case .started:
+                    awaitingNetwork = false
+                    DiagnosticLog.app.record("Player", "live start: audio moving after \(seconds) s")
+                    let outcome = recovering && watch.outcome == .started ? LiveStartOutcome.recoveredOnNetwork : watch.outcome
+                    onLiveStart(LiveStart(outcome: outcome, took: StartDuration(seconds: elapsed), network: network, route: route))
                     return
-                }
-                if tick % 4 == 0 {
-                    let reason = player.reasonForWaitingToPlay?.rawValue ?? "none"
-                    DiagnosticLog.app.record(
-                        "Player",
-                        "back to live: \(seconds) s, control \(player.timeControlStatus.rawValue), item \(item.status.rawValue), waiting \(reason)")
+                case .rebuild:
+                    DiagnosticLog.app.record("Player", "live start: no audio after \(seconds) s; rebuilding the item")
+                    if let rebuilt = await rebuildLiveItem() { item = rebuilt }
+                case .fallBackDirect:
+                    DiagnosticLog.app.record("Player", "live start: no audio after \(seconds) s; playing the stream directly")
+                    if let direct = await playLiveDirectly() { item = direct }
+                case .giveUp:
+                    DiagnosticLog.app.record("Player", "live start: gave up after \(seconds) s")
+                    awaitingNetwork = true
+                    FieldDiagnostics.shared.report(.rewindUnavailable(.gaveUpWatching))
+                    onLiveStart(LiveStart(outcome: .gaveUp, took: StartDuration(seconds: elapsed), network: network, route: route))
+                    return
+                case .waiting:
+                    if tick % 4 == 0 {
+                        let reason = player.reasonForWaitingToPlay?.rawValue ?? "none"
+                        DiagnosticLog.app.record(
+                            "Player",
+                            "live start: \(seconds) s, control \(player.timeControlStatus.rawValue), item \(item.status.rawValue), waiting \(reason), network \(network.rawValue)")
+                    }
                 }
             }
-            DiagnosticLog.app.record("Player", "back to live: gave up watching after 40 s")
-            FieldDiagnostics.shared.report(.rewindUnavailable(.gaveUpWatching))
+        }
+
+        /// Gives the player a fresh item: the local stream served again at a new address, or the direct stream if that is what is playing.
+        private func rebuildLiveItem() async -> AVPlayerItem? {
+            guard let player, !isPlayingArchive else { return nil }
+            let address: URL? = liveSource == .shifted ? await liveShift?.reserve() : liveLink
+            guard let address else { return nil }
+            let item = AVPlayerItem(url: address)
+            replaceItems(with: item)
+            player.play()
+            return item
+        }
+
+        /// Drops the recording and plays the live stream itself.
+        private func playLiveDirectly() async -> AVPlayerItem? {
+            guard let player, !isPlayingArchive, let liveLink else { return nil }
+            shiftTask.task?.cancel()
+            stopWatchingLag()
+            if liveSource == .shifted { setTransportControls(nil) }
+            liveSource = .direct
+            await liveShift?.stop()
+            let item = AVPlayerItem(url: liveLink)
+            item.preferredForwardBufferDuration = 300
+            replaceItems(with: item)
+            player.play()
+            return item
+        }
+
+        /// When the network comes back after a start gave up, and the listener still wants audio, starts live again.
+        private func watchNetwork() {
+            networkTask.task?.cancel()
+            networkTask.task = Task { [weak self] in await self?.followNetwork() }
+        }
+
+        private func followNetwork() async {
+            var recovery = NetworkRecovery()
+            for await kind in NetworkPathObserver.shared.updates() {
+                guard !Task.isCancelled else { return }
+                if recovery.shouldRetry(network: kind, waiting: awaitingNetwork) { await recoverLive() }
+            }
+        }
+
+        private func recoverLive() async {
+            guard awaitingNetwork, !isPlayingArchive, player != nil else { return }
+            awaitingNetwork = false
+            startIsRecovery = true
+            shiftTask.task?.cancel()
+            stopWatchingLag()
+            if liveSource == .shifted { setTransportControls(nil) }
+            liveSource = .unresolved
+            await liveShift?.stop()
+            (player as? AVQueuePlayer)?.removeAllItems()
+            await playLive()
         }
 
         // MARK: - Now Playing
@@ -279,6 +369,7 @@ import UniformTypeIdentifiers
             guard let liveShift else {
                 liveSource = .direct
                 player.play()
+                if let item = player.currentItem { measureLiveStart(of: item) }
                 return
             }
             liveSource = .resolving
@@ -298,6 +389,7 @@ import UniformTypeIdentifiers
                 // The recording could not start: the stream the app has always played.
                 if player.currentItem == nil, let liveLink { replaceItems(with: AVPlayerItem(url: liveLink)) }
                 liveSource = .direct
+                if let item = player.currentItem { measureLiveStart(of: item) }
             }
             player.play()
         }
@@ -305,6 +397,8 @@ import UniformTypeIdentifiers
         func pausePlayer() {
             // A pause while the recording is still starting means the listener does not want to hear it begin.
             if liveSource == .resolving { shiftTask.task?.cancel() }
+            awaitingNetwork = false
+            liveTimer.task?.cancel()
             player?.pause()
         }
 
@@ -433,6 +527,7 @@ import UniformTypeIdentifiers
         ///   - url: The archived audio file.
         ///   - offset: Seconds into the file at which to begin.
         func playArchive(url: URL, at offset: TimeInterval) async {
+            awaitingNetwork = false
             guard let player else { return }
             sessionCoordinator.activate()
             shiftTask.task?.cancel()

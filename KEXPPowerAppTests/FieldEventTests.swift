@@ -34,9 +34,60 @@ struct FieldEventTests {
         }
     }
 
+    @Test("A live start carries how it went, how long, over what network and to what output, all as codes")
+    func liveStartRecord() {
+        let start = LiveStart(outcome: .rebuilt, took: .from5to15, network: .cellular, route: .carPlay)
+        let record = FieldEvent.liveStart(start).record
+        #expect(record.kind == "liveStart")
+        #expect(record.fields == [
+            "outcome": .code("rebuilt"), "took": .code("from5to15"), "network": .code("cellular"), "route": .code("carPlay"),
+        ])
+    }
+
+    @Test("A start that went as it should is routine; one that needed help is a warning; one that never began is an error")
+    func liveStartSeverity() {
+        func severity(_ outcome: LiveStartOutcome) -> Severity {
+            FieldEvent.liveStart(LiveStart(outcome: outcome, took: .under2, network: .wifi, route: .speaker)).record.severity
+        }
+        #expect(severity(.started) == .info)
+        #expect(severity(.rebuilt) == .warning)
+        #expect(severity(.fellBackDirect) == .warning)
+        #expect(severity(.recoveredOnNetwork) == .warning)
+        #expect(severity(.gaveUp) == .error)
+    }
+
+    @Test("Live starts are never held back as repeats: each is one start")
+    func liveStartIsNotCoalesced() {
+        let start = LiveStart(outcome: .gaveUp, took: .over40, network: .none, route: .speaker)
+        #expect(FieldEvent.liveStart(start).coalescingKey == nil)
+    }
+
+    @Test("Every value a live start can carry passes the schema file, so the hub accepts all of them")
+    func everyLiveStartPasses() throws {
+        let validator = SchemaValidator(schema: try loadSchema())
+        var events: [EventRecord] = []
+        for outcome in LiveStartOutcome.allCases {
+            for took in StartDuration.allCases {
+                for network in NetworkKind.allCases {
+                    for route in OutputRoute.allCases {
+                        events.append(FieldEvent.liveStart(LiveStart(outcome: outcome, took: took, network: network, route: route)).record)
+                    }
+                }
+            }
+        }
+        for channel in Channel.allCases {
+            // The envelope holds at most a hundred events, so the combinations go in as many as it needs.
+            for chunk in stride(from: 0, to: events.count, by: 100) {
+                let result = validator.validate(envelope(Array(events[chunk..<min(chunk + 100, events.count)]), channel: channel))
+                #expect(result.rejected.isEmpty, "\(channel): \(result.rejected.prefix(1))")
+            }
+        }
+    }
+
     @Test("No event holds free text, a number or a boolean: every field is a code")
     func onlyCodes() {
         var events: [FieldEvent] = RewindReason.allCases.map { .rewindUnavailable($0) }
+        events.append(.liveStart(LiveStart(outcome: .started, took: .under2, network: .wifi, route: .speaker)))
         events += [PreviousRun.firstLaunch, .endedWhileActive, .endedInBackground, .quit].map { .launch(previousRun: $0) }
         for event in events {
             for value in event.record.fields.values {
@@ -105,7 +156,7 @@ struct FieldEventTests {
     @Test("The schema file carries every kind the MetricKit mapping can emit, exactly, so the hub accepts what the operating system reports")
     func schemaHasMetricKitKinds() throws {
         let schema = try loadSchema()
-        #expect(schema.version == 4)
+        #expect(schema.version == 5)
         for kind in MetricKitMapping.kinds { #expect(schema.kinds.contains(kind), "\(kind.name)") }
     }
 

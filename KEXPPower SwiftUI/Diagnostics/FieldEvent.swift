@@ -28,13 +28,15 @@ enum FieldEvent: Sendable, Equatable {
     case rewindUnavailable(RewindReason)
     /// A call to KEXP's API failed.
     case apiFailed(APIEndpoint, APIFailure)
+    /// Live was asked for and audio did, or did not, begin: how long it took, what the network was, where the sound went.
+    case liveStart(LiveStart)
 
     /// What makes two failures the same one, for ``FieldEventCoalescer``; `nil` for events that are never held back.
     var coalescingKey: String? {
         switch self {
         case .apiFailed(let endpoint, let failure):
             "apiFailed.\(endpoint.rawValue).\(failure.outcome.rawValue).\(failure.status.map(String.init) ?? "-")"
-        case .launch, .rewindUnavailable:
+        case .launch, .rewindUnavailable, .liveStart:
             nil
         }
     }
@@ -53,6 +55,18 @@ enum FieldEvent: Sendable, Equatable {
             var fields: [String: FieldValue] = ["endpoint": .code(endpoint.rawValue), "outcome": .code(failure.outcome.rawValue)]
             if let status = failure.status { fields["status"] = .int(status) }
             return EventRecord(kind: "apiFailed", severity: .warning, at: Date(), fields: fields)
+        case .liveStart(let start):
+            let severity: Severity = switch start.outcome {
+            case .started: .info
+            case .rebuilt, .fellBackDirect, .recoveredOnNetwork: .warning
+            case .gaveUp: .error
+            }
+            return EventRecord(
+                kind: "liveStart", severity: severity, at: Date(),
+                fields: [
+                    "outcome": .code(start.outcome.rawValue), "took": .code(start.took.rawValue),
+                    "network": .code(start.network.rawValue), "route": .code(start.route.rawValue),
+                ])
         }
     }
 }

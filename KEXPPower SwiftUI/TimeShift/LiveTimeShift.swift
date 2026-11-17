@@ -13,6 +13,9 @@ protocol LiveShifting: AnyObject {
     /// Starts recording the live stream and serving it locally.
     /// - Returns: The address to play, or `nil` if it could not be made ready, in which case the direct stream is played.
     func start() async -> URL?
+    /// Serves what is recorded again at a new address, keeping the recording, for a player whose address stopped answering.
+    /// - Returns: The new address, or `nil` if there is no recording to serve.
+    func reserve() async -> URL?
     /// Stops recording and serving, and forgets what was kept.
     func stop() async
 }
@@ -67,6 +70,19 @@ final class LiveTimeShift: LiveShifting {
             DiagnosticLog.app.record("TimeShift", "server failed: \(error.localizedDescription); playing directly")
             FieldDiagnostics.shared.report(.rewindUnavailable(.serverFailed))
             await recorder.stop()
+            return nil
+        }
+    }
+
+    func reserve() async -> URL? {
+        guard address != nil else { return nil }
+        do {
+            let url = try await server.start()
+            address = url
+            DiagnosticLog.app.record("TimeShift", "serving again at \(url.absoluteString)")
+            return url
+        } catch {
+            DiagnosticLog.app.record("TimeShift", "serving again failed: \(error.localizedDescription)")
             return nil
         }
     }
