@@ -423,7 +423,7 @@ import UniformTypeIdentifiers
             guard let player, !isPlayingArchive else { return nil }
             let address: URL? = liveSource == .shifted ? await liveShift?.reserve() : liveLink
             guard let address else { return nil }
-            let item = AVPlayerItem(url: address)
+            let item = liveItem(url: address)
             replaceItems(with: item)
             player.play()
             return item
@@ -437,7 +437,7 @@ import UniformTypeIdentifiers
             if liveSource == .shifted { setTransportControls(nil) }
             liveSource = .direct
             await liveShift?.stop()
-            let item = AVPlayerItem(url: liveLink)
+            let item = liveItem(url: liveLink)
             item.preferredForwardBufferDuration = 300
             replaceItems(with: item)
             player.play()
@@ -516,6 +516,10 @@ import UniformTypeIdentifiers
 
             var artwork: CGImage?
             if let url = next.artworkURL { artwork = await artworkLoader.image(for: url) }
+            let outcome = ArtworkOutcome(
+                offered: next.artworkURL != nil, allowed: next.artworkURL.map(artworkLoader.isAllowed) ?? false,
+                loaded: artwork.map { CGSize(width: $0.width, height: $0.height) })
+            DiagnosticLog.app.record("Player", "artwork: \(outcome.line)")
             // A newer track arrived while the artwork was loading; leave it to publish.
             guard snapshot.artworkURL == next.artworkURL, snapshot.title == next.title else { return }
 
@@ -526,6 +530,16 @@ import UniformTypeIdentifiers
             player?.currentItem?.externalMetadata = externalMetadata(for: snapshot, artwork: artwork)
             #endif
             publisher.publish(snapshot, artwork: artwork)
+        }
+
+        /// A live item with the current track's title and artwork already on it. Metadata belongs to an item, and a receiver reads it from there: an item
+        /// made after the track arrived (every live start makes one) would otherwise show nothing until the next track.
+        private func liveItem(url: URL) -> AVPlayerItem {
+            let item = AVPlayerItem(url: url)
+            #if os(iOS) || os(visionOS)
+            if !snapshot.title.isEmpty { item.externalMetadata = externalMetadata(for: snapshot, artwork: currentArtwork) }
+            #endif
+            return item
         }
 
         #if os(iOS) || os(visionOS)
@@ -602,7 +616,7 @@ import UniformTypeIdentifiers
                 return
             }
             if let address {
-                let item = AVPlayerItem(url: address)
+                let item = liveItem(url: address)
                 replaceItems(with: item)
                 liveSource = .shifted
                 setTransportControls(liveTransportControls())
@@ -610,7 +624,7 @@ import UniformTypeIdentifiers
                 measureLiveStart(of: item)
             } else {
                 // The recording could not start: the stream the app has always played.
-                if player.currentItem == nil, let liveLink { replaceItems(with: AVPlayerItem(url: liveLink)) }
+                if player.currentItem == nil, let liveLink { replaceItems(with: liveItem(url: liveLink)) }
                 liveSource = .direct
                 if let item = player.currentItem { measureLiveStart(of: item) }
             }
@@ -839,7 +853,7 @@ import UniformTypeIdentifiers
                 playPlayer()
                 return
             }
-            let item = AVPlayerItem(url: liveLink)
+            let item = liveItem(url: liveLink)
             item.preferredForwardBufferDuration = 300
             replaceItems(with: item)
             playPlayer()
@@ -867,7 +881,7 @@ import UniformTypeIdentifiers
             liveSource = .unresolved
             await old?.stop()
             if newShift == nil {
-                replaceItems(with: AVPlayerItem(url: link))
+                replaceItems(with: liveItem(url: link))
             } else {
                 // The item is chosen once the new recording is ready.
                 (player as? AVQueuePlayer)?.removeAllItems()
@@ -928,7 +942,7 @@ import UniformTypeIdentifiers
                 next = AVPlayerItem(url: url)
             case .live:
                 guard let liveLink else { return }
-                next = AVPlayerItem(url: liveLink)
+                next = liveItem(url: liveLink)
                 next.preferredForwardBufferDuration = 300
             }
             queued = (next, plan)
@@ -971,5 +985,23 @@ private final class TaskHolder {
 
     deinit {
         task?.cancel()
+    }
+}
+
+/// What became of the artwork for a track, as a fixed phrase for the journal: the person reading a report needs to tell "none offered" from "blocked"
+/// from "could not be loaded", and nothing else records it.
+struct ArtworkOutcome: Equatable {
+    /// Whether the track came with an artwork address.
+    let offered: Bool
+    /// Whether the loader allows that address's host.
+    let allowed: Bool
+    /// The size of the decoded image, or `nil` if there is none.
+    let loaded: CGSize?
+
+    var line: String {
+        guard offered else { return "none offered" }
+        guard allowed else { return "host not allowed" }
+        guard let loaded else { return "not loaded (request failed or not an image)" }
+        return "loaded \(Int(loaded.width))x\(Int(loaded.height))"
     }
 }

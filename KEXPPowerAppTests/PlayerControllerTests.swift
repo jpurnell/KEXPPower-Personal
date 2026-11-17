@@ -4,6 +4,7 @@ import Observation
 import os
 import StationKit
 import Testing
+import UIKit
 @testable import KEXPPowerExampleSwiftUI
 
 /// Stands in for the system: records what the controller publishes and which transport commands it asks for.
@@ -386,6 +387,37 @@ struct PlayerControllerTests {
         #expect(!controller.wantsPlayback)
         controller.handle(sessionAction: .resume)
         #expect(controller.wantsPlayback)
+    }
+
+    // MARK: Artwork on the item a receiver plays
+
+    private func jpegBytes() -> Data {
+        UIGraphicsImageRenderer(size: CGSize(width: 8, height: 8)).jpegData(withCompressionQuality: 0.8) { context in
+            UIColor.red.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 8, height: 8))
+        }
+    }
+
+    @Test("A live item created after the track arrived carries the track's artwork, so a receiver that reads the item shows it")
+    func liveItemCarriesTheArtwork() async {
+        let bytes = jpegBytes()
+        let controller = PlayerController(artworkLoader: ArtworkLoader(allowedDomains: ["kexp.org"], fetch: { _ in bytes }), publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let art = URL(string: "https://kexp.org/art.jpg") ?? .temporaryDirectory
+        await controller.updateNowPlaying(.program(ProgramInfo(title: "The Afternoon Show", host: nil, artworkURL: art)))
+        controller.liveShift = FakeShift(address: local)
+        await controller.playLive()
+        let identifiers: [AVMetadataIdentifier] = (controller.player?.currentItem?.externalMetadata ?? []).compactMap { $0.identifier }
+        #expect(identifiers.contains(.commonIdentifierArtwork))
+        #expect(identifiers.contains(.commonIdentifierTitle))
+    }
+
+    @Test("The journal says what became of the artwork, as a fixed phrase")
+    func artworkOutcomes() {
+        #expect(ArtworkOutcome(offered: false, allowed: false, loaded: nil).line == "none offered")
+        #expect(ArtworkOutcome(offered: true, allowed: false, loaded: nil).line == "host not allowed")
+        #expect(ArtworkOutcome(offered: true, allowed: true, loaded: nil).line == "not loaded (request failed or not an image)")
+        #expect(ArtworkOutcome(offered: true, allowed: true, loaded: CGSize(width: 500, height: 500)).line == "loaded 500x500")
     }
 
     @Test("If the time-shift cannot start, the direct stream plays as it always has")
