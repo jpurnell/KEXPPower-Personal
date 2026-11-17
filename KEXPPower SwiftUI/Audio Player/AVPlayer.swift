@@ -558,7 +558,9 @@ import UniformTypeIdentifiers
                 if liveSource != .resolving { player.play() }
                 return
             }
-            guard let liveShift else {
+            // An AirPlay receiver fetches the item itself, and the recording's address is the phone's own loopback: it cannot be reached from there, and the
+            // start would sit silent until the fall-back. The stream's public address works from anywhere, so on that route live is played directly.
+            guard let liveShift, outputRoute() != .airPlay else {
                 liveSource = .direct
                 player.play()
                 if let item = player.currentItem { measureLiveStart(of: item) }

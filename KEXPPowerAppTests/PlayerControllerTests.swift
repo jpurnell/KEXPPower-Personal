@@ -350,6 +350,30 @@ struct PlayerControllerTests {
         #expect(controller.player?.currentItem == nil)
     }
 
+    @Test("On an AirPlay route the receiver fetches the item itself and cannot reach the phone's loopback address, so live plays the stream directly and the recording is never started")
+    func airPlayPlaysDirectly() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .airPlay }
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        #expect(itemURL(controller) == direct)
+        #expect(shift.starts == 0)
+    }
+
+    @Test("On a route the phone plays to itself (speaker, CarPlay, Bluetooth) live still plays through the recording")
+    func otherRoutesUseTheRecording() async {
+        for route in [OutputRoute.speaker, .carPlay, .bluetooth, .headphones] {
+            let controller = PlayerController(publisher: FakePublisher())
+            controller.initPlayer(link: direct)
+            controller.outputRoute = { route }
+            controller.liveShift = FakeShift(address: local)
+            await controller.playLive()
+            #expect(itemURL(controller) == local)
+        }
+    }
+
     @Test("If the time-shift cannot start, the direct stream plays as it always has")
     func fallsBackToDirect() async {
         let controller = PlayerController(publisher: FakePublisher())
