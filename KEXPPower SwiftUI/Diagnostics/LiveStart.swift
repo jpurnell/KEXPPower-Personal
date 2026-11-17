@@ -39,7 +39,7 @@ enum LiveStartOutcome: String, Sendable, CaseIterable {
 }
 
 /// How the phone was connected when live was asked for.
-enum NetworkKind: String, Sendable, CaseIterable {
+enum NetworkKind: String, Sendable, CaseIterable, Codable {
     case none, wifi, cellular, wired, other
 
     init(isSatisfied: Bool, usesWiFi: Bool, usesCellular: Bool, usesWired: Bool) {
@@ -49,7 +49,7 @@ enum NetworkKind: String, Sendable, CaseIterable {
 }
 
 /// Where the sound was going: a few kinds, never the name of a device.
-enum OutputRoute: String, Sendable, CaseIterable {
+enum OutputRoute: String, Sendable, CaseIterable, Codable {
     case carPlay, airPlay, bluetooth, headphones, speaker, other
 
     /// - Parameter portType: An audio session output port type's raw value; anything not listed, including a name someone gave a device, is `other`.

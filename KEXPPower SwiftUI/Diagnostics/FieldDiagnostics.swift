@@ -149,6 +149,12 @@ struct FieldDiagnostics: Sendable {
         report(.apiFailed(endpoint, failure))
     }
 
+    /// Reports a stall the last run did not see the end of (the app was stopped while playback was stalled), once, as `unfinished`.
+    func reportUnfinishedOutage(marker: OutageMarker = .app) {
+        guard let open = marker.takeUnfinished() else { return }
+        report(.playbackStall(.unfinished(open)))
+    }
+
     /// Tries to send what an earlier failure left on disk, without waiting for it.
     func requestFlush() {
         Task(priority: .utility) { await flush() }

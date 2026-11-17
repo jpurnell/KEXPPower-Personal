@@ -30,13 +30,16 @@ enum FieldEvent: Sendable, Equatable {
     case apiFailed(APIEndpoint, APIFailure)
     /// Live was asked for and audio did, or did not, begin: how long it took, what the network was, where the sound went.
     case liveStart(LiveStart)
+    /// Playback stopped moving while the listener wanted it, and what became of that: why, how long, what was buffered, over what network and to
+    /// what output.
+    case playbackStall(PlaybackStall)
 
     /// What makes two failures the same one, for ``FieldEventCoalescer``; `nil` for events that are never held back.
     var coalescingKey: String? {
         switch self {
         case .apiFailed(let endpoint, let failure):
             "apiFailed.\(endpoint.rawValue).\(failure.outcome.rawValue).\(failure.status.map(String.init) ?? "-")"
-        case .launch, .rewindUnavailable, .liveStart:
+        case .launch, .rewindUnavailable, .liveStart, .playbackStall:
             nil
         }
     }
@@ -55,6 +58,19 @@ enum FieldEvent: Sendable, Equatable {
             var fields: [String: FieldValue] = ["endpoint": .code(endpoint.rawValue), "outcome": .code(failure.outcome.rawValue)]
             if let status = failure.status { fields["status"] = .int(status) }
             return EventRecord(kind: "apiFailed", severity: .warning, at: Date(), fields: fields)
+        case .playbackStall(let stall):
+            let severity: Severity = switch stall.outcome {
+            case .resumed, .listenerPaused: .info
+            case .rebuilt, .restarted, .unfinished: .warning
+            case .gaveUp: .error
+            }
+            return EventRecord(
+                kind: "playbackStall", severity: severity, at: Date(),
+                fields: [
+                    "reason": .code(stall.reason.rawValue), "took": .code(stall.took.rawValue), "ahead": .code(stall.ahead.rawValue),
+                    "network": .code(stall.network.rawValue), "route": .code(stall.route.rawValue), "outcome": .code(stall.outcome.rawValue),
+                    "cycles": .int(stall.cycles),
+                ])
         case .liveStart(let start):
             let severity: Severity = switch start.outcome {
             case .started: .info

@@ -46,6 +46,8 @@ struct KEXPPowerExampleSwiftUIApp: App {
         // The same fact, as a typed health event for the diagnostics hub. It returns at once, and it sends nothing unless the listener
         // has opted in: diagnostics are off until they say yes, and no connection to our servers is made before then.
         FieldDiagnostics.shared.report(.launch(previousRun: previousRun))
+        // A stall the last run was stopped in the middle of is reported now, as unfinished, so outages that end the app are counted.
+        FieldDiagnostics.shared.reportUnfinishedOutage()
         // If they have already said yes, listen for the operating system's crash and hang reports too; otherwise this does nothing.
         FieldConsent.resume()
     }

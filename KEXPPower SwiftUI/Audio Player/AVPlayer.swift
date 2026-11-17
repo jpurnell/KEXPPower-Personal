@@ -68,6 +68,17 @@ import UniformTypeIdentifiers
         /// Whether the live start under way is the retry after the network came back.
         @ObservationIgnored private var startIsRecovery = false
         @ObservationIgnored private let networkTask = TaskHolder()
+        /// Called with each stall that ended (playback stopped moving while the listener wanted it); the app passes it on to the diagnostics hub.
+        @ObservationIgnored var onStall: @MainActor (PlaybackStall) -> Void = { FieldDiagnostics.shared.report(.playbackStall($0)) }
+        @ObservationIgnored private var stallWatching = false
+        @ObservationIgnored private let stallTask = TaskHolder()
+        /// Whether the listener wants audio: set by play and cleared by pause, so a stall the listener ends by pausing is told from one that ends by itself.
+        @ObservationIgnored private var wantsPlayback = false
+        /// Set while something the listener did (an archived show, a seek) makes the player wait, which is not a stall; cleared when audio moves.
+        @ObservationIgnored private var settling = false
+        /// Set while a live start is being watched, which has its own report.
+        @ObservationIgnored private var liveStartRunning = false
+        @ObservationIgnored private var lastStatusLine = ""
         /// How far from the end of an archived file the next item is lined up, so it is loaded before it is needed.
         static let handoffLead: TimeInterval = 30
         /// How far the system's skip buttons move: a short rewind and a longer skip forward.
@@ -172,9 +183,20 @@ import UniformTypeIdentifiers
             let waitingReason = player?.reasonForWaitingToPlay?.rawValue ?? "none"
             let message = "timeControlStatus \(status.rawValue); waiting reason \(waitingReason)"
             logger.info("\(message, privacy: .public)")
+            // The same, in the app's own journal, which the system log is not: a report cannot say what the player did through a dropped connection
+            // unless every change is written down. A repeat of the last line is not.
+            let line = "status \(status.rawValue), waiting \(waitingReason), item \(player?.currentItem?.status.rawValue ?? -1), network \(networkKind().rawValue)"
+            if line != lastStatusLine {
+                lastStatusLine = line
+                DiagnosticLog.app.record("Player", line)
+            }
             let wasPlaying = isPlaying
             isPlaying = status == .playing
-            if isPlaying { hasPlayed = true }
+            if isPlaying {
+                hasPlayed = true
+                settling = false
+            }
+            if status == .waitingToPlayAtSpecifiedRate { startStallWatch() }
             if isPlaying != wasPlaying { onPlayingChange?(isPlaying) }
             snapshot.state = isPlaying ? .playing : .paused
             snapshot.timeline = transportControls?.timeline()
@@ -197,7 +219,49 @@ import UniformTypeIdentifiers
                     FieldDiagnostics.shared.report(.rewindUnavailable(.gaveUpWatching))
                 },
                 report: { [weak self] in self?.onLiveStart($0) })
-            liveTimer.task = Task { await runner.run() }
+            liveTimer.task = Task { [weak self] in await self?.runLiveStart(runner) }
+        }
+
+        private func runLiveStart(_ runner: LiveStartRunner) async {
+            liveStartRunning = true
+            await runner.run()
+            // A watch that was cancelled was replaced (a new one set the flag) or ended by a pause (which cleared it); only one that ran out clears it.
+            if !Task.isCancelled { liveStartRunning = false }
+        }
+
+        // MARK: - Stalls
+
+        /// Seconds of audio buffered ahead of the playhead: the recording ahead of it when live plays through the recording, else what the item has loaded.
+        private func aheadSeconds() -> Double? {
+            guard let player, let item = player.currentItem else { return nil }
+            if liveSource == .shifted, let window = liveWindow { return window.end - window.position }
+            guard let loaded = item.loadedTimeRanges.last?.timeRangeValue else { return nil }
+            return loaded.end.seconds - player.currentTime().seconds
+        }
+
+        private func stallSample() -> StallSample? {
+            guard let player else { return nil }
+            return StallSample(
+                isPlaying: player.timeControlStatus == .playing, isWaiting: player.timeControlStatus == .waitingToPlayAtSpecifiedRate,
+                itemFailed: player.currentItem?.status == .failed, listenerPaused: !wantsPlayback, startInProgress: liveStartRunning || settling,
+                aheadSeconds: aheadSeconds(), network: networkKind(), route: outputRoute())
+        }
+
+        /// Starts watching a stall when the player has been playing and now waits. Observes only: nothing here changes what the player does.
+        private func startStallWatch() {
+            guard !stallWatching, hasPlayed else { return }
+            stallWatching = true
+            let runner = StallRunner(
+                sample: { [weak self] in self?.stallSample() },
+                sleep: { milliseconds in try? await Task.sleep(for: .milliseconds(milliseconds)) },
+                now: { Date().timeIntervalSince1970 }, record: { DiagnosticLog.app.record("Player", $0) },
+                report: { [weak self] in self?.onStall($0) }, marker: .app)
+            stallTask.task = Task { [weak self] in await self?.runStallWatch(runner) }
+        }
+
+        private func runStallWatch(_ runner: StallRunner) async {
+            await runner.run()
+            stallWatching = false
         }
 
         /// The item a start is being watched on, and what the local server had served when that item was made.
@@ -354,6 +418,7 @@ import UniformTypeIdentifiers
         // MARK: - Playback Control
 
         func playPlayer() {
+            wantsPlayback = true
             sessionCoordinator.activate()
             guard !isPlayingArchive, liveSource == .unresolved else {
                 player?.play()
@@ -404,6 +469,8 @@ import UniformTypeIdentifiers
             // A pause while the recording is still starting means the listener does not want to hear it begin.
             if liveSource == .resolving { shiftTask.task?.cancel() }
             awaitingNetwork = false
+            wantsPlayback = false
+            liveStartRunning = false
             liveTimer.task?.cancel()
             player?.pause()
         }
@@ -499,6 +566,7 @@ import UniformTypeIdentifiers
         /// Moves to a place in the window, counted in seconds from its oldest audio, as the lock screen's scrubber does.
         private func seekLive(toWindowPosition position: TimeInterval) async {
             guard let window = liveWindow else { return }
+            settling = true
             await skipLive(by: window.start + position - window.position)
         }
 
@@ -534,6 +602,8 @@ import UniformTypeIdentifiers
         ///   - offset: Seconds into the file at which to begin.
         func playArchive(url: URL, at offset: TimeInterval) async {
             awaitingNetwork = false
+            wantsPlayback = true
+            settling = true
             guard let player else { return }
             sessionCoordinator.activate()
             shiftTask.task?.cancel()
@@ -594,6 +664,7 @@ import UniformTypeIdentifiers
         /// - Parameter seconds: Seconds from the start of the file.
         func seekArchive(to seconds: TimeInterval) async {
             guard let player, isPlayingArchive else { return }
+            settling = true
             let target = CMTime(seconds: max(0, seconds), preferredTimescale: 600)
             await player.seek(to: target, toleranceBefore: .zero, toleranceAfter: .zero)
             refreshTimeline()

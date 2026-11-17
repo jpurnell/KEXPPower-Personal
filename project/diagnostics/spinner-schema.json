@@ -1,6 +1,6 @@
 {
   "app": "spinner",
-  "version": 5,
+  "version": 6,
   "kinds": [
     {
       "name": "launch",
@@ -613,6 +613,113 @@
               "speaker",
               "other"
             ]
+          },
+          "isRequired": true
+        }
+      ],
+      "channels": [
+        "development",
+        "testFlight",
+        "appStore"
+      ]
+    },
+    {
+      "name": "playbackStall",
+      "fields": [
+        {
+          "name": "reason",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "networkLost",
+              "bufferEmpty",
+              "itemFailed",
+              "localServer",
+              "unknown"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "took",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "under2",
+              "from2to5",
+              "from5to15",
+              "from15to40",
+              "from40to120",
+              "from120to300",
+              "over300"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "ahead",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "none",
+              "under30",
+              "from30to120",
+              "from120to300",
+              "over300"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "network",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "none",
+              "wifi",
+              "cellular",
+              "wired",
+              "other"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "route",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "carPlay",
+              "airPlay",
+              "bluetooth",
+              "headphones",
+              "speaker",
+              "other"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "outcome",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "resumed",
+              "rebuilt",
+              "restarted",
+              "gaveUp",
+              "listenerPaused",
+              "unfinished"
+            ]
+          },
+          "isRequired": true
+        },
+        {
+          "name": "cycles",
+          "type": {
+            "type": "int",
+            "min": 0,
+            "max": 50
           },
           "isRequired": true
         }

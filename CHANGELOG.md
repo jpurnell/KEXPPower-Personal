@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Playback stalls are observed (Part 3 of `LiveRecovery.md`)
+- **A stall is written down and reported.** When audio has played and the player then waits, longer than a second, with the listener wanting it, the app records it: why (`networkLost`, `bufferEmpty`, `itemFailed`), how long (steps with edges at 120 and 300 seconds, the lengths of a cushion), how much audio was buffered ahead when it began (a fact about playback, not the cushion setting), the network, the output, and how it ended (`resumed`, `listenerPaused`, `unfinished`). One typed `playbackStall` event per stall, codes and one bounded number. It observes only; nothing about what the player does has changed.
+- **The journal records every player status change** (status, waiting reason, item status, network), which it did not before: the system log did, and a shared report could not say what the player did through a dropped connection.
+- **An outage the app did not see the end of is counted.** A stall still open when the app is stopped is kept in one small file and reported at the next launch as `unfinished`, with how long it was seen to last, so estimates of outage length are not biased short.
+- Schema version 6 (`playbackStall`). The hub tries it **provisionally** from a Debug build; it is registered when its shape has settled. A start that is being watched, an archived show beginning, and a seek are not stalls.
+- Tests: 598 on iOS (51 new).
+
 ### Debug builds use a development key
 - **A Debug build carries the app's development key**, the hub subject `spinner.dev`, set as `DIAGNOSTICS_INGEST_KEY[config=Debug]` in the untracked `Config/Secrets.xcconfig` (documented in `Config/Secrets.xcconfig.example`). Release builds, which is what TestFlight and the App Store ship, carry only the production key. The hub decides what a key may do from the key and never from the channel a build declares: a development key must declare `development`, and it can try an event kind the hub has not registered yet (kept apart from real data, never an issue, a count or an alert). Checked from the build settings by hash: Debug resolves to the development key, Release to the production key. No Swift change: the app already read its key from `DiagnosticsIngestKey` in the Info.plist.
 

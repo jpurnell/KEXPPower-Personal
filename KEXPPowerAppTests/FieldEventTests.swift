@@ -84,6 +84,63 @@ struct FieldEventTests {
         }
     }
 
+    @Test("A stall carries why, how long, what was buffered, the network, the output, how it ended and how many recoveries were tried: codes and one bounded number")
+    func playbackStallRecord() {
+        let stall = PlaybackStall(reason: .networkLost, took: .from120to300, ahead: .from30to120, network: .none, route: .carPlay, outcome: .resumed, cycles: 0)
+        let record = FieldEvent.playbackStall(stall).record
+        #expect(record.kind == "playbackStall")
+        #expect(record.fields == [
+            "reason": .code("networkLost"), "took": .code("from120to300"), "ahead": .code("from30to120"), "network": .code("none"),
+            "route": .code("carPlay"), "outcome": .code("resumed"), "cycles": .int(0),
+        ])
+        #expect(FieldEvent.playbackStall(stall).coalescingKey == nil)
+    }
+
+    @Test("A stall that ended by itself or by the listener is routine, one that needed help or whose end was not seen is a warning, one given up on is an error")
+    func playbackStallSeverity() {
+        func severity(_ outcome: StallOutcome) -> Severity {
+            FieldEvent.playbackStall(PlaybackStall(reason: .bufferEmpty, took: .under2, ahead: .none, network: .wifi, route: .speaker, outcome: outcome, cycles: 0)).record.severity
+        }
+        #expect(severity(.resumed) == .info)
+        #expect(severity(.listenerPaused) == .info)
+        #expect(severity(.rebuilt) == .warning)
+        #expect(severity(.restarted) == .warning)
+        #expect(severity(.unfinished) == .warning)
+        #expect(severity(.gaveUp) == .error)
+    }
+
+    @Test("Every value a stall can carry passes the schema file, on every channel, and a cycle count past the cap does not")
+    func everyPlaybackStallPasses() throws {
+        let validator = SchemaValidator(schema: try loadSchema())
+        var events: [EventRecord] = []
+        for reason in StallReason.allCases {
+            for took in OutageDuration.allCases {
+                for ahead in AheadBucket.allCases {
+                    for network in NetworkKind.allCases {
+                        for route in OutputRoute.allCases {
+                            for outcome in StallOutcome.allCases {
+                                events.append(FieldEvent.playbackStall(PlaybackStall(
+                                    reason: reason, took: took, ahead: ahead, network: network, route: route, outcome: outcome, cycles: 0)).record)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for channel in Channel.allCases {
+            for chunk in stride(from: 0, to: events.count, by: 100) {
+                let result = validator.validate(envelope(Array(events[chunk..<min(chunk + 100, events.count)]), channel: channel))
+                #expect(result.rejected.isEmpty, "\(channel): \(result.rejected.prefix(1))")
+            }
+        }
+        for cycles in [0, 10, 50] {
+            let record = FieldEvent.playbackStall(PlaybackStall(reason: .unknown, took: .under2, ahead: .none, network: .none, route: .other, outcome: .gaveUp, cycles: cycles)).record
+            #expect(validator.validate(envelope([record])).rejected.isEmpty, "cycles \(cycles)")
+        }
+        let tooMany = FieldEvent.playbackStall(PlaybackStall(reason: .unknown, took: .under2, ahead: .none, network: .none, route: .other, outcome: .gaveUp, cycles: 51)).record
+        #expect(validator.validate(envelope([tooMany])).rejected.count == 1)
+    }
+
     @Test("No event holds free text, a number or a boolean: every field is a code")
     func onlyCodes() {
         var events: [FieldEvent] = RewindReason.allCases.map { .rewindUnavailable($0) }
@@ -156,7 +213,7 @@ struct FieldEventTests {
     @Test("The schema file carries every kind the MetricKit mapping can emit, exactly, so the hub accepts what the operating system reports")
     func schemaHasMetricKitKinds() throws {
         let schema = try loadSchema()
-        #expect(schema.version == 5)
+        #expect(schema.version == 6)
         for kind in MetricKitMapping.kinds { #expect(schema.kinds.contains(kind), "\(kind.name)") }
     }
 
