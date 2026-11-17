@@ -1,6 +1,6 @@
 # Design Proposal: live playback that starts and keeps playing through a lost connection
 
-**Status:** PROPOSED 2026-11-17. **Not approved.** Part 1 (§3) is already built and committed locally as `df8ae1d`, **before this proposal existed, which the guidelines forbid for a feature of this size** (several components, and a process that stays running while the app is open). This document is the proposal it should have had. It asks the owner to approve, change or reject Part 1 as built, and to approve Parts 2 and 3 before any code for them. Nothing in Parts 2 and 3 is written.
+**Status:** PROPOSED 2026-11-17; **direction set by the owner the same day** (§16: measure first, then act; a reassuring "Reconnecting…" state is wanted; return to the recording is probably yes; the hub schema can wait for 0.7.0). **Not yet approved as a whole**: Q4, Q6, Q9 and Q10 are open. Part 1 (§3) is already built and committed locally as `df8ae1d`, **before this proposal existed, which the guidelines forbid for a feature of this size** (several components, and a process that stays running while the app is open). This document is the proposal it should have had. It asks the owner to approve, change or reject Part 1 as built, and to approve Parts 2 and 3 before any code for them. Nothing in Parts 2 and 3 is written.
 
 **Facts marked (repo) were read in this repository on 2026-11-17; (log) come from the two diagnostic reports the owner sent from Brawn (`diagnostic-report.json`, generated 2026-11-16T20:10Z, and `diagnostic-report 8.json`, 2026-11-17T13:15Z; times below are UTC); (device) were observed on a device. Anything not observed is marked *unverified*.** No behaviour of `AVPlayer` in this document has been observed in a stall; every statement about it is *unverified* until Part 2's first slice has run on a device.
 
@@ -56,7 +56,13 @@ Three parts, each with its own approval: **Part 1** a live-start watch (built); 
 
 ### Part 3: observation
 
-- **Events (schema 6):** `playbackStall`: `reason` (a code: `networkLost`, `bufferEmpty`, `itemFailed`, `localServer`, `unknown`), `took` (the existing `StartDuration` buckets, extended with `over120`), `network`, `route`, `outcome` (`resumed`, `rebuilt`, `restarted`, `gaveUp`, `listenerPaused`), `cycles` (an int 0 to 10). All codes or a bounded int; no names, no addresses.
+- **Events (schema 6):** `playbackStall`: `reason` (a code: `networkLost`, `bufferEmpty`, `itemFailed`, `localServer`, `unknown`), `took` (buckets with edges at 120 s and 300 s, the cushion lengths), `ahead` (audio buffered ahead of the playhead when the stall began, bucketed), `network`, `route`, `outcome` (`resumed`, `rebuilt`, `restarted`, `gaveUp`, `listenerPaused`, `unfinished`), `cycles` (an int 0 to 10). All codes or a bounded int; no names, no addresses.
+- **Measuring the cushion, with statistics the hub can stand behind (owner's question, 2026-11-17).** The question the data must answer is: *what fraction of real outages would a 2-minute or a 5-minute cushion have bridged?* That is the survival function of outage length, `P(outage > c)`, read at c = 120 s and 300 s. Three design points follow.
+  - **Duration buckets with edges at the cushion lengths.** `took` gets `from40to120`, `from120to300` and `over300` (replacing the coarse `over40`/`over120` of the first draft), so 120 s and 300 s are bucket edges. Additive for `liveStart` too.
+  - **What the app can and cannot say about the cushion.** The cushion *setting* is a setting, and the privacy line is "health, not behavior" (no show, song, station or setting travels). So the event does **not** carry the setting. It carries `ahead`, **how much audio was buffered ahead of the playhead when the stall began** (`none`, `under30`, `from30to120`, `from120to300`, `over300`), a fact about playback health. That is the quantity that decides whether an outage was audible, and it answers the cushion question without recording a preference (Q9).
+  - **Unfinished outages are censored data, not missing data.** An outage that ends because the app is killed or suspended has no end event, and leaving it out biases every estimate toward short outages. The app writes an *open-outage marker* (as `RunMarker` does for runs); at the next launch it reports that outage once with outcome `unfinished` and the longest duration it observed. The hub treats `unfinished` as right-censored.
+  - **Hub side (separate change, in the hub repository).** The analysis the hub already does uses BusinessMath for every statistic (Wilson intervals, a Poisson tail; `Analysis.md` §3.0, "statistics come from BusinessMath, and only from there"). The cushion analysis is the same kind of work: a **Kaplan–Meier estimate of outage length with a confidence band**, and from it the share bridged by 120 s and by 300 s with an interval. BusinessMath has `KaplanMeier`, `SurvivalCurve`, `quantile` and `empiricalCDF` in its source tree (seen by file listing in the hub's checkout; **their signatures and whether they handle censoring and give intervals are not verified here**, and any missing piece is added to BusinessMath, not to the hub). It needs its own hub proposal; this one only fixes what the app must send.
+  - **What the data will not support yet.** Today the owner's phone is the only sender, so *n* is a handful, and the hub's small-cell rule (under 5) suppresses it by design. Senders are **opted-in** listeners, so any estimate describes opted-in listeners, not all of them. A *rate* (stalls per listening hour) needs an exposure denominator, which is listening time, which is behavior (Q10). The conditional answer ("given a stall, how long?") needs no denominator and is what this measures.
 - **Local log:** **every `timeControlStatus` change with its waiting reason and the item's status, which the journal does not record today (§2)**, and each action and outcome, as fixed phrases in the on-device journal (category `Player`). Status changes are bounded by coalescing repeats; actions by the 10-cycle cap, so a long outage cannot flood it.
 - Registration: the hub must know schema 6 before a build that sends it ships; with the hub's `SchemaEvolution` 0.7.0 that is `schema apply`; until then it is the manual edit and restart.
 
@@ -92,9 +98,10 @@ struct StallRecovery: Sendable {
 }
 
 enum StallReason: String, Sendable, CaseIterable { case networkLost, bufferEmpty, itemFailed, localServer, unknown }
-enum StallOutcome: String, Sendable, CaseIterable { case resumed, rebuilt, restarted, gaveUp, listenerPaused }
+enum StallOutcome: String, Sendable, CaseIterable { case resumed, rebuilt, restarted, gaveUp, listenerPaused, unfinished }
 
-struct PlaybackStall: Sendable, Equatable { let reason: StallReason, took: StartDuration, network: NetworkKind, route: OutputRoute, outcome: StallOutcome, cycles: Int }
+struct PlaybackStall: Sendable, Equatable { let reason: StallReason, took: StartDuration, ahead: AheadBucket, network: NetworkKind, route: OutputRoute, outcome: StallOutcome, cycles: Int }
+enum AheadBucket: String, Sendable, CaseIterable { case none, under30, from30to120, from120to300, over300 }
 // FieldEvent gains: case playbackStall(PlaybackStall)
 
 /// The recorder's wait ends early when the path returns.
@@ -112,15 +119,16 @@ protocol PathSource: Sendable { func updates() -> AsyncStream<NetworkKind> }   /
   "channels": ["development", "testFlight", "appStore"],
   "fields": [
     { "name": "reason",  "isRequired": true, "type": { "type": "code", "allowed": ["networkLost", "bufferEmpty", "itemFailed", "localServer", "unknown"] } },
-    { "name": "took",    "isRequired": true, "type": { "type": "code", "allowed": ["under2", "from2to5", "from5to15", "from15to40", "over40", "over120"] } },
+    { "name": "took",    "isRequired": true, "type": { "type": "code", "allowed": ["under2", "from2to5", "from5to15", "from15to40", "from40to120", "from120to300", "over300"] } },
+    { "name": "ahead",   "isRequired": true, "type": { "type": "code", "allowed": ["none", "under30", "from30to120", "from120to300", "over300"] } },
     { "name": "network", "isRequired": true, "type": { "type": "code", "allowed": ["none", "wifi", "cellular", "wired", "other"] } },
     { "name": "route",   "isRequired": true, "type": { "type": "code", "allowed": ["carPlay", "airPlay", "bluetooth", "headphones", "speaker", "other"] } },
-    { "name": "outcome", "isRequired": true, "type": { "type": "code", "allowed": ["resumed", "rebuilt", "restarted", "gaveUp", "listenerPaused"] } },
+    { "name": "outcome", "isRequired": true, "type": { "type": "code", "allowed": ["resumed", "rebuilt", "restarted", "gaveUp", "listenerPaused", "unfinished"] } },
     { "name": "cycles",  "isRequired": true, "type": { "type": "int", "min": 0, "max": 10 } }
   ]
 }
 ```
-**Parameter types:** `code` is one of the listed tokens; `cycles` is an integer 0 to 10. No dates (the event's time is the envelope's, ISO 8601, as for every kind). No free text from any channel. **Adding `over120` to `took` also changes the `liveStart` kind's allowed list**: an additive change (a code added), which the hub's `schema apply` accepts.
+**Parameter types:** `code` is one of the listed tokens; `cycles` is an integer 0 to 10. No dates (the event's time is the envelope's, ISO 8601, as for every kind). No free text from any channel. **The new `took` edges (`from40to120`, `from120to300`, `over300`) replace `over40` in `liveStart` too**: `over40` stays valid for old builds, so the change is additive (codes added, none removed), which the hub's `schema apply` accepts.
 
 ## 6. Constraints & Compliance
 
@@ -169,7 +177,7 @@ N/A: not compute-intensive.
 - **Part 1, from the log.** Request at 22:25:10, clock never moves. `LiveStartWatch`: at 22:25:18 (8 s) → `rebuild`; at 22:25:28 (18 s) → `fallBackDirect`; at 22:25:55 (45 s) → `giveUp`, outcome `gaveUp`. (The log's 40 s cut-off gave up at 22:25:51.) Whether the rebuild or direct stream *would have started* is **unknown**: it is what the device matrix measures.
 - **Part 1, from the log.** Request at 22:46:46, audio moves at 19.2 s. With the watch: 8 s → `rebuild`, 18 s → `fallBackDirect`; the start that succeeded unaided at 19.2 s is **changed by the recovery**, and may now take longer. This is the risk in §13.
 - **Part 2.** Playing; path `wifi` → `none` at t=0, stall begins; `StallRecovery` returns `wait` at every observation until t=37 s when the path becomes `cellular` (`networkJustReturned`) → `nudge`; at t=45 s (8 s later, still no progress) → `rebuildItem`; at t=55 s (18 s after return) → `restartLive`; at t=85 s → cycle 2 `nudge`. `cyclesUsed == 1` after the first full cycle; after 10 cycles `giveUp`. If audio moves at t=39 s: outcome `resumed`, `took` bucket `from15to40`, `cycles` 0.
-- **Event.** `PlaybackStall(reason: .networkLost, took: .from15to40, network: .cellular, route: .carPlay, outcome: .resumed, cycles: 0)` encodes to exactly the six fields in §5 and passes the schema validator on all three channels.
+- **Event.** `PlaybackStall(reason: .networkLost, took: .from15to40, ahead: .none, network: .cellular, route: .carPlay, outcome: .resumed, cycles: 0)` encodes to exactly the seven fields in §5 and passes the schema validator on all three channels.
 
 ## 12. Architecture Decision Review
 
@@ -220,14 +228,31 @@ N/A: not compute-intensive.
 
 ## 16. Open Questions
 
-1. **Cushion (2e):** include an automatic cushion, offer it as a setting, or leave it out? (Recommended: leave it out of this proposal and decide after the hub shows how often stalls occur.)
-2. **Thresholds** 8, 18 and 45 s (Part 1) and 8, 18 and 30 s with a cap of 10 cycles (Part 2): acceptable as starting values, to be tuned from the device matrix and the `liveStart` and `playbackStall` buckets?
-3. **After falling back to the direct stream, should the app return to the recording** (ADR-010's rewind window) when the connection is stable again, or stay direct until the listener restarts live? (Returning keeps rewind available; staying is simpler and has fewer moving parts.)
-4. **Cycle cap:** 10 cycles of 30 s and then wait for a path change: right for a car? Or retry for as long as the path is usable and the app is alive?
-5. **UI:** may Part 2 add a "Reconnecting…" state to the player bar and CarPlay Now Playing? This is a UI change and needs a state matrix (`ui_testing.md`) before it is built; it is **not** in this proposal's scope unless the owner says so.
-6. **Part 1 as built:** keep, revise or revert? It was built before this proposal; the owner may prefer to review it against §3 first.
-7. **Order:** observation (Part 3) before action (Part 2), as §13 recommends? That means one release that only reports stalls.
-8. **Hub dependency:** register schema 6 by hand (as with schema 5) or wait for `SchemaEvolution` 0.7.0? (Recommended: wait, since Part 3 ships first anyway.)
+**Answered by the owner 2026-11-17** (the owner's numbering ran one behind this list from item 4; the mapping below is my reading and Q4 and Q6 are to be confirmed):
+
+1. **Cushion: measure it.** The owner asked whether the cushion should be recorded so that decisions are statistically backed, and noted this is a prime place to show the hub's BusinessMath integration. **Decided: yes, measure; the design is in §3 Part 3** (buckets with edges at 120 s and 300 s, a buffered-ahead field, censoring, a Kaplan–Meier analysis on the hub). Whether recording the *setting* itself is acceptable is Q9. No automatic cushion is built; the data decides whether to propose one.
+2. **Thresholds: measure.** The owner: "measurement is our friend." **Decided:** the 8, 18 and 45 s and 8, 18 and 30 s values are starting points, tuned from the device matrix and from `liveStart` and `playbackStall` buckets, not from three logs.
+3. **Return to the recording after a direct fallback: "probably, yes."** **Decided in principle** (amends ADR-010 as §12 says); the rule for *when* (for example, the path has been usable for a set time) is part of Part 2's design and is measured like the rest.
+4. **Cycle cap (10 cycles, then wait for a path change): not answered.** The owner's reply to the item numbered 4, "that would be reassuring to the user," reads as an answer to the UI question (Q5). **To confirm.** If it was about the cap, it points toward retrying for as long as the path is usable and the app is alive, which this proposal can do; say so.
+5. **A "Reconnecting…" state: yes.** "That would be reassuring to the user." **Decided in principle.** It is a UI change and needs a state matrix (`ui_testing.md`) and its own small proposal section before it is built: the states are *playing*, *reconnecting (no network)*, *reconnecting (network back, recovering)* and *could not reconnect*, and in each the button, the lock screen and CarPlay Now Playing must be defined.
+6. **Part 1 as built: what would change?** The owner asked. See "What would change in Part 1" below; nothing is changed until the owner decides.
+7. **Order: observe first.** **Decided.** Part 3 ships and runs before Part 2 acts. Part 1's actions (already built) are not part of this decision: see "What would change in Part 1".
+8. **Hub schema: wait for 0.7.0.** **Decided.** No schema is registered by hand. Part 3's build is held until the hub has `schema apply`, or ships with the event refused and dropped by the hub, which is **not** acceptable; so it waits.
+
+**New, from the owner's questions:**
+
+9. **May the event carry the cushion *setting*** (off, 2 or 5 minutes)? The privacy line has been "health, not behavior": no setting travels. The design above avoids the question by sending buffered-ahead, which is playback health. Recording the setting would be a small, coarse exception that would let the hub compare people who chose a cushion with those who did not. (Recommended: do not; the buffered-ahead field answers the cushion question.)
+10. **Exposure.** A rate ("stalls per listening hour") needs listening time, which is usage, a line the owner has held ("health, not behavior"; usage analytics deliberately not added). The conditional analysis does not need it. May a coarse per-day live-listening bucket be added to `dailyMetrics`, as an opt-in tier, or is the conditional analysis enough? (Recommended: enough, for now.)
+
+### What would change in Part 1 (answer to the owner's question)
+
+Part 1 is built and committed locally (`df8ae1d`), untested on a device. Changes I would propose, none made:
+- **Decide the rebuild from evidence, not only a clock.** Today it rebuilds at 8 s whatever is happening. The local server can count the requests it has served: *zero requests* means the player never reached it (the listener may be dead or unreachable: rebuild, or restart the server); *a playlist request but no segment* means something else. That one counter would tell the three explanations of the Nov 16 stalls apart and costs a few lines. Until it has data, the rebuild could disturb a start that would have succeeded (the 19.2 s start in §11).
+- **Record the evidence at every tick of the watch** in the journal and in the event: the item's status, whether the player has fetched the playlist, and the server's request count (codes and a small int).
+- **Use the finer duration buckets** (§3 Part 3) so starts and stalls are measured on one scale.
+- **Stop sending two events for one give-up.** `watchLiveStart` sends `rewindUnavailable(.gaveUpWatching)` and a `liveStart` with `gaveUp`. The first is older and the hub's dashboards read it; the second says more. Keep both until the dashboard reads `liveStart`, then drop the first? (Owner's call.)
+- **Put the wiring under a seam** so a fake player can drive the watch in a test; today only the pure policy is tested and the controller is verified only by hand.
+- **Optionally gate the actions behind a flag** while measuring, so the first runs on a device observe rather than act. This is the one change that contradicts "Part 1 is built to fix a failure we saw", so I recommend **not** doing it: the logs show a start stuck for 41.9 s with no recovery; the recovery can only help that case, and the buckets will show whether it disturbs the 19 s case.
 
 ## 17. Documentation Strategy
 
@@ -275,7 +300,7 @@ N/A: not compute-intensive.
 - [x] Test strategy covers golden path, edge, invalid, determinism, and says what unit tests cannot show (a real stall)
 - [x] Reference truth identified: the owner's logs, the playlist generator, Apple's documentation **to be read at implementation (not read here)**
 - [x] Dependencies acceptable (none new; hub schema 6 is a dependency)
-- [ ] **Open questions** resolved or deferred explicitly: **eight, for the owner (§16)**
+- [ ] **Open questions** resolved or deferred explicitly: six answered in principle, **Q4, Q6, Q9 and Q10 open (§16)**
 
 ### Adversarial Review
 - [x] Counter-design articulated (§13 and Alternative 1)
