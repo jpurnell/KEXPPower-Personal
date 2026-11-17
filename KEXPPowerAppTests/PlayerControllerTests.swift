@@ -60,6 +60,7 @@ private final class FakeShift: LiveShifting {
     }
     func stop() async { stops += 1 }
     func reserve() async -> URL? { address }
+    var served = ServedCounts(playlists: 0, segments: 0)
 }
 
 @MainActor

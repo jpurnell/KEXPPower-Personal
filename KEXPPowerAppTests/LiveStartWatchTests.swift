@@ -23,9 +23,50 @@ struct LiveStartWatchTests {
     @Test("Silence for eight seconds rebuilds the item, once")
     func rebuildsOnce() {
         var watch = LiveStartWatch()
-        #expect(watch.observe(elapsed: 8, audioMoving: false) == .rebuild)
+        #expect(watch.observe(elapsed: 8, audioMoving: false) == .rebuild(.noEvidence))
         #expect(watch.observe(elapsed: 8.5, audioMoving: false) == .waiting)
         #expect(watch.observe(elapsed: 12, audioMoving: false) == .waiting)
+    }
+
+    // MARK: Evidence from the local server and the item
+
+    @Test("A player that never asked the local server for the playlist is rebuilt at eight seconds, and the reason says so")
+    func neverConnected() {
+        var watch = LiveStartWatch()
+        let evidence = LiveStartEvidence(playlistFetches: 0, segmentFetches: 0, itemFailed: false)
+        #expect(watch.observe(elapsed: 7.5, audioMoving: false, evidence: evidence) == .waiting)
+        #expect(watch.observe(elapsed: 8, audioMoving: false, evidence: evidence) == .rebuild(.playerNeverConnected))
+    }
+
+    @Test("A player that fetched the playlist but no segment is rebuilt at eight seconds")
+    func noSegments() {
+        var watch = LiveStartWatch()
+        let evidence = LiveStartEvidence(playlistFetches: 2, segmentFetches: 0, itemFailed: false)
+        #expect(watch.observe(elapsed: 8, audioMoving: false, evidence: evidence) == .rebuild(.noSegmentsFetched))
+    }
+
+    @Test("Segments arriving means a rebuild would not help: it is not done, and the fall-back to the direct stream still comes at eighteen")
+    func dataFlowing() {
+        var watch = LiveStartWatch()
+        let evidence = LiveStartEvidence(playlistFetches: 3, segmentFetches: 5, itemFailed: false)
+        #expect(watch.observe(elapsed: 8, audioMoving: false, evidence: evidence) == .waiting)
+        #expect(watch.observe(elapsed: 12, audioMoving: false, evidence: evidence) == .waiting)
+        #expect(watch.observe(elapsed: 18, audioMoving: false, evidence: evidence) == .fallBackDirect)
+    }
+
+    @Test("An item that has failed is rebuilt at once, not after eight seconds")
+    func failedItem() {
+        var watch = LiveStartWatch()
+        let evidence = LiveStartEvidence(playlistFetches: 1, segmentFetches: 1, itemFailed: true)
+        #expect(watch.observe(elapsed: 0.5, audioMoving: false, evidence: evidence) == .rebuild(.itemFailed))
+        #expect(watch.observe(elapsed: 1, audioMoving: false, evidence: evidence) == .waiting)
+    }
+
+    @Test("With no local server to ask (the direct stream), there is no evidence and the rebuild is by the clock, as before")
+    func noEvidenceDirect() {
+        var watch = LiveStartWatch()
+        let evidence = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: false)
+        #expect(watch.observe(elapsed: 8, audioMoving: false, evidence: evidence) == .rebuild(.noEvidence))
     }
 
     @Test("Still silent eighteen seconds in, it falls back to the stream played directly, once")

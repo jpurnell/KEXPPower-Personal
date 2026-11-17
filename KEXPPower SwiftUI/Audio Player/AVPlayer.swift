@@ -181,58 +181,64 @@ import UniformTypeIdentifiers
             publisher.publish(snapshot, artwork: currentArtwork)
         }
 
-        /// Watches a live start: records how long it takes for the item's clock to start moving, which is when audio is heard, and helps it
-        /// along when it does not. Eight seconds in, the item is rebuilt (the local stream is served again); at eighteen, the stream is played
-        /// directly; at forty-five the start is given up on, and tried again when the network returns. How it ended is reported either way.
+        /// Watches a live start with a `LiveStartRunner`: records how long it takes for the item's clock to start moving, which is when
+        /// audio is heard, and helps it along when it does not. An item the local server was never asked for, or was asked for without a
+        /// segment, is rebuilt at eight seconds (one being given segments is not); at eighteen the stream is played directly; at forty-five
+        /// the start is given up on, and tried again when the network returns. How it ended is reported either way.
         private func measureLiveStart(of item: AVPlayerItem) {
             liveTimer.task?.cancel()
             let recovering = startIsRecovery
             startIsRecovery = false
-            liveTimer.task = Task { [weak self] in await self?.watchLiveStart(of: item, requestedAt: Date(), recovering: recovering) }
+            let runner = LiveStartRunner(
+                host: makeLiveStartHost(watching: item), network: networkKind(), route: outputRoute(), recovering: recovering,
+                onStarted: { [weak self] in self?.awaitingNetwork = false },
+                onGaveUp: { [weak self] in
+                    self?.awaitingNetwork = true
+                    FieldDiagnostics.shared.report(.rewindUnavailable(.gaveUpWatching))
+                },
+                report: { [weak self] in self?.onLiveStart($0) })
+            liveTimer.task = Task { await runner.run() }
         }
 
-        private func watchLiveStart(of first: AVPlayerItem, requestedAt requested: Date, recovering: Bool) async {
-            DiagnosticLog.app.record("Player", "live start: requested\(recovering ? " (network is back)" : "")")
-            let network = networkKind()
-            let route = outputRoute()
-            var watch = LiveStartWatch()
-            var item = first
-            // The watch gives up at forty-five seconds, so a minute of half-second ticks is more than it can use.
-            for tick in 1...120 {
-                try? await Task.sleep(for: .milliseconds(500))
-                guard !Task.isCancelled, let player, player.currentItem === item else { return }
-                let elapsed = Date().timeIntervalSince(requested)
-                let seconds = elapsed.formatted(.number.precision(.fractionLength(1)))
-                let position = player.currentTime().seconds
-                let moving = position.isFinite && position > 0.1
-                switch watch.observe(elapsed: elapsed, audioMoving: moving) {
-                case .started:
-                    awaitingNetwork = false
-                    DiagnosticLog.app.record("Player", "live start: audio moving after \(seconds) s")
-                    let outcome = recovering && watch.outcome == .started ? LiveStartOutcome.recoveredOnNetwork : watch.outcome
-                    onLiveStart(LiveStart(outcome: outcome, took: StartDuration(seconds: elapsed), network: network, route: route))
-                    return
-                case .rebuild:
-                    DiagnosticLog.app.record("Player", "live start: no audio after \(seconds) s; rebuilding the item")
-                    if let rebuilt = await rebuildLiveItem() { item = rebuilt }
-                case .fallBackDirect:
-                    DiagnosticLog.app.record("Player", "live start: no audio after \(seconds) s; playing the stream directly")
-                    if let direct = await playLiveDirectly() { item = direct }
-                case .giveUp:
-                    DiagnosticLog.app.record("Player", "live start: gave up after \(seconds) s")
-                    awaitingNetwork = true
-                    FieldDiagnostics.shared.report(.rewindUnavailable(.gaveUpWatching))
-                    onLiveStart(LiveStart(outcome: .gaveUp, took: StartDuration(seconds: elapsed), network: network, route: route))
-                    return
-                case .waiting:
-                    if tick % 4 == 0 {
-                        let reason = player.reasonForWaitingToPlay?.rawValue ?? "none"
-                        DiagnosticLog.app.record(
-                            "Player",
-                            "live start: \(seconds) s, control \(player.timeControlStatus.rawValue), item \(item.status.rawValue), waiting \(reason), network \(network.rawValue)")
-                    }
-                }
+        /// The item a start is being watched on, and what the local server had served when that item was made.
+        private final class WatchedItem {
+            var item: AVPlayerItem
+            var baseline: ServedCounts
+            init(item: AVPlayerItem, baseline: ServedCounts) {
+                self.item = item
+                self.baseline = baseline
             }
+        }
+
+        private func makeLiveStartHost(watching first: AVPlayerItem) -> ClosureLiveStartHost {
+            let watched = WatchedItem(item: first, baseline: liveShift?.served ?? ServedCounts(playlists: 0, segments: 0))
+            return ClosureLiveStartHost(
+                snapshot: { [weak self] in
+                    guard let self, let player = self.player, player.currentItem === watched.item else { return nil }
+                    let position = player.currentTime().seconds
+                    var evidence = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: watched.item.status == .failed)
+                    // Only a recording has a local server to ask; the direct stream has none.
+                    if self.liveSource == .shifted, let served = self.liveShift?.served {
+                        evidence.playlistFetches = served.playlists - watched.baseline.playlists
+                        evidence.segmentFetches = served.segments - watched.baseline.segments
+                    }
+                    return LiveStartSnapshot(
+                        audioMoving: position.isFinite && position > 0.1, evidence: evidence,
+                        controlStatus: player.timeControlStatus.rawValue, itemStatus: watched.item.status.rawValue,
+                        waitingReason: player.reasonForWaitingToPlay?.rawValue ?? "none")
+                },
+                rebuild: { [weak self] in
+                    guard let self, let item = await self.rebuildLiveItem() else { return false }
+                    watched.item = item
+                    watched.baseline = self.liveShift?.served ?? ServedCounts(playlists: 0, segments: 0)
+                    return true
+                },
+                playDirectly: { [weak self] in
+                    guard let self, let item = await self.playLiveDirectly() else { return false }
+                    watched.item = item
+                    return true
+                },
+                record: { DiagnosticLog.app.record("Player", $0) })
         }
 
         /// Gives the player a fresh item: the local stream served again at a new address, or the direct stream if that is what is playing.

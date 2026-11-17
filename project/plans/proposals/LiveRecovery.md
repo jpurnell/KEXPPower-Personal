@@ -1,6 +1,6 @@
 # Design Proposal: live playback that starts and keeps playing through a lost connection
 
-**Status:** PROPOSED 2026-11-17; **direction set by the owner the same day** (§16: measure first, then act; a reassuring "Reconnecting…" state is wanted; return to the recording is probably yes; the hub schema can wait for 0.7.0). **Not yet approved as a whole**: Q4, Q6, Q9 and Q10 are open. Part 1 (§3) is already built and committed locally as `df8ae1d`, **before this proposal existed, which the guidelines forbid for a feature of this size** (several components, and a process that stays running while the app is open). This document is the proposal it should have had. It asks the owner to approve, change or reject Part 1 as built, and to approve Parts 2 and 3 before any code for them. Nothing in Parts 2 and 3 is written.
+**Status:** PART 1 CHANGES APPROVED 2026-11-17 by the owner (§16, "What would change in Part 1": "I think these changes to Part 1 are smart, and we should make them"). **Parts 2 and 3: direction set, not yet approved as a whole** (measure first, then act; a "Reconnecting…" state is wanted; return to the recording is probably yes; the cycle cap is to be measured too; the cushion is measured through buffered-ahead, not the setting; no exposure data; the hub schema waits for 0.7.0). Part 3's build is held for the hub's `schema apply`; Part 1's changes that need no new wire code are built first (see §16). Part 1 (§3) is already built and committed locally as `df8ae1d`, **before this proposal existed, which the guidelines forbid for a feature of this size** (several components, and a process that stays running while the app is open). This document is the proposal it should have had. It asks the owner to approve, change or reject Part 1 as built, and to approve Parts 2 and 3 before any code for them. Nothing in Parts 2 and 3 is written.
 
 **Facts marked (repo) were read in this repository on 2026-11-17; (log) come from the two diagnostic reports the owner sent from Brawn (`diagnostic-report.json`, generated 2026-11-16T20:10Z, and `diagnostic-report 8.json`, 2026-11-17T13:15Z; times below are UTC); (device) were observed on a device. Anything not observed is marked *unverified*.** No behaviour of `AVPlayer` in this document has been observed in a stall; every statement about it is *unverified* until Part 2's first slice has run on a device.
 
@@ -31,8 +31,9 @@ Three parts, each with its own approval: **Part 1** a live-start watch (built); 
 
 ### Part 1: the live-start watch (as built, `df8ae1d`; for review)
 
-- `LiveStartWatch` (pure): from seconds elapsed and whether the clock is moving, returns one step at a time and each only once: **8 s** rebuild the player's item, **18 s** play the direct stream, **45 s** give up.
-- `PlayerController.measureLiveStart` / `watchLiveStart` run it every 0.5 s (bounded at 120 ticks); `rebuildLiveItem` serves the recording again at a new address (`LiveShifting.reserve()`, `LocalHLSServer` restart) or reuses the direct link; `playLiveDirectly` drops the recording and plays the stream.
+- `LiveStartWatch` (pure): from seconds elapsed, whether the clock is moving and **evidence from the local server and the item** (`LiveStartEvidence`), returns one step at a time and each only once: **8 s** rebuild the player's item *if the player never asked the server for the playlist or got no segment* (a failed item is rebuilt at once; one being given segments is not rebuilt), **18 s** play the direct stream, **45 s** give up. **Revised 2026-11-17 after the owner approved the changes in §16** (the first build rebuilt by the clock alone).
+- `LiveStartRunner` runs the watch every 0.5 s (bounded at 120 looks) through a `LiveStartHost` seam, so the sequence is tested with a scripted host; `PlayerController` supplies a host over the player. It writes the player's state and the server's counts (`ServedCounts`, from `LocalHLSServer`) to the journal every two seconds.
+- `PlayerController.measureLiveStart` builds the runner; `rebuildLiveItem` serves the recording again at a new address (`LiveShifting.reserve()`, `LocalHLSServer` restart) or reuses the direct link; `playLiveDirectly` drops the recording and plays the stream.
 - `NetworkRecovery` (pure) and `NetworkPathObserver` (one `NWPathMonitor`): a start that **gave up** is tried again once when the path goes from unusable to usable, if the listener has not paused or chosen an archive show.
 - `liveStart` event (`LiveStart.swift`, schema 5): outcome, duration bucket, network kind, output route; all codes.
 
@@ -56,7 +57,7 @@ Three parts, each with its own approval: **Part 1** a live-start watch (built); 
 
 ### Part 3: observation
 
-- **Events (schema 6):** `playbackStall`: `reason` (a code: `networkLost`, `bufferEmpty`, `itemFailed`, `localServer`, `unknown`), `took` (buckets with edges at 120 s and 300 s, the cushion lengths), `ahead` (audio buffered ahead of the playhead when the stall began, bucketed), `network`, `route`, `outcome` (`resumed`, `rebuilt`, `restarted`, `gaveUp`, `listenerPaused`, `unfinished`), `cycles` (an int 0 to 10). All codes or a bounded int; no names, no addresses.
+- **Events (schema 6):** `playbackStall`: `reason` (a code: `networkLost`, `bufferEmpty`, `itemFailed`, `localServer`, `unknown`), `took` (buckets with edges at 120 s and 300 s, the cushion lengths), `ahead` (audio buffered ahead of the playhead when the stall began, bucketed), `network`, `route`, `outcome` (`resumed`, `rebuilt`, `restarted`, `gaveUp`, `listenerPaused`, `unfinished`), `cycles` (an int 0 to 50: the cap is measured, so changing it must not need a schema change). All codes or a bounded int; no names, no addresses.
 - **Measuring the cushion, with statistics the hub can stand behind (owner's question, 2026-11-17).** The question the data must answer is: *what fraction of real outages would a 2-minute or a 5-minute cushion have bridged?* That is the survival function of outage length, `P(outage > c)`, read at c = 120 s and 300 s. Three design points follow.
   - **Duration buckets with edges at the cushion lengths.** `took` gets `from40to120`, `from120to300` and `over300` (replacing the coarse `over40`/`over120` of the first draft), so 120 s and 300 s are bucket edges. Additive for `liveStart` too.
   - **What the app can and cannot say about the cushion.** The cushion *setting* is a setting, and the privacy line is "health, not behavior" (no show, song, station or setting travels). So the event does **not** carry the setting. It carries `ahead`, **how much audio was buffered ahead of the playhead when the stall began** (`none`, `under30`, `from30to120`, `from120to300`, `over300`), a fact about playback health. That is the quantity that decides whether an outage was audible, and it answers the cushion question without recording a preference (Q9).
@@ -124,11 +125,11 @@ protocol PathSource: Sendable { func updates() -> AsyncStream<NetworkKind> }   /
     { "name": "network", "isRequired": true, "type": { "type": "code", "allowed": ["none", "wifi", "cellular", "wired", "other"] } },
     { "name": "route",   "isRequired": true, "type": { "type": "code", "allowed": ["carPlay", "airPlay", "bluetooth", "headphones", "speaker", "other"] } },
     { "name": "outcome", "isRequired": true, "type": { "type": "code", "allowed": ["resumed", "rebuilt", "restarted", "gaveUp", "listenerPaused", "unfinished"] } },
-    { "name": "cycles",  "isRequired": true, "type": { "type": "int", "min": 0, "max": 10 } }
+    { "name": "cycles",  "isRequired": true, "type": { "type": "int", "min": 0, "max": 50 } }
   ]
 }
 ```
-**Parameter types:** `code` is one of the listed tokens; `cycles` is an integer 0 to 10. No dates (the event's time is the envelope's, ISO 8601, as for every kind). No free text from any channel. **The new `took` edges (`from40to120`, `from120to300`, `over300`) replace `over40` in `liveStart` too**: `over40` stays valid for old builds, so the change is additive (codes added, none removed), which the hub's `schema apply` accepts.
+**Parameter types:** `code` is one of the listed tokens; `cycles` is an integer 0 to 50. No dates (the event's time is the envelope's, ISO 8601, as for every kind). No free text from any channel. **The new `took` edges (`from40to120`, `from120to300`, `over300`) replace `over40` in `liveStart` too**: `over40` stays valid for old builds, so the change is additive (codes added, none removed), which the hub's `schema apply` accepts.
 
 ## 6. Constraints & Compliance
 
@@ -233,16 +234,16 @@ N/A: not compute-intensive.
 1. **Cushion: measure it.** The owner asked whether the cushion should be recorded so that decisions are statistically backed, and noted this is a prime place to show the hub's BusinessMath integration. **Decided: yes, measure; the design is in §3 Part 3** (buckets with edges at 120 s and 300 s, a buffered-ahead field, censoring, a Kaplan–Meier analysis on the hub). Whether recording the *setting* itself is acceptable is Q9. No automatic cushion is built; the data decides whether to propose one.
 2. **Thresholds: measure.** The owner: "measurement is our friend." **Decided:** the 8, 18 and 45 s and 8, 18 and 30 s values are starting points, tuned from the device matrix and from `liveStart` and `playbackStall` buckets, not from three logs.
 3. **Return to the recording after a direct fallback: "probably, yes."** **Decided in principle** (amends ADR-010 as §12 says); the rule for *when* (for example, the path has been usable for a set time) is part of Part 2's design and is measured like the rest.
-4. **Cycle cap (10 cycles, then wait for a path change): not answered.** The owner's reply to the item numbered 4, "that would be reassuring to the user," reads as an answer to the UI question (Q5). **To confirm.** If it was about the cap, it points toward retrying for as long as the path is usable and the app is alive, which this proposal can do; say so.
-5. **A "Reconnecting…" state: yes.** "That would be reassuring to the user." **Decided in principle.** It is a UI change and needs a state matrix (`ui_testing.md`) and its own small proposal section before it is built: the states are *playing*, *reconnecting (no network)*, *reconnecting (network back, recovering)* and *could not reconnect*, and in each the button, the lock screen and CarPlay Now Playing must be defined.
-6. **Part 1 as built: what would change?** The owner asked. See "What would change in Part 1" below; nothing is changed until the owner decides.
+4. **Cycle cap: measure it too.** The owner: "I meant to measure the cycle cap as well." **Decided:** the cap (10 cycles, one per 30 s) is a starting value, not a rule. The event's `cycles` field is widened to 0 to 50 so a different cap needs no schema change, and the hub's analysis reads how many cycles outages actually needed. My earlier reading of the owner's "reassuring" reply as being about the cap was wrong; it was about item 5.
+5. **A "Reconnecting…" state: yes** ("reconnecting was meant to be the reassuring item"). **Decided in principle.** It is a UI change and needs a state matrix (`ui_testing.md`) and its own small section before it is built: *playing*, *reconnecting (no network)*, *reconnecting (network back, recovering)* and *could not reconnect*, and in each the button, the lock screen and CarPlay Now Playing must be defined.
+6. **Part 1 as built: the changes below are approved** ("smart, and we should make them"). Built 2026-11-17 in the order given, with one deferral stated under the list.
 7. **Order: observe first.** **Decided.** Part 3 ships and runs before Part 2 acts. Part 1's actions (already built) are not part of this decision: see "What would change in Part 1".
 8. **Hub schema: wait for 0.7.0.** **Decided.** No schema is registered by hand. Part 3's build is held until the hub has `schema apply`, or ships with the event refused and dropped by the hub, which is **not** acceptable; so it waits.
 
 **New, from the owner's questions:**
 
-9. **May the event carry the cushion *setting*** (off, 2 or 5 minutes)? The privacy line has been "health, not behavior": no setting travels. The design above avoids the question by sending buffered-ahead, which is playback health. Recording the setting would be a small, coarse exception that would let the hub compare people who chose a cushion with those who did not. (Recommended: do not; the buffered-ahead field answers the cushion question.)
-10. **Exposure.** A rate ("stalls per listening hour") needs listening time, which is usage, a line the owner has held ("health, not behavior"; usage analytics deliberately not added). The conditional analysis does not need it. May a coarse per-day live-listening bucket be added to `dailyMetrics`, as an opt-in tier, or is the conditional analysis enough? (Recommended: enough, for now.)
+9. **DECIDED 2026-11-17: use buffered-ahead; the setting is not recorded** ("if we can get it from buffered ahead, let's use that"). *The question was:* may the event carry the cushion *setting* (off, 2 or 5 minutes)? The privacy line has been "health, not behavior": no setting travels. The design above avoids the question by sending buffered-ahead, which is playback health. Recording the setting would be a small, coarse exception that would let the hub compare people who chose a cushion with those who did not. (Recommended: do not; the buffered-ahead field answers the cushion question.)
+10. **DECIDED 2026-11-17: the recommendation; no listening-time data, conditional analysis only.** *The question was:* exposure. A rate ("stalls per listening hour") needs listening time, which is usage, a line the owner has held ("health, not behavior"; usage analytics deliberately not added). The conditional analysis does not need it. May a coarse per-day live-listening bucket be added to `dailyMetrics`, as an opt-in tier, or is the conditional analysis enough? (Recommended: enough, for now.)
 
 ### What would change in Part 1 (answer to the owner's question)
 
@@ -252,6 +253,8 @@ Part 1 is built and committed locally (`df8ae1d`), untested on a device. Changes
 - **Use the finer duration buckets** (§3 Part 3) so starts and stalls are measured on one scale.
 - **Stop sending two events for one give-up.** `watchLiveStart` sends `rewindUnavailable(.gaveUpWatching)` and a `liveStart` with `gaveUp`. The first is older and the hub's dashboards read it; the second says more. Keep both until the dashboard reads `liveStart`, then drop the first? (Owner's call.)
 - **Put the wiring under a seam** so a fake player can drive the watch in a test; today only the pure policy is tested and the controller is verified only by hand.
+**Deferred, with the reason:** the finer duration buckets and the evidence *in the event* both need new wire codes, which the hub does not accept until schema 6 (hub 0.7.0, which is first). Sending them now would have the hub refuse and drop the event. So the **journal** carries the evidence now and the **event** carries it with schema 6, in the same build as Part 3. The evidence-based rebuild and the test seam need no wire change and are built now.
+
 - **Optionally gate the actions behind a flag** while measuring, so the first runs on a device observe rather than act. This is the one change that contradicts "Part 1 is built to fix a failure we saw", so I recommend **not** doing it: the logs show a start stuck for 41.9 s with no recovery; the recovery can only help that case, and the buckets will show whether it disturbs the 19 s case.
 
 ## 17. Documentation Strategy
@@ -300,7 +303,7 @@ Part 1 is built and committed locally (`df8ae1d`), untested on a device. Changes
 - [x] Test strategy covers golden path, edge, invalid, determinism, and says what unit tests cannot show (a real stall)
 - [x] Reference truth identified: the owner's logs, the playlist generator, Apple's documentation **to be read at implementation (not read here)**
 - [x] Dependencies acceptable (none new; hub schema 6 is a dependency)
-- [ ] **Open questions** resolved or deferred explicitly: six answered in principle, **Q4, Q6, Q9 and Q10 open (§16)**
+- [x] Open questions resolved or deferred explicitly: all ten answered by the owner 2026-11-17 (Q5's UI state and Q3's return-to-recording rule each need a short section before they are built)
 
 ### Adversarial Review
 - [x] Counter-design articulated (§13 and Alternative 1)

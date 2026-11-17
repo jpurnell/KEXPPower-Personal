@@ -16,6 +16,8 @@ protocol LiveShifting: AnyObject {
     /// Serves what is recorded again at a new address, keeping the recording, for a player whose address stopped answering.
     /// - Returns: The new address, or `nil` if there is no recording to serve.
     func reserve() async -> URL?
+    /// What the local server has handed out so far: how many playlists and segments.
+    var served: ServedCounts { get }
     /// Stops recording and serving, and forgets what was kept.
     func stop() async
 }
@@ -73,6 +75,8 @@ final class LiveTimeShift: LiveShifting {
             return nil
         }
     }
+
+    var served: ServedCounts { server.served }
 
     func reserve() async -> URL? {
         guard address != nil else { return nil }

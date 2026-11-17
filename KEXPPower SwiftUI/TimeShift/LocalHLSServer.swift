@@ -43,6 +43,31 @@ enum HTTPMessage {
     }
 }
 
+/// How many playlists and segments the server has handed out, so a start that never reached it can be told from one that did.
+struct ServedCounts: Sendable, Equatable {
+    var playlists: Int
+    var segments: Int
+}
+
+/// Counts what the server serves. Only the kind of thing and that it was served are kept: no path, no address, no timing.
+final class ServedCounter: Sendable {
+    private static let playlistPath = "/live.m3u8"
+    private let counts = OSAllocatedUnfairLock(initialState: ServedCounts(playlists: 0, segments: 0))
+
+    var value: ServedCounts { counts.withLock { $0 } }
+
+    /// Notes one answered request: the playlist whatever its status, a segment only if it was found.
+    func note(path: String, status: Int) {
+        counts.withLock { counts in
+            if path == Self.playlistPath {
+                counts.playlists += 1
+            } else if status == 200 {
+                counts.segments += 1
+            }
+        }
+    }
+}
+
 /// Serves a `LiveRelay` to the player over HTTP on this device's loopback address, so `AVPlayer` can treat the last few
 /// minutes of the live stream as an HLS stream with a rewind window.
 ///
@@ -59,6 +84,10 @@ final class LocalHLSServer: Sendable {
     private let relay: LiveRelay
     private let queue = DispatchQueue(label: "LocalHLSServer")
     private let state = OSAllocatedUnfairLock(initialState: State())
+    private let counter = ServedCounter()
+
+    /// What has been served since this server was made; it is not reset when the server starts listening again.
+    var served: ServedCounts { counter.value }
 
     init(relay: LiveRelay) {
         self.relay = relay
@@ -71,8 +100,8 @@ final class LocalHLSServer: Sendable {
         let parameters = NWParameters.tcp
         parameters.requiredLocalEndpoint = .hostPort(host: "127.0.0.1", port: .any)
         let listener = try NWListener(using: parameters)
-        listener.newConnectionHandler = { [relay, queue] connection in
-            Self.serve(connection, relay: relay, queue: queue)
+        listener.newConnectionHandler = { [relay, queue, counter] connection in
+            Self.serve(connection, relay: relay, queue: queue, counter: counter)
         }
         state.withLock { $0.listener = listener }
         let port: NWEndpoint.Port = try await withCheckedThrowingContinuation { continuation in
@@ -103,33 +132,34 @@ final class LocalHLSServer: Sendable {
 
     // MARK: Connections
 
-    private static func serve(_ connection: NWConnection, relay: LiveRelay, queue: DispatchQueue) {
+    private static func serve(_ connection: NWConnection, relay: LiveRelay, queue: DispatchQueue, counter: ServedCounter) {
         connection.start(queue: queue)
-        receive(on: connection, collected: Data(), relay: relay)
+        receive(on: connection, collected: Data(), relay: relay, counter: counter)
     }
 
-    private static func receive(on connection: NWConnection, collected: Data, relay: LiveRelay) {
+    private static func receive(on connection: NWConnection, collected: Data, relay: LiveRelay, counter: ServedCounter) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 4_096) { data, _, isComplete, error in
             let request = collected + (data ?? Data())
             if error != nil {
                 connection.cancel()
             } else if HTTPMessage.isComplete(request) {
-                respond(to: request, on: connection, relay: relay)
+                respond(to: request, on: connection, relay: relay, counter: counter)
             } else if isComplete || request.count >= maximumRequest {
                 connection.send(content: HTTPMessage.badRequest, completion: .contentProcessed { _ in connection.cancel() })
             } else {
-                receive(on: connection, collected: request, relay: relay)
+                receive(on: connection, collected: request, relay: relay, counter: counter)
             }
         }
     }
 
-    private static func respond(to request: Data, on connection: NWConnection, relay: LiveRelay) {
+    private static func respond(to request: Data, on connection: NWConnection, relay: LiveRelay, counter: ServedCounter) {
         guard let path = HTTPMessage.path(ofRequest: request) else {
             connection.send(content: HTTPMessage.badRequest, completion: .contentProcessed { _ in connection.cancel() })
             return
         }
         Task {
             let response = await relay.response(forPath: path)
+            counter.note(path: path, status: response.status)
             connection.send(
                 content: HTTPMessage.bytes(for: response), completion: .contentProcessed { _ in connection.cancel() })
         }

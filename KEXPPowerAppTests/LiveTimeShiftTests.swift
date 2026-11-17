@@ -83,4 +83,26 @@ struct LiveTimeShiftTests {
         let shift = LiveTimeShift(source: SteadySource(), window: 600, firstAudio: 3, timeout: 5)
         #expect(await shift.reserve() == nil)
     }
+
+    @Test("The server counts what it has served: playlists and segments, so a start that never reached it can be told from one that did")
+    func countsWhatItServes() async throws {
+        let shift = LiveTimeShift(source: SteadySource(), window: 600, firstAudio: 3, timeout: 5)
+        let url = try #require(await shift.start())
+        #expect(shift.served == ServedCounts(playlists: 0, segments: 0))
+        let (playlist, _) = try await fetch(url)
+        let segmentName = try #require(String(decoding: playlist, as: UTF8.self).split(whereSeparator: \.isNewline).first { !$0.hasPrefix("#") })
+        // The segment is asked for on the server the playlist came from, and nowhere else.
+        func local(_ path: String) throws -> URL {
+            var components = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false))
+            components.path = path
+            let address = try #require(components.url)
+            try #require(address.host == "127.0.0.1")
+            return address
+        }
+        _ = try await fetch(try local("/" + String(segmentName)))
+        _ = try await fetch(try local("/no-such-segment.aac"))
+        let counts = shift.served
+        await shift.stop()
+        #expect(counts == ServedCounts(playlists: 1, segments: 1))
+    }
 }

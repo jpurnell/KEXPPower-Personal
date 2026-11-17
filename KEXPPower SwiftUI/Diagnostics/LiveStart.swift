@@ -73,14 +73,42 @@ struct LiveStart: Sendable, Equatable {
     let route: OutputRoute
 }
 
-/// Decides what to do about a live start that is slow, from the seconds elapsed and whether audio is moving.
+/// What the local server and the player's item say about a start that has no audio yet, counted from when the item was made.
 ///
-/// Each step is taken once. A listener on a poor connection gets eight seconds before the player's item is rebuilt, until eighteen before
-/// the recording is dropped for the stream itself, and until forty-five before the app stops waiting.
+/// A count is `nil` when there is nothing to ask: the direct stream has no local server.
+struct LiveStartEvidence: Sendable, Equatable {
+    /// How many times the player asked the local server for the playlist.
+    var playlistFetches: Int?
+    /// How many segments it has been given.
+    var segmentFetches: Int?
+    /// Whether the item has failed.
+    var itemFailed: Bool
+
+    static let unavailable = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: false)
+}
+
+/// Why the player's item was rebuilt.
+enum RebuildReason: String, Sendable, Equatable, CaseIterable {
+    /// The player never asked the local server for the playlist.
+    case playerNeverConnected = "player never connected"
+    /// It fetched the playlist and no segment.
+    case noSegmentsFetched = "no segment fetched"
+    /// The item failed.
+    case itemFailed = "item failed"
+    /// There was nothing to ask, so the clock decided.
+    case noEvidence = "no evidence available"
+}
+
+/// Decides what to do about a live start that is slow, from the seconds elapsed, whether audio is moving, and what the local server and
+/// the item say.
+///
+/// Each step is taken once. Eight seconds in, an item that has not been given the playlist or any segment is rebuilt (one that has been
+/// given segments is not: more of the same would not help); a failed item is rebuilt at once. At eighteen seconds the recording is dropped
+/// for the stream itself, and at forty-five the app stops waiting.
 struct LiveStartWatch: Sendable {
     /// What the caller should do now.
     enum Step: Sendable, Equatable {
-        case waiting, started, rebuild, fallBackDirect, giveUp
+        case waiting, started, rebuild(RebuildReason), fallBackDirect, giveUp
     }
 
     static let rebuildAfter: TimeInterval = 8
@@ -94,7 +122,8 @@ struct LiveStartWatch: Sendable {
     /// - Parameters:
     ///   - elapsed: Seconds since live was asked for.
     ///   - audioMoving: Whether the player's clock is moving.
-    mutating func observe(elapsed: TimeInterval, audioMoving: Bool) -> Step {
+    ///   - evidence: What the local server and the item say; none by default.
+    mutating func observe(elapsed: TimeInterval, audioMoving: Bool, evidence: LiveStartEvidence = .unavailable) -> Step {
         if audioMoving {
             audioHeard = true
             return .started
@@ -107,9 +136,23 @@ struct LiveStartWatch: Sendable {
             stage = .fellBack
             return .fallBackDirect
         }
-        if elapsed >= Self.rebuildAfter, stage.rawValue < Stage.rebuilt.rawValue {
+        guard stage == .none else { return .waiting }
+        if evidence.itemFailed {
             stage = .rebuilt
-            return .rebuild
+            return .rebuild(.itemFailed)
+        }
+        guard elapsed >= Self.rebuildAfter else { return .waiting }
+        guard let playlists = evidence.playlistFetches, let segments = evidence.segmentFetches else {
+            stage = .rebuilt
+            return .rebuild(.noEvidence)
+        }
+        if playlists == 0 {
+            stage = .rebuilt
+            return .rebuild(.playerNeverConnected)
+        }
+        if segments == 0 {
+            stage = .rebuilt
+            return .rebuild(.noSegmentsFetched)
         }
         return .waiting
     }
