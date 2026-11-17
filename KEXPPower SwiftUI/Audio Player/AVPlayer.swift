@@ -177,13 +177,6 @@ import UniformTypeIdentifiers
             #if os(iOS) || os(visionOS)
             watchRouteChanges()
             #endif
-            isPlayingExternally = { [weak self] in
-                #if os(macOS)
-                false
-                #else
-                self?.player?.isExternalPlaybackActive ?? false
-                #endif
-            }
             sessionCoordinator.observe { [weak self] action in self?.handle(sessionAction: action) }
 
             watchNetwork()
@@ -194,27 +187,17 @@ import UniformTypeIdentifiers
                 toggle: { [weak self] in self?.playOrPause() })
         }
 
-        /// Whether a receiver is playing the stream itself (AirPlay), so the phone is its remote control and not its source.
-        @ObservationIgnored var isPlayingExternally: @MainActor () -> Bool = { false }
-
         /// What the player does about what the system's audio session reports.
         ///
-        /// The journal records each one, since a pause from a route change looks like the listener's own pause afterwards. A route change does not pause a
-        /// receiver playing the stream itself: the phone going to its own speaker, or taking a call, is not a reason to stop the house. Only the listener's
-        /// own pause does that.
+        /// The journal records each one, since a pause from a route change looks like the listener's own pause afterwards. Switching an AirPlay receiver
+        /// to the phone's own speaker arrives as an output device removed and pauses both devices; that is the system's model (Apple News does the same),
+        /// so it is accepted and only recorded.
         func handle(sessionAction action: AudioSessionCoordinator.Action) {
             DiagnosticLog.app.record("Player", "audio session asked: \(action)")
             switch action {
-            case .resume:
-                playPlayer()
-            case .pause:
-                guard !isPlayingExternally() else {
-                    DiagnosticLog.app.record("Player", "pause ignored: a receiver is playing the stream itself")
-                    return
-                }
-                pausePlayer()
-            case .none:
-                break
+            case .resume: playPlayer()
+            case .pause: pausePlayer()
+            case .none: break
             }
         }
 

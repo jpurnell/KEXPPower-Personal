@@ -374,40 +374,18 @@ struct PlayerControllerTests {
         }
     }
 
-    @Test("While a receiver is playing the stream itself, the phone's route changing does not pause it: a call on the phone must not stop the house")
-    func routeChangeDoesNotPauseAReceiver() async {
+    @Test("An audio-session pause (an output device removed) pauses, and a resume resumes")
+    func sessionActionsAreFollowed() async {
         let controller = PlayerController(publisher: FakePublisher())
         controller.initPlayer(link: direct)
         controller.liveShift = nil
         controller.playPlayer()
+        controller.handle(sessionAction: .none)
         #expect(controller.wantsPlayback)
-        controller.isPlayingExternally = { true }
-        controller.handle(sessionAction: .pause)
-        #expect(controller.wantsPlayback)
-    }
-
-    @Test("With the sound on the phone itself, an output device going away (unplugged headphones) still pauses, by convention")
-    func routeChangePausesLocalPlayback() async {
-        let controller = PlayerController(publisher: FakePublisher())
-        controller.initPlayer(link: direct)
-        controller.liveShift = nil
-        controller.playPlayer()
-        #expect(controller.wantsPlayback)
-        controller.isPlayingExternally = { false }
         controller.handle(sessionAction: .pause)
         #expect(!controller.wantsPlayback)
-    }
-
-    @Test("The listener's own pause still pauses a receiver")
-    func ownPauseStillPausesAReceiver() async {
-        let controller = PlayerController(publisher: FakePublisher())
-        controller.initPlayer(link: direct)
-        controller.liveShift = nil
-        controller.playPlayer()
+        controller.handle(sessionAction: .resume)
         #expect(controller.wantsPlayback)
-        controller.isPlayingExternally = { true }
-        controller.pausePlayer()
-        #expect(!controller.wantsPlayback)
     }
 
     @Test("If the time-shift cannot start, the direct stream plays as it always has")
