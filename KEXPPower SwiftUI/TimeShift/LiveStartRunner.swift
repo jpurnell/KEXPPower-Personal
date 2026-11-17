@@ -15,6 +15,8 @@ struct LiveStartSnapshot: Sendable, Equatable {
     var itemStatus: Int
     /// The player's reason for waiting, or `none`.
     var waitingReason: String
+    /// What the start is running in (app state, audio route, what the item's own logs say), as fixed codes and counts; empty if there is nothing to say.
+    var environment: String = ""
 }
 
 /// What a live start is watched through: the player, the local server and the clock. The app's player is one; a test scripts another.
@@ -112,6 +114,7 @@ final class LiveStartRunner {
             guard !Task.isCancelled, let snapshot = host.snapshot() else { return }
             let elapsed = host.now().timeIntervalSince(requested)
             let seconds = elapsed.formatted(.number.precision(.fractionLength(1)))
+            if look == 1, !snapshot.environment.isEmpty { host.record("live start: environment \(snapshot.environment)") }
             switch watch.observe(elapsed: elapsed, audioMoving: snapshot.audioMoving, evidence: snapshot.evidence) {
             case .started:
                 host.record("live start: audio moving after \(seconds) s")
@@ -142,5 +145,6 @@ final class LiveStartRunner {
         let misses = snapshot.evidence.segmentMisses.map(String.init) ?? "n/a"
         return "live start: \(seconds) s, control \(snapshot.controlStatus), item \(snapshot.itemStatus), waiting \(snapshot.waitingReason), "
             + "network \(network.rawValue), playlist fetches \(playlists), segment fetches \(segments), segment misses \(misses)"
+            + (snapshot.environment.isEmpty ? "" : ", \(snapshot.environment)")
     }
 }

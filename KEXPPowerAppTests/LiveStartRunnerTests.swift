@@ -147,6 +147,26 @@ struct LiveStartRunnerTests {
         #expect(reports.isEmpty)
     }
 
+    @Test("The environment the start runs in (app state, route, what the item's own logs say) is written once at the first look and with every two-second line")
+    func environmentIsJournaled() async {
+        let host = ScriptedHost()
+        host.script = [LiveStartSnapshot(
+            audioMoving: false, evidence: LiveStartEvidence(playlistFetches: 2, segmentFetches: 0, itemFailed: false, segmentMisses: 0),
+            controlStatus: 1, itemStatus: 0, waitingReason: "none", environment: "app active, outputs CarAudio, external false")]
+        _ = await run(host: host)
+        let first = host.lines.first { $0.contains("environment") }
+        #expect(first == "live start: environment app active, outputs CarAudio, external false")
+        #expect(host.lines.filter { $0.contains("playlist fetches") }.allSatisfy { $0.hasSuffix("app active, outputs CarAudio, external false") })
+    }
+
+    @Test("With no environment to report, the lines are as before")
+    func noEnvironment() async {
+        let host = ScriptedHost()
+        host.script = [.silent(playlists: 1, segments: 0)]
+        _ = await run(host: host)
+        #expect(!host.lines.contains { $0.contains("environment") })
+    }
+
     @Test("The journal gets the player's state and the server's counts every two seconds while a start is slow")
     func evidenceEveryTwoSeconds() async {
         let host = ScriptedHost()

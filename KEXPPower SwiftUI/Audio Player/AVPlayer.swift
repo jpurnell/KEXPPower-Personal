@@ -239,6 +239,32 @@ import UniformTypeIdentifiers
             if !Task.isCancelled { liveStartRunning = false }
         }
 
+        // MARK: - What a start runs in
+
+        /// The surroundings of a start, as fixed codes and counts for the journal: whether the app is in front, how the audio session shares its route, where
+        /// the audio is going, whether the player handed playback to something external, and what the item's own HLS logs say. A start that works from the
+        /// phone and stalls from a car differs in one of these.
+        private func environmentSummary(for item: AVPlayerItem) -> String {
+            var parts: [String] = []
+            #if os(iOS) || os(visionOS)
+            parts.append("app \(UIApplication.shared.applicationState.rawValue)")
+            let session = AVAudioSession.sharedInstance()
+            parts.append("category \(session.category.rawValue), policy \(session.routeSharingPolicy.rawValue)")
+            parts.append("outputs " + session.currentRoute.outputs.map { $0.portType.rawValue }.joined(separator: ","))
+            #endif
+            #if !os(macOS)
+            if let player { parts.append("external \(player.isExternalPlaybackActive)") }
+            #endif
+            if let error = item.error as NSError? { parts.append("item error \(error.domain) \(error.code)") }
+            let access = item.accessLog()?.events.count ?? 0
+            let media = item.accessLog()?.events.last?.numberOfMediaRequests ?? 0
+            parts.append("access events \(access), media requests \(media)")
+            if let last = item.errorLog()?.events.last {
+                parts.append("error log \(last.errorDomain) \(last.errorStatusCode)")
+            }
+            return parts.joined(separator: ", ")
+        }
+
         // MARK: - The stream's connection
 
         /// Follows the recording's connection to the stream for as long as there is one. Replaced when the recording is.
@@ -347,7 +373,7 @@ import UniformTypeIdentifiers
                     return LiveStartSnapshot(
                         audioMoving: position.isFinite && position > 0.1, evidence: evidence,
                         controlStatus: player.timeControlStatus.rawValue, itemStatus: watched.item.status.rawValue,
-                        waitingReason: player.reasonForWaitingToPlay?.rawValue ?? "none")
+                        waitingReason: player.reasonForWaitingToPlay?.rawValue ?? "none", environment: self.environmentSummary(for: watched.item))
                 },
                 rebuild: { [weak self] in
                     guard let self, let item = await self.rebuildLiveItem() else { return false }
