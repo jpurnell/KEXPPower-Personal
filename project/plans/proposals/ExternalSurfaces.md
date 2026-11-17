@@ -1,8 +1,8 @@
 # Design Proposal: playing to surfaces other than the phone (CarPlay, AirPlay receivers, wearables)
 
-**Status:** DRAFT 2026-11-17, **nothing approved.** Two changes in this area were built and pushed **before this proposal existed, which the guidelines forbid** (`664c9af` "live on an AirPlay route plays the stream directly" and `7263e45` "a recording start handed to an external receiver falls back to the stream at once"); they were fixes made while reading a device's journal, and §3 treats them as the first step of this design, for the owner to approve, change or reject. Everything else here is unwritten.
+**Status:** DRAFT 2026-11-17. **Decided by the owner 2026-11-17:** an unknown route plays the stream (§16 question 1: *"Unknown plays the stream is the right fallback"*), and the direct start is to keep being measured and optimized (§3a). **Everything else is not yet approved.** Two changes in this area were built and pushed **before this proposal existed, which the guidelines forbid** (`664c9af` "live on an AirPlay route plays the stream directly" and `7263e45` "a recording start handed to an external receiver falls back to the stream at once"); they were fixes made while reading a device's journal, and §3 treats them as the first step of this design, for the owner to approve, change or reject. Everything else here is unwritten.
 
-**Facts marked (device) were observed on Brawn (iPhone 15 Pro, iOS 27.3, Spinner 3.6.0) on 2026-11-17, from its on-device journal, a screenshot or the owner's video; (repo) were read in this repository; the owner's statements are quoted. Anything not observed is marked *unverified*.** Every device observation below comes from **one receiver**: the owner's home display ("Kitchen"), which shows CarPlay-style views and reports itself to the phone as AirPlay. **No real car, HomePod, Apple TV or wearable has been observed.**
+**Facts marked (device) were observed on Brawn (iPhone 15 Pro, iOS 27.3, Spinner 3.6.0) on 2026-11-17, from its on-device journal, a screenshot or the owner's video; (repo) were read in this repository; the owner's statements are quoted. Anything not observed is marked *unverified*.** Every device observation below comes from **one receiver**: the owner's home display ("Kitchen"), which shows CarPlay-style views and reports itself to the phone as AirPlay. **The owner reports that a HomePod also worked, alone and paired with the home display (reported, not examined in a journal by me); no real car, Apple TV or wearable has been observed.**
 
 ---
 
@@ -51,6 +51,20 @@ The owner's framing (2026-11-17): the home display is *"meant to play indefinite
 - New: `KEXPPower SwiftUI/Audio Player/PlaybackSource.swift` (`PlaybackSource`, `LivePlan`, `DirectReason`, `PlaybackCapabilities`; no AVFoundation, so it is unit-testable), `KEXPPowerAppTests/LivePlanTests.swift`.
 - Modified: `AVPlayer.swift` (`playLive()` asks `LivePlan.choose`; capabilities published before the item swap; a route observer re-plans), `LiveStart.swift` (`OutputRoute` gains the port mapping `PlaybackSource` needs; `LiveStart` event gains a `plan`/`reason` code), `Diagnostics/FieldEvent.swift`, the Spinner schema (provisional kind change, see §7), `project/diagnostics/spinner-schema.json`.
 - **Module placement:** the app target. `PlaybackSource` could move to `StationKit` once a second app (the watch, a glasses companion) needs it (§15).
+
+### 3a. Measuring the direct start (owner, 2026-11-17: *"we should continue to measure direct start and optimize"*)
+
+**Today (device):** 4.3 s and 4.6 s from the tap to audio on the Kitchen display, against about 0.5 s on the phone's speaker. The journal says when the start was asked for, when the player first reports `playing` (`control 2`, at 2.2 s and 3.0 s), and when the clock moves (4.3 s, 4.6 s); it does not say what the 2 to 3 s before `playing` and the 1.5 to 2 s after it are made of.
+
+**Measure first, change nothing yet.** Per start, journal the phases as fixed codes in seconds: *item created* → *item ready to play* → *player reports playing* → *clock moving*, and the buffer state at each (`isPlaybackLikelyToKeepUp`, loaded duration). Add `surface` (the `PlaybackSource` code) to the `liveStart` event beside `took`, so the hub can report start time **by surface** and the 5 s criterion is measured, not asserted. Statistics follow the owner's standing rule (measure, then decide; BusinessMath on the hub later).
+
+**Candidates to test, each *unverified* and none assumed to help:**
+- `automaticallyWaitsToMinimizeStalling` is on by default, so the player may wait for a buffer before it starts; for a stream a receiver fetches, a shorter wait might be possible.
+- `preferredForwardBufferDuration` is set to 300 s on the direct item (repo, `playLiveDirectly`); whether it delays the first sound is not known.
+- Warming up before the tap: the audio session is activated at play; a connection to the stream could be opened when the car connects or the app opens.
+- The receiver's own startup, which the phone cannot change; the split is what the measurement would show.
+
+**Done when:** the phases are in the journal and the hub, a baseline per surface exists over at least 20 starts, and each candidate is a measured before-and-after, not a belief.
 
 ## 4. API Surface
 
@@ -128,7 +142,7 @@ None new. `AVAudioSession` and `AVPlayer` (system), `StationKit`'s `AudioSession
 ## 13. Adversarial Review
 
 **Against this design.**
-1. **It rests on one receiver.** The Kitchen display is the only AirPlay destination observed. A HomePod, an Apple TV or AirPlay 2 speaker may behave differently (for example, AirPlay 2 audio streamed *from the phone* rather than handed off by URL, in which case the phone is the source and the recording would have worked). Playing the stream there is still correct, only without rewind, so the failure is a lost feature, not a broken start. *Mitigation:* the device matrix; the `plan` and `reason` codes in the hub will show which surfaces took which path.
+1. **It rests on few receivers.** The Kitchen display is the only one whose journal was read; the owner reports a HomePod, alone and paired with the display, also worked. A HomePod, an Apple TV or AirPlay 2 speaker may behave differently (for example, AirPlay 2 audio streamed *from the phone* rather than handed off by URL, in which case the phone is the source and the recording would have worked). Playing the stream there is still correct, only without rewind, so the failure is a lost feature, not a broken start. *Mitigation:* the device matrix; the `plan` and `reason` codes in the hub will show which surfaces took which path.
 2. **"Unknown plays the stream" trades rewind for safety.** A glasses companion that renders on the phone would lose rewind it could have had. *Mitigation:* an explicit allow-list for `.phone` that grows as surfaces are observed.
 3. **The route is not a reliable signal at the moment of decision** (the 21:39 first tap). The start watch's external-playback evidence is the second line, but it costs about a second of silence, and that explanation is a hypothesis. *Mitigation:* instrument the decision (log route and external flag at `playLive()`), then see whether the second line ever fires after the first line has been fixed.
 4. **A direct start is still 4.6 s**, against 0.5 s on the phone. This design does not change that; the split between the receiver's startup and the stream's is not measured.
@@ -158,11 +172,11 @@ None new. `AVAudioSession` and `AVPlayer` (system), `StationKit`'s `AudioSession
 
 ## 16. Open Questions
 
-1. **Unknown routes play the stream (recording only where the phone is positively the source). Agreed?** This is the one decision that changes the default.
+1. ~~**Unknown routes play the stream (recording only where the phone is positively the source). Agreed?**~~ **Decided 2026-11-17 (owner): yes, "unknown plays the stream is the right fallback."**
 2. **When the route moves from the phone to a receiver mid-playback, switching to the live edge is accepted?**
 3. **A real car:** the owner's CarPlay sessions came from the display, not a `CarAudio` route. Can one be tried (or the Xcode CarPlay simulator), before `CarAudio` is allow-listed as `.phone`?
 4. **A phone call while a receiver plays:** the owner raised it (*"I'd have to pause playback for the entire house"*). Untested; should it be tested now, on the display?
-5. **Black / blank Now Playing during the swap** (owner's video, second CarPlay session): only the stall misclassification was fixed (`4873978`); publishing Now Playing from intent (§3, piece 3) is the proposed fix, not yet verified to cover it.
+5. **Black / blank Now Playing during the swap** (the metadata part was fixed in `9575285`; the owner confirmed the display now shows it) (owner's video, second CarPlay session): only the stall misclassification was fixed (`4873978`); publishing Now Playing from intent (§3, piece 3) is the proposed fix, not yet verified to cover it.
 6. **Event fields:** `plan` and `reason` on `liveStart`, provisionally on the development key, then `schema apply`?
 
 ## 17. Documentation Strategy
