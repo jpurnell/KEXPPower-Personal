@@ -300,6 +300,17 @@ struct PlayerControllerTests {
         #expect(shift.reserves == 0)
     }
 
+    @Test("Going back to live from an archived show is a start and not a stall: the player is settling until audio moves")
+    func returnToLiveIsSettling() {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        #expect(!controller.settling)
+        controller.returnToLive()
+        #expect(controller.settling)
+        controller.timeControlStatusChanged(.playing)
+        #expect(!controller.settling)
+    }
+
     @Test("If the recording cannot be served again, play falls back to the stream itself rather than staying silent")
     func fallsBackWhenTheRecordingCannotBeServed() async {
         let controller = PlayerController(publisher: FakePublisher())

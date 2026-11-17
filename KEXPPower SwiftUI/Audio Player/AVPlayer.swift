@@ -77,7 +77,7 @@ import UniformTypeIdentifiers
         /// Whether the listener wants audio: set by play and cleared by pause, so a stall the listener ends by pausing is told from one that ends by itself.
         @ObservationIgnored private var wantsPlayback = false
         /// Set while something the listener did (an archived show, a seek) makes the player wait, which is not a stall; cleared when audio moves.
-        @ObservationIgnored private var settling = false
+        @ObservationIgnored private(set) var settling = false
         /// Set while a live start is being watched, which has its own report.
         @ObservationIgnored private var liveStartRunning = false
         @ObservationIgnored private var lastStatusLine = ""
@@ -337,11 +337,12 @@ import UniformTypeIdentifiers
                 snapshot: { [weak self] in
                     guard let self, let player = self.player, player.currentItem === watched.item else { return nil }
                     let position = player.currentTime().seconds
-                    var evidence = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: watched.item.status == .failed)
+                    var evidence = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: watched.item.status == .failed, segmentMisses: nil)
                     // Only a recording has a local server to ask; the direct stream has none.
                     if self.liveSource == .shifted, let served = self.liveShift?.served {
                         evidence.playlistFetches = served.playlists - watched.baseline.playlists
                         evidence.segmentFetches = served.segments - watched.baseline.segments
+                        evidence.segmentMisses = served.missing - watched.baseline.missing
                     }
                     return LiveStartSnapshot(
                         audioMoving: position.isFinite && position > 0.1, evidence: evidence,
@@ -767,6 +768,8 @@ import UniformTypeIdentifiers
         /// Puts the live stream back and plays it.
         func returnToLive() {
             guard player != nil, let liveLink else { return }
+            // Going back to live empties the player for a moment, which is a start and not a stall.
+            settling = true
             endWatch.task?.cancel()
             continuation = nil
             onAdvanced = nil

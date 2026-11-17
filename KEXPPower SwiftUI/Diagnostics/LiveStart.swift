@@ -83,8 +83,10 @@ struct LiveStartEvidence: Sendable, Equatable {
     var segmentFetches: Int?
     /// Whether the item has failed.
     var itemFailed: Bool
+    /// How many requests for a segment the server could not answer.
+    var segmentMisses: Int?
 
-    static let unavailable = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: false)
+    static let unavailable = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: false, segmentMisses: nil)
 }
 
 /// Why the player's item was rebuilt.

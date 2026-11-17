@@ -47,22 +47,27 @@ enum HTTPMessage {
 struct ServedCounts: Sendable, Equatable {
     var playlists: Int
     var segments: Int
+    /// Requests for anything but the playlist that the server could not answer (a segment it no longer, or never, had). A player that asked for
+    /// segments and was told none existed looks, by `segments` alone, like one that never asked.
+    var missing: Int = 0
 }
 
 /// Counts what the server serves. Only the kind of thing and that it was served are kept: no path, no address, no timing.
 final class ServedCounter: Sendable {
     private static let playlistPath = "/live.m3u8"
-    private let counts = OSAllocatedUnfairLock(initialState: ServedCounts(playlists: 0, segments: 0))
+    private let counts = OSAllocatedUnfairLock(initialState: ServedCounts(playlists: 0, segments: 0, missing: 0))
 
     var value: ServedCounts { counts.withLock { $0 } }
 
-    /// Notes one answered request: the playlist whatever its status, a segment only if it was found.
+    /// Notes one answered request: the playlist whatever its status, a segment if it was found, and anything else as missing.
     func note(path: String, status: Int) {
         counts.withLock { counts in
             if path == Self.playlistPath {
                 counts.playlists += 1
             } else if status == 200 {
                 counts.segments += 1
+            } else {
+                counts.missing += 1
             }
         }
     }

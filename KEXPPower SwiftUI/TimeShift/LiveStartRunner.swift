@@ -139,7 +139,8 @@ final class LiveStartRunner {
     private static func state(_ snapshot: LiveStartSnapshot, seconds: String, network: NetworkKind) -> String {
         let playlists = snapshot.evidence.playlistFetches.map(String.init) ?? "n/a"
         let segments = snapshot.evidence.segmentFetches.map(String.init) ?? "n/a"
+        let misses = snapshot.evidence.segmentMisses.map(String.init) ?? "n/a"
         return "live start: \(seconds) s, control \(snapshot.controlStatus), item \(snapshot.itemStatus), waiting \(snapshot.waitingReason), "
-            + "network \(network.rawValue), playlist fetches \(playlists), segment fetches \(segments)"
+            + "network \(network.rawValue), playlist fetches \(playlists), segment fetches \(segments), segment misses \(misses)"
     }
 }
