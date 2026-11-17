@@ -18,8 +18,26 @@ enum FieldDiagnosticsConfiguration {
     /// The Info.plist entry that carries the key.
     static let infoKey = IngestKey.defaultInfoKey
 
+    /// A build run from Xcode is on the `development` channel, which the client library does not send from unless told to. The owner's test
+    /// phone is such a build, so it is told to: once the person has opted in, a development build reports like any other, and the hub files
+    /// it under the `development` channel so it never mixes with real listeners. Free text stays off.
+    static let uploader = UploaderConfiguration(sendsFromDevelopment: true)
+
     /// The key this build was given, or `nil` when it has none. The rules for a usable key are the package's (`IngestKey`).
     static var appKey: String? { IngestKey.value(from: Bundle.main.infoDictionary ?? [:], infoKey: infoKey) }
+}
+
+/// Writes what became of each upload to the app's own log, since nothing else shows it: an upload that never arrives leaves the hub with no
+/// trace and the app with an empty queue. It records the outcome and a count, never the body.
+struct LoggingTransport: Transport {
+    let base: any Transport
+    let log: DiagnosticLog
+
+    func send(_ request: UploadRequest) async -> TransportOutcome {
+        let outcome = await base.send(request)
+        log.record("Field", "upload \(outcome), \(request.body.count) bytes")
+        return outcome
+    }
 }
 
 /// Sends Spinner's typed health events to the diagnostics hub.
@@ -31,41 +49,47 @@ struct FieldDiagnostics: Sendable {
     private let uploader: DiagnosticsUploader?
     private let queue: DiskQueue?
     private let coalescer: EventCoalescer
+    private let log: DiagnosticLog
 
     /// A sender over an uploader; tests give it one over a fake transport.
     /// - Parameters:
     ///   - queue: The uploader's queue, so it can be cleared when the person opts out.
     ///   - coalescer: Holds back a failure that repeats; the default allows each one once in ten minutes.
-    init(uploader: DiagnosticsUploader, queue: DiskQueue? = nil, coalescer: EventCoalescer = EventCoalescer()) {
+    ///   - log: Where the outcome of each send is written, for the person reading a shared report.
+    init(uploader: DiagnosticsUploader, queue: DiskQueue? = nil, coalescer: EventCoalescer = EventCoalescer(), log: DiagnosticLog = .app) {
         self.uploader = uploader
         self.queue = queue
         self.coalescer = coalescer
+        self.log = log
     }
 
-    private init() {
+    private init(log: DiagnosticLog) {
         uploader = nil
         queue = nil
         coalescer = EventCoalescer()
+        self.log = log
     }
 
     /// A sender that **asks the person's consent before it does anything**: nothing is queued and nothing is sent until they opt in, and an
     /// event from before they agreed is never sent after.
     static func make(
         endpoint: URL, appKey: String, identity: AppIdentity, channel: Channel, queue: DiskQueue, transport: any Transport,
-        clock: any UploaderClock = SystemUploaderClock(), consent: DiagnosticsConsent = DiagnosticsConsent()
+        clock: any UploaderClock = SystemUploaderClock(), consent: DiagnosticsConsent = DiagnosticsConsent(),
+        configuration: UploaderConfiguration = FieldDiagnosticsConfiguration.uploader, log: DiagnosticLog = .app
     ) -> FieldDiagnostics {
         FieldDiagnostics(
             uploader: DiagnosticsUploader(
-                endpoint: endpoint, appKey: appKey, identity: identity, channel: channel, queue: queue, transport: transport, clock: clock,
-                enabled: { consent.isOn }),
-            queue: queue)
+                endpoint: endpoint, appKey: appKey, identity: identity, channel: channel, queue: queue,
+                transport: LoggingTransport(base: transport, log: log), clock: clock, enabled: { consent.isOn }, configuration: configuration),
+            queue: queue, log: log)
     }
 
     /// The running app's sender. If the endpoint cannot be formed, or this build has no key, it sends nothing; whatever it has, it sends nothing
     /// until the person opts in.
     static let shared: FieldDiagnostics = {
         guard let endpoint = FieldDiagnosticsConfiguration.endpoint, let appKey = FieldDiagnosticsConfiguration.appKey else {
-            return FieldDiagnostics()
+            DiagnosticLog.app.record("Field", "not sending: this build has no ingest key")
+            return FieldDiagnostics(log: .app)
         }
         let folder = URL.applicationSupportDirectory
             .appendingPathComponent("Diagnostics", isDirectory: true)
@@ -81,7 +105,19 @@ struct FieldDiagnostics: Sendable {
     func send(_ event: FieldEvent) async -> SendOutcome? {
         guard let uploader else { return .notSent(.disabled) }
         guard coalescer.allows(key: event.coalescingKey) else { return nil }
-        return await uploader.send(event.record)
+        let outcome = await uploader.send(event.record)
+        log.record("Field", "\(event.record.kind) \(Self.describe(outcome))")
+        return outcome
+    }
+
+    /// An outcome as words for the log: a fixed phrase, never anything the event carried.
+    private static func describe(_ outcome: SendOutcome) -> String {
+        switch outcome {
+        case .queued: "queued"
+        case .notSent(.disabled): "not sent: disabled"
+        case .notSent(.notEnabledForChannel(let channel)): "not sent: channel \(channel.rawValue)"
+        case .refused: "refused by the privacy line"
+        }
     }
 
     /// Sends events that came from somewhere else, such as the operating system's diagnostics, through the same gate.

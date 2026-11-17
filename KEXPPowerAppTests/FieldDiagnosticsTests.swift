@@ -90,7 +90,7 @@ struct FieldDiagnosticsTests {
         #expect(await rig.transport.requests.count == 1)
     }
 
-    @Test("A Debug build sends nothing, whatever the setting")
+    @Test("The package's own default: an uploader on the development channel sends nothing unless it is configured to")
     func developmentSendsNothing() async throws {
         let rig = try makeRig(channel: .development)
         let outcome = await rig.diagnostics.send(.launch(previousRun: .firstLaunch))
@@ -184,6 +184,68 @@ struct FieldDiagnosticsTests {
         await diagnostics.send(records: [crash])
         let request = try #require(await transport.requests.first)
         #expect(try decode(request).events == [crash])
+    }
+
+    // MARK: Development builds and the local record of what happened to an upload
+
+    private func makeLogged(
+        channel: Channel, consent: DiagnosticsConsent, transport: RecordingTransport, log: DiagnosticLog
+    ) throws -> FieldDiagnostics {
+        let endpoint = try #require(URL(string: "https://diagnostics.example/v1/ingest"))
+        let identity = AppIdentity(app: "spinner", platform: .ios, appVersion: "3.6.0", build: "1", osVersion: "27.2", deviceClass: "iPhone")
+        return FieldDiagnostics.make(
+            endpoint: endpoint, appKey: "test-key-0123456789abcdef", identity: identity, channel: channel,
+            queue: DiskQueue(directory: scratchFolder()), transport: transport, consent: consent, log: log)
+    }
+
+    private func scratchLog() -> DiagnosticLog {
+        DiagnosticLog(directory: FileManager.default.temporaryDirectory.appendingPathComponent("field-log-\(UUID().uuidString)", isDirectory: true))
+    }
+
+    @Test("A development build sends once the person has opted in, and not before: the owner's test phone is one")
+    func developmentSendsAfterOptIn() async throws {
+        let consent = freshConsent()
+        let transport = RecordingTransport()
+        let diagnostics = try makeLogged(channel: .development, consent: consent, transport: transport, log: scratchLog())
+        #expect(await diagnostics.send(.launch(previousRun: .quit)) == .notSent(.disabled))
+        consent.record(.optedIn)
+        #expect(await diagnostics.send(.launch(previousRun: .quit)) == .queued)
+        let request = try #require(await transport.requests.first)
+        #expect(try decode(request).channel == .development)
+    }
+
+    @Test("A send that is not made says why in the app's own log, because nobody else can see it")
+    func notSentIsLogged() async throws {
+        let log = scratchLog()
+        let diagnostics = try makeLogged(channel: .appStore, consent: freshConsent(), transport: RecordingTransport(), log: log)
+        _ = await diagnostics.send(.rewindUnavailable(.serverFailed))
+        #expect(log.contents().contains("[Field] rewindUnavailable not sent: disabled"))
+    }
+
+    @Test("Each upload's result is logged: delivered, to be retried, or refused for good")
+    func uploadResultIsLogged() async throws {
+        let consent = freshConsent()
+        consent.record(.optedIn)
+        let transport = RecordingTransport()
+        let log = scratchLog()
+        let diagnostics = try makeLogged(channel: .appStore, consent: consent, transport: transport, log: log)
+        _ = await diagnostics.send(.launch(previousRun: .quit))
+        await transport.set(.rejectedPermanently)
+        _ = await diagnostics.send(.rewindUnavailable(.noAudioInTime))
+        let text = log.contents()
+        #expect(text.contains("[Field] launch queued"))
+        #expect(text.contains("[Field] upload delivered"))
+        #expect(text.contains("[Field] upload rejectedPermanently"))
+    }
+
+    @Test("The log holds codes and counts, never what the event carried")
+    func logHoldsNoEventFields() async throws {
+        let consent = freshConsent()
+        consent.record(.optedIn)
+        let log = scratchLog()
+        let diagnostics = try makeLogged(channel: .appStore, consent: consent, transport: RecordingTransport(), log: log)
+        _ = await diagnostics.send(.rewindUnavailable(.gaveUpWatching))
+        #expect(!log.contents().contains("gaveUpWatching"))
     }
 
     @Test("The identity is the bundle's version and build, with tokens for the platform and the device class")
