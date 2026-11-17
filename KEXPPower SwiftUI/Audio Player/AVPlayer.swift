@@ -364,6 +364,9 @@ import UniformTypeIdentifiers
                     guard let self, let player = self.player, player.currentItem === watched.item else { return nil }
                     let position = player.currentTime().seconds
                     var evidence = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: watched.item.status == .failed, segmentMisses: nil)
+                    #if !os(macOS)
+                    evidence.externalPlayback = player.isExternalPlaybackActive
+                    #endif
                     // Only a recording has a local server to ask; the direct stream has none.
                     if self.liveSource == .shifted, let served = self.liveShift?.served {
                         evidence.playlistFetches = served.playlists - watched.baseline.playlists

@@ -54,6 +54,23 @@ struct LiveStartWatchTests {
         #expect(watch.observe(elapsed: 18, audioMoving: false, evidence: evidence) == .fallBackDirect)
     }
 
+    @Test("A recording start the player has handed to an external receiver falls back to the stream at once: the receiver cannot reach the phone's loopback")
+    func externalPlayback() {
+        var watch = LiveStartWatch()
+        let evidence = LiveStartEvidence(playlistFetches: 2, segmentFetches: 0, itemFailed: false, segmentMisses: 0, externalPlayback: true)
+        #expect(watch.observe(elapsed: 1, audioMoving: false, evidence: evidence) == .fallBackDirect)
+        #expect(watch.observe(elapsed: 2, audioMoving: false, evidence: evidence) == .waiting)
+        #expect(watch.observe(elapsed: 4, audioMoving: true, evidence: evidence) == .started)
+        #expect(watch.outcome == .fellBackDirect)
+    }
+
+    @Test("A direct start (no local server to ask) on an external receiver is left alone: it is already the stream")
+    func externalPlaybackWhenDirect() {
+        var watch = LiveStartWatch()
+        let evidence = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: false, segmentMisses: nil, externalPlayback: true)
+        #expect(watch.observe(elapsed: 1, audioMoving: false, evidence: evidence) == .waiting)
+    }
+
     @Test("An item that has failed is rebuilt at once, not after eight seconds")
     func failedItem() {
         var watch = LiveStartWatch()

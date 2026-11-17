@@ -85,6 +85,8 @@ struct LiveStartEvidence: Sendable, Equatable {
     var itemFailed: Bool
     /// How many requests for a segment the server could not answer.
     var segmentMisses: Int?
+    /// Whether the player has handed the item to an external receiver (AirPlay), which fetches it itself and cannot reach the recording's loopback address.
+    var externalPlayback = false
 
     static let unavailable = LiveStartEvidence(playlistFetches: nil, segmentFetches: nil, itemFailed: false, segmentMisses: nil)
 }
@@ -135,6 +137,11 @@ struct LiveStartWatch: Sendable {
             return .giveUp
         }
         if elapsed >= Self.fallBackAfter, stage.rawValue < Stage.fellBack.rawValue {
+            stage = .fellBack
+            return .fallBackDirect
+        }
+        // A receiver fetches the item itself, and the recording is at the phone's own loopback address: waiting would only be silence.
+        if evidence.externalPlayback, evidence.playlistFetches != nil, stage.rawValue < Stage.fellBack.rawValue {
             stage = .fellBack
             return .fallBackDirect
         }
