@@ -59,7 +59,12 @@ private final class FakeShift: LiveShifting {
         return Task.isCancelled ? nil : address
     }
     func stop() async { stops += 1 }
-    func reserve() async -> URL? { address }
+    private(set) var reserves = 0
+    var reserveFails = false
+    func reserve() async -> URL? {
+        reserves += 1
+        return reserveFails ? nil : address
+    }
     var served = ServedCounts(playlists: 0, segments: 0)
     let connectionEvents = AsyncStream<RecorderEvent>.makeStream(bufferingPolicy: .bufferingNewest(32)).stream
 }
@@ -248,6 +253,90 @@ struct PlayerControllerTests {
         await controller.playLive()
         #expect(itemURL(controller) == local)
         #expect(shift.starts == 1)
+    }
+
+    // MARK: A player whose item was dropped (a long outage empties the queue player)
+
+    /// Empties the queue player, as a long outage did on a device.
+    private func drop(_ controller: PlayerController) {
+        (controller.player as? AVQueuePlayer)?.removeAllItems()
+    }
+
+    /// Waits for a condition on the main actor for up to two seconds.
+    private func eventually(_ condition: @MainActor () -> Bool) async -> Bool {
+        for _ in 0..<200 {
+            if condition() { return true }
+            try? await Task.sleep(for: .milliseconds(10))
+        }
+        return false
+    }
+
+    @Test("When the player has lost its item, pressing play puts the recording back and plays it: it is not a dead end")
+    func playAfterTheItemWasDropped() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        // What a long outage did on Brawn: the queue player's item was gone, and the status read "waiting, no item to play".
+        drop(controller)
+        #expect(controller.player?.currentItem == nil)
+        controller.playPlayer()
+        #expect(await eventually { itemURL(controller) == local })
+        #expect(shift.reserves >= 1)
+    }
+
+    @Test("A failed item is replaced when play is pressed, and an item that is fine is left alone")
+    func healthyItemIsLeftAlone() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        let before = controller.player?.currentItem
+        controller.playPlayer()
+        try? await Task.sleep(for: .milliseconds(100))
+        #expect(controller.player?.currentItem === before)
+        #expect(shift.reserves == 0)
+    }
+
+    @Test("If the recording cannot be served again, play falls back to the stream itself rather than staying silent")
+    func fallsBackWhenTheRecordingCannotBeServed() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        shift.reserveFails = true
+        drop(controller)
+        controller.playPlayer()
+        #expect(await eventually { controller.player?.currentItem != nil })
+    }
+
+    @Test("When the connection comes back and the player has lost its item while the listener still wanted audio, the item is put back without a press")
+    func restoredConnectionPutsTheItemBack() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        controller.playPlayer()
+        drop(controller)
+        controller.connectionRestored()
+        #expect(await eventually { itemURL(controller) == local })
+    }
+
+    @Test("A listener who paused is not given audio back when the connection returns")
+    func pausedListenerIsLeftAlone() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.liveShift = FakeShift(address: local)
+        await controller.playLive()
+        controller.pausePlayer()
+        drop(controller)
+        controller.connectionRestored()
+        try? await Task.sleep(for: .milliseconds(150))
+        #expect(controller.player?.currentItem == nil)
     }
 
     @Test("If the time-shift cannot start, the direct stream plays as it always has")

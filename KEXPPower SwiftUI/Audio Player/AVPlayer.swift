@@ -86,6 +86,9 @@ import UniformTypeIdentifiers
         @ObservationIgnored private var outageObserver = StreamOutageObserver()
         @ObservationIgnored private let outageTask = TaskHolder()
         @ObservationIgnored private var outageMarkerWrittenAt: TimeInterval = 0
+        @ObservationIgnored private var itemRecovery = false
+        /// The task that puts the item back: its own, because starting live over cancels the shift task and must not cancel the task that asked for it.
+        @ObservationIgnored private let itemTask = TaskHolder()
         /// How far from the end of an archived file the next item is lined up, so it is loaded before it is needed.
         static let handoffLead: TimeInterval = 30
         /// How far the system's skip buttons move: a short rewind and a longer skip forward.
@@ -274,6 +277,7 @@ import UniformTypeIdentifiers
                     outageMarkerWrittenAt = now
                 }
             case .restored:
+                connectionRestored()
                 guard let outage = outageObserver.restored(at: now) else { return }
                 DiagnosticLog.app.record(
                     "Player", "stream outage: ended, \(outage.outcome.rawValue) after \(outage.took.rawValue), ahead \(outage.ahead.rawValue), attempts \(outage.attempts)")
@@ -398,10 +402,41 @@ import UniformTypeIdentifiers
             }
         }
 
+        /// Whether live is meant to be playing and the player has no usable item: none at all, or one that failed.
+        private var liveItemIsGone: Bool {
+            guard let player, !isPlayingArchive, liveSource == .shifted || liveSource == .direct else { return false }
+            return player.currentItem == nil || player.currentItem?.status == .failed
+        }
+
+        /// Called when the stream's connection comes back: if the listener still wants audio and the player lost its item while it was down, the item
+        /// is put back without anyone pressing play.
+        func connectionRestored() {
+            guard wantsPlayback, liveItemIsGone else { return }
+            putTheLiveItemBack(because: "the connection came back")
+        }
+
+        /// Puts a fresh item in the player: the recording served again, or the stream itself if that cannot be. One attempt at a time.
+        private func putTheLiveItemBack(because reason: String) {
+            guard !itemRecovery else { return }
+            itemRecovery = true
+            DiagnosticLog.app.record("Player", "the player has no live item (\(reason)); putting it back")
+            itemTask.task = Task { [weak self] in await self?.rebuildGoneItem() }
+        }
+
+        private func rebuildGoneItem() async {
+            if await rebuildLiveItem() == nil { await restartLive() }
+            itemRecovery = false
+        }
+
         private func recoverLive() async {
             guard awaitingNetwork, !isPlayingArchive, player != nil else { return }
             awaitingNetwork = false
             startIsRecovery = true
+            await restartLive()
+        }
+
+        /// Starts live over: the recording is stopped and made again, and the item is chosen when it is ready.
+        private func restartLive() async {
             shiftTask.task?.cancel()
             stopWatchingLag()
             if liveSource == .shifted { setTransportControls(nil) }
@@ -473,6 +508,12 @@ import UniformTypeIdentifiers
         func playPlayer() {
             wantsPlayback = true
             sessionCoordinator.activate()
+            // A long outage can leave the queue player with no item at all (its status then reads "waiting, no item to play"). `play()` on that is
+            // silence, and it was the dead end that left a listener unable to restart live: the item is put back first.
+            if liveItemIsGone {
+                putTheLiveItemBack(because: "play pressed")
+                return
+            }
             guard !isPlayingArchive, liveSource == .unresolved else {
                 player?.play()
                 return
