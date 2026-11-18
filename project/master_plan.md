@@ -207,8 +207,8 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 ## Roadmap
 
 ### Phase 1: Solid foundation on current OS (now)
-- [ ] Playback hardening and Swift 6 (iOS 17+)
-- [ ] Fork upkeep (ADR-001): program image field, 14-day lookback, Swift 6 mode for the framework
+- [x] ~~Playback hardening and Swift 6 (iOS 17+)~~ done: `project/plans/completed/PlaybackHardening.md`; every target is Swift 6 with strict concurrency (reconciled 2026-11-18; the box was left unchecked)
+- [x] ~~Fork upkeep (ADR-001): program image field, 14-day lookback, Swift 6 mode for the framework~~ done by another route: the app uses `KEXPPowerKit` 4.x (ADR-002), which has them (reconciled 2026-11-18)
 
 ### Phase 2: The features this app exists for
 - [x] Spotify and Bandcamp search links; tappable links in DJ comments (`MusicLinks`)
@@ -224,6 +224,7 @@ This principle is operationalized in the **Adversarial Review** step of `design_
 - [x] Watch widget built 2026-11-05 (`project/plans/proposals/WatchWidget.md`; StationKit 0.7.0 `WidgetFeed`; same App Group as the phone, auto-registered); awaiting a check on a watch
 - [x] Archive browser by Date / Host / Show / Genre, like kexp.org/archive: built on iPhone and iPad 2026-11-06/07 (`project/plans/proposals/ArchiveBrowser.md`, `ArchiveTransport.md`); the adaptive grid also serves the Mac, but the Mac has had no layout pass of its own; CarPlay's Archive tab was built 2026-11-08
 - [x] Live rewind: pause and rewind the live stream, with a bolt back to live. Shipped (unreleased) by another route than the one first proposed: KEXP's archive has no audio for the show on the air (probed 2026-11-07), so the app records the live stream itself, ten minutes at a time, and plays through that (`project/plans/proposals/LiveRewind.md`, ADR-010). The first idea was to rewind into the archive; the plan was wrong about the route. Phases 0 to 2 built 2026-11-07/08; Phase 3, a "stay N minutes behind live" cushion (Off, 2 or 5 minutes, at most half the window; the bolt goes back to the cushion, and "Cushion now" replays to make one), was built 2026-11-09 as Part A only (`project/plans/upcoming/LiveRewindCushion.md`; Part B, a slow-play drift, was dropped because 0.9x takes about 50 minutes to build 5); not yet checked across a real dead zone on a device
+- [x] External surfaces (built 2026-11-17/18, `ExternalSurfaces.md`, ADR-011): live to the Kitchen display, AirPlay receivers and (unverified) a real car, designed so a wearable is one more line. Open: measure and tune the 4 to 6 s receiver start; a real car; the `liveStart` plan/reason/surface hub fields (needs the owner's yes)
 - [x] Settings: rewind window, stream quality, show times in (`project/plans/upcoming/Settings.md`, approved and built 2026-11-08; it shipped the "Settings screen" that `LiveRewind.md` §10 asked for)
 - [x] Control Center play/pause control built 2026-11-05 (`project/plans/proposals/ControlCenterControl.md`; iOS 18 and macOS 26; visionOS cannot get controls in this SDK); awaiting a check in Control Center on a device
 
