@@ -96,6 +96,11 @@ import UniformTypeIdentifiers
         @ObservationIgnored private let outageTask = TaskHolder()
         @ObservationIgnored private var outageMarkerWrittenAt: TimeInterval = 0
         @ObservationIgnored private var itemRecovery = false
+        /// The item the player had before the latest change, for saying what a lost one was.
+        @ObservationIgnored private var lastItem: AVPlayerItem?
+        /// How many times an item that went away was put back since audio last played.
+        @ObservationIgnored private var unplayedRecoveries = 0
+        private static let maximumUnplayedRecoveries = 3
         /// The task that puts the item back: its own, because starting live over cancels the shift task and must not cancel the task that asked for it.
         @ObservationIgnored private let itemTask = TaskHolder()
         /// How far from the end of an archived file the next item is lined up, so it is loaded before it is needed.
@@ -229,6 +234,7 @@ import UniformTypeIdentifiers
             if isPlaying {
                 hasPlayed = true
                 settling = false
+                unplayedRecoveries = 0
             }
             if status == .waitingToPlayAtSpecifiedRate { startStallWatch() }
             if isPlaying != wasPlaying { onPlayingChange?(isPlaying) }
@@ -487,6 +493,24 @@ import UniformTypeIdentifiers
         private var liveItemIsGone: Bool {
             guard let player, !isPlayingArchive, liveSource == .shifted || liveSource == .direct else { return false }
             return player.currentItem == nil || player.currentItem?.status == .failed
+        }
+
+        /// The player's item is gone while live should be playing: a stream with no recording to report its connection coming back (the display, which
+        /// plays the stream itself) otherwise stays silent until someone presses play, as it did for 82 seconds on a receiver. The journal says what the
+        /// lost item last was, since nothing else recorded why it went; the item is put back unless the listener paused, and no more than
+        /// `maximumUnplayedRecoveries` times without audio having played in between, so a stream that is down is not retried forever.
+        private func liveItemWentAway(_ previous: AVPlayerItem?) {
+            // The queue reports the empty state more than once for one loss; a put-back already under way is the answer to all of them.
+            guard wantsPlayback, liveItemIsGone, !itemRecovery else { return }
+            let error = previous?.error as NSError?
+            let cause = error.map { "\($0.domain) \($0.code)" } ?? "none"
+            DiagnosticLog.app.record("Player", "the live item went away (it was status \(previous?.status.rawValue ?? -1), error \(cause))")
+            guard unplayedRecoveries < Self.maximumUnplayedRecoveries else {
+                DiagnosticLog.app.record("Player", "not putting it back again: \(Self.maximumUnplayedRecoveries) tries without audio")
+                return
+            }
+            unplayedRecoveries += 1
+            putTheLiveItemBack(because: "it went away")
         }
 
         /// Called when the stream's connection comes back: if the listener still wants audio and the player lost its item while it was down, the item
@@ -992,6 +1016,9 @@ import UniformTypeIdentifiers
 
         /// The player moved to its next item: if that is the one lined up, the show has rolled over.
         private func currentItemChanged(_ item: AVPlayerItem?) {
+            let previous = lastItem
+            lastItem = item
+            if item == nil { liveItemWentAway(previous) }
             guard let item, let lined = queued, item === lined.item else { return }
             queued = nil
             switch lined.plan {

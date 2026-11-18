@@ -338,6 +338,51 @@ struct PlayerControllerTests {
         #expect(await eventually { itemURL(controller) == local })
     }
 
+    @Test("A direct stream that loses its item while the listener wants audio gets it back without a press and without the recording's help")
+    func directItemIsPutBackOnItsOwn() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .airPlay }
+        await controller.playLive()
+        controller.playPlayer()
+        let before = controller.player?.currentItem
+        drop(controller)
+        #expect(await eventually { controller.player?.currentItem != nil && controller.player?.currentItem !== before })
+        #expect(itemURL(controller) == direct)
+    }
+
+    @Test("A listener who paused is not given an item back when it goes away")
+    func pausedListenerKeepsNoItem() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .airPlay }
+        await controller.playLive()
+        controller.pausePlayer()
+        drop(controller)
+        try? await Task.sleep(for: .milliseconds(150))
+        #expect(controller.player?.currentItem == nil)
+    }
+
+    @Test("An item that keeps going away without audio ever playing is put back three times and then left, not retried forever")
+    func recoveriesAreCapped() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        controller.playPlayer()
+        for tries in 1...3 {
+            drop(controller)
+            #expect(await eventually { controller.player?.currentItem != nil && shift.reserves == tries })
+        }
+        for _ in 0..<2 {
+            drop(controller)
+            try? await Task.sleep(for: .milliseconds(200))
+        }
+        #expect(shift.reserves == 3)
+        #expect(controller.player?.currentItem == nil)
+    }
+
     @Test("A listener who paused is not given audio back when the connection returns")
     func pausedListenerIsLeftAlone() async {
         let controller = PlayerController(publisher: FakePublisher())
