@@ -87,12 +87,14 @@ enum FieldEvent: Sendable, Equatable {
             case .rebuilt, .fellBackDirect, .recoveredOnNetwork: .warning
             case .gaveUp: .error
             }
-            return EventRecord(
-                kind: "liveStart", severity: severity, at: Date(),
-                fields: [
-                    "outcome": .code(start.outcome.rawValue), "took": .code(start.took.rawValue),
-                    "network": .code(start.network.rawValue), "route": .code(start.route.rawValue),
-                ])
+            var fields: [String: FieldValue] = [
+                "outcome": .code(start.outcome.rawValue), "took": .code(start.took.rawValue),
+                "network": .code(start.network.rawValue), "route": .code(start.route.rawValue),
+            ]
+            if let plan = start.plan { fields["plan"] = .code(plan.code) }
+            if let reason = start.plan?.reason { fields["reason"] = .code(reason.rawValue) }
+            if let surface = start.surface { fields["surface"] = .code(surface.code) }
+            return EventRecord(kind: "liveStart", severity: severity, at: Date(), fields: fields)
         }
     }
 }

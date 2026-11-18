@@ -1,6 +1,6 @@
 {
   "app": "spinner",
-  "version": 6,
+  "version": 7,
   "kinds": [
     {
       "name": "launch",
@@ -615,6 +615,42 @@
             ]
           },
           "isRequired": true
+        },
+        {
+          "name": "plan",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "recording",
+              "direct"
+            ]
+          },
+          "isRequired": false
+        },
+        {
+          "name": "reason",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "receiver",
+              "unknownRoute",
+              "recordingUnavailable",
+              "evidenceFallBack"
+            ]
+          },
+          "isRequired": false
+        },
+        {
+          "name": "surface",
+          "type": {
+            "type": "code",
+            "allowed": [
+              "phone",
+              "receiver",
+              "unknown"
+            ]
+          },
+          "isRequired": false
         }
       ],
       "channels": [

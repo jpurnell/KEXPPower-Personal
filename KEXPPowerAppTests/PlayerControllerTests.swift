@@ -351,6 +351,30 @@ struct PlayerControllerTests {
         #expect(itemURL(controller) == direct)
     }
 
+    @Test("A live start is reported with the plan that played it and where the sound was rendered")
+    func liveStartIsReportedWithThePlan() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .airPlay }
+        await controller.playLive()
+        var reported: LiveStart?
+        controller.onLiveStart = { reported = $0 }
+        controller.reportLiveStart(LiveStart(outcome: .started, took: .from2to5, network: .wifi, route: .airPlay))
+        #expect(reported?.plan == .direct(.receiver))
+        #expect(reported?.surface == .receiver)
+
+        let phone = PlayerController(publisher: FakePublisher())
+        phone.initPlayer(link: direct)
+        phone.outputRoute = { .speaker }
+        phone.liveShift = FakeShift(address: local)
+        await phone.playLive()
+        var phoneReported: LiveStart?
+        phone.onLiveStart = { phoneReported = $0 }
+        phone.reportLiveStart(LiveStart(outcome: .started, took: .under2, network: .wifi, route: .speaker))
+        #expect(phoneReported?.plan == .recording)
+        #expect(phoneReported?.surface == .phone)
+    }
+
     @Test("A listener who paused is not given an item back when it goes away")
     func pausedListenerKeepsNoItem() async {
         let controller = PlayerController(publisher: FakePublisher())
@@ -421,10 +445,12 @@ struct PlayerControllerTests {
         controller.routeDidChange()
         #expect(await eventually { itemURL(controller) == direct })
         #expect(!controller.capabilities.canRewind)
-        let after = controller.player?.currentItem
+        // Once: the recording was stopped for the switch, and a second route change does not stop or switch again. (The item itself is not compared: the
+        // real player fails to load the unreachable test addresses, and the start watch replaces a failed item for its own reasons.)
+        #expect(shift.stops == 1)
         controller.routeDidChange()
         try? await Task.sleep(for: .milliseconds(100))
-        #expect(controller.player?.currentItem === after)
+        #expect(shift.stops == 1)
     }
 
     @Test("When the sound moves back to the phone, nothing is switched on its own: the next play plans again")
@@ -432,14 +458,15 @@ struct PlayerControllerTests {
         let controller = PlayerController(publisher: FakePublisher())
         controller.initPlayer(link: direct)
         controller.outputRoute = { .airPlay }
-        controller.liveShift = FakeShift(address: local)
-        controller.playPlayer()
-        #expect(await eventually { itemURL(controller) == direct })
-        let before = controller.player?.currentItem
+        let shift = FakeShift(address: local)
+        controller.liveShift = shift
+        await controller.playLive()
+        #expect(itemURL(controller) == direct)
         controller.outputRoute = { .speaker }
         controller.routeDidChange()
         try? await Task.sleep(for: .milliseconds(100))
-        #expect(controller.player?.currentItem === before)
+        // Nothing was started, stopped or served again for the move: the recording was never in use and is not switched to on its own.
+        #expect(shift.starts == 0 && shift.stops == 0 && shift.reserves == 0)
     }
 
     @Test("A route change while an archived show plays leaves it alone")
@@ -488,6 +515,23 @@ struct PlayerControllerTests {
         controller.liveShift = FakeShift(address: local)
         await controller.playLive()
         #expect(controller.capabilities.canRewind)
+    }
+
+    @Test("A route that becomes a receiver while the recording is starting plays the stream: the receiver is never handed the phone's loopback address")
+    func routeChangesWhileTheRecordingStarts() async {
+        let controller = PlayerController(publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .speaker }
+        let shift = FakeShift(address: local, delay: .milliseconds(150))
+        controller.liveShift = shift
+        let start = Task { await controller.playLive() }
+        try? await Task.sleep(for: .milliseconds(30))
+        // What happened on a cold launch from the display: the route was the speaker at the tap and AirPlay two seconds later.
+        controller.outputRoute = { .airPlay }
+        await start.value
+        #expect(itemURL(controller) == direct)
+        #expect(!controller.capabilities.canRewind)
+        #expect(shift.stops >= 1)
     }
 
     @Test("On a route the phone plays to itself (speaker, CarPlay, Bluetooth) live still plays through the recording")
@@ -555,6 +599,18 @@ struct PlayerControllerTests {
         #expect(itemURL(controller) == direct)
         let identifiers: [AVMetadataIdentifier] = (item?.externalMetadata ?? []).compactMap { $0.identifier }
         #expect(identifiers.contains(.commonIdentifierArtwork) && identifiers.contains(.commonIdentifierTitle))
+    }
+
+    @Test("The journal says what an audio interruption was, and what the item's end was, as fixed phrases with codes")
+    func interruptionAndItemEndLines() {
+        #expect(PlaybackEventLine.interruption(began: true, reason: 1, options: nil) == "interruption began, reason 1")
+        #expect(PlaybackEventLine.interruption(began: true, reason: nil, options: nil) == "interruption began, reason none")
+        #expect(PlaybackEventLine.interruption(began: false, reason: nil, options: 1) == "interruption ended, should resume true")
+        #expect(PlaybackEventLine.interruption(began: false, reason: nil, options: 0) == "interruption ended, should resume false")
+        #expect(PlaybackEventLine.interruption(began: false, reason: nil, options: nil) == "interruption ended, should resume false")
+        #expect(PlaybackEventLine.itemPlayedToEnd == "an item played to its end")
+        #expect(PlaybackEventLine.itemFailed(domain: "NSURLErrorDomain", code: -1005) == "an item failed to play to its end (NSURLErrorDomain -1005)")
+        #expect(PlaybackEventLine.itemFailed(domain: nil, code: nil) == "an item failed to play to its end (no error)")
     }
 
     @Test("The journal says what became of the artwork, as a fixed phrase")

@@ -71,6 +71,9 @@ struct LiveStart: Sendable, Equatable {
     let took: StartDuration
     let network: NetworkKind
     let route: OutputRoute
+    /// How live was being played when the start ended, and where the sound was rendered; `nil` when the reporter does not know.
+    var plan: LivePlan?
+    var surface: PlaybackSource?
 }
 
 /// What the local server and the player's item say about a start that has no audio yet, counted from when the item was made.

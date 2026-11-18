@@ -44,6 +44,44 @@ struct FieldEventTests {
         ])
     }
 
+    @Test("A live start also says which plan played it, why the stream was played directly, and where the sound was rendered, when it knows")
+    func liveStartCarriesThePlan() {
+        var start = LiveStart(outcome: .started, took: .from2to5, network: .wifi, route: .airPlay)
+        start.plan = .direct(.receiver)
+        start.surface = .receiver
+        #expect(FieldEvent.liveStart(start).record.fields == [
+            "outcome": .code("started"), "took": .code("from2to5"), "network": .code("wifi"), "route": .code("airPlay"),
+            "plan": .code("direct"), "reason": .code("receiver"), "surface": .code("receiver"),
+        ])
+        start.plan = .recording
+        start.surface = .phone
+        let fields = FieldEvent.liveStart(start).record.fields
+        #expect(fields["plan"] == .code("recording"))
+        #expect(fields["surface"] == .code("phone"))
+        #expect(fields["reason"] == nil)
+    }
+
+    @Test("Every plan, reason and surface a live start can carry passes the schema file")
+    func everyPlanPasses() throws {
+        let validator = SchemaValidator(schema: try loadSchema())
+        var plans: [LivePlan] = [.recording]
+        plans += DirectReason.allCases.map { .direct($0) }
+        let surfaces: [PlaybackSource] = [.phone, .receiver, .unknown]
+        var events: [EventRecord] = []
+        for plan in plans {
+            for surface in surfaces {
+                var start = LiveStart(outcome: .started, took: .under2, network: .wifi, route: .speaker)
+                start.plan = plan
+                start.surface = surface
+                events.append(FieldEvent.liveStart(start).record)
+            }
+        }
+        for channel in Channel.allCases {
+            let result = validator.validate(envelope(events, channel: channel))
+            #expect(result.rejected.isEmpty, "\(channel): \(result.rejected.prefix(1))")
+        }
+    }
+
     @Test("A start that went as it should is routine; one that needed help is a warning; one that never began is an error")
     func liveStartSeverity() {
         func severity(_ outcome: LiveStartOutcome) -> Severity {
@@ -252,7 +290,7 @@ struct FieldEventTests {
     @Test("The schema file carries every kind the MetricKit mapping can emit, exactly, so the hub accepts what the operating system reports")
     func schemaHasMetricKitKinds() throws {
         let schema = try loadSchema()
-        #expect(schema.version == 6)
+        #expect(schema.version == 7)
         for kind in MetricKitMapping.kinds { #expect(schema.kinds.contains(kind), "\(kind.name)") }
     }
 

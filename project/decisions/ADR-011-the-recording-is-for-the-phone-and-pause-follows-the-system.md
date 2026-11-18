@@ -22,6 +22,7 @@ ADR-010 plays live through a recording served on `127.0.0.1`. An AirPlay receive
 - An answered FaceTime Audio call did not interrupt a receiver playing the stream (verified on the display); cellular and declined calls are untested.
 - `CarAudio` is treated as the phone and is unverified in a real car.
 - A new surface needs one line in `PlaybackSource` (and an observation), not a fix in the player.
-- Open: `plan`, `reason` and `surface` on the `liveStart` hub event need a schema change, which needs the owner's approval.
+- `plan`, `reason` and `surface` are optional fields on the `liveStart` hub event (schema 7, 2026-11-18). The app sends them; the hub accepts them once schema 7 is applied there.
+- The plan is chosen again once the recording has started, because the route can change in that time (a cold launch from the display: 23 s before the fix).
 
 Design: `project/plans/proposals/ExternalSurfaces.md`.

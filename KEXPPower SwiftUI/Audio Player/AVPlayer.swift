@@ -127,6 +127,8 @@ import UniformTypeIdentifiers
         @ObservationIgnored private var currentArtwork: CGImage?
         @ObservationIgnored private var statusObservation: AnyCancellable?
         @ObservationIgnored private var routeObservation: AnyCancellable?
+        @ObservationIgnored private var interruptionObservation: AnyCancellable?
+        @ObservationIgnored private var itemEndObservations: [AnyCancellable] = []
 
         private let artworkLoader: ArtworkLoader
         private let publisher: any NowPlayingPublishing
@@ -190,7 +192,9 @@ import UniformTypeIdentifiers
 
             #if os(iOS) || os(visionOS)
             watchRouteChanges()
+            watchInterruptions()
             #endif
+            watchItemEnds()
             sessionCoordinator.observe { [weak self] action in self?.handle(sessionAction: action) }
 
             #if !os(macOS)
@@ -247,6 +251,17 @@ import UniformTypeIdentifiers
         /// audio is heard, and helps it along when it does not. An item the local server was never asked for, or was asked for without a
         /// segment, is rebuilt at eight seconds (one being given segments is not); at eighteen the stream is played directly; at forty-five
         /// the start is given up on, and tried again when the network returns. How it ended is reported either way.
+        /// How live is being played, for a report: set where the plan is chosen or changed.
+        @ObservationIgnored private var currentPlan: LivePlan?
+
+        /// Sends a finished start to its report with the plan that played it and where the sound was rendered, which the runner does not know.
+        func reportLiveStart(_ start: LiveStart) {
+            var start = start
+            start.plan = currentPlan
+            start.surface = playbackSource()
+            onLiveStart(start)
+        }
+
         private func measureLiveStart(of item: AVPlayerItem) {
             liveTimer.task?.cancel()
             let recovering = startIsRecovery
@@ -258,7 +273,7 @@ import UniformTypeIdentifiers
                     self?.awaitingNetwork = true
                     FieldDiagnostics.shared.report(.rewindUnavailable(.gaveUpWatching))
                 },
-                report: { [weak self] in self?.onLiveStart($0) })
+                report: { [weak self] in self?.reportLiveStart($0) })
             liveTimer.task = Task { [weak self] in await self?.runLiveStart(runner) }
         }
 
@@ -269,7 +284,37 @@ import UniformTypeIdentifiers
             if !Task.isCancelled { liveStartRunning = false }
         }
 
+        /// Writes how each item of the player ended: played to its end (a queue player then drops it, which empties the player) or failed with an error.
+        private func watchItemEnds() {
+            itemEndObservations = [
+                NotificationCenter.default.publisher(for: AVPlayerItem.didPlayToEndTimeNotification)
+                    .receive(on: DispatchQueue.main)
+                    .sink { _ in DiagnosticLog.app.record("Player", PlaybackEventLine.itemPlayedToEnd) },
+                NotificationCenter.default.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification)
+                    .receive(on: DispatchQueue.main)
+                    .sink { note in
+                        let error = note.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? NSError
+                        DiagnosticLog.app.record("Player", PlaybackEventLine.itemFailed(domain: error?.domain, code: error?.code))
+                    },
+            ]
+        }
+
         #if os(iOS) || os(visionOS)
+        /// Writes each audio interruption (a call, Siri, an alarm, another app taking the session) to the journal with its reason code, and, when it ends,
+        /// whether the system says to resume. The coordinator reports only the action it takes, which is nothing for most of these.
+        private func watchInterruptions() {
+            interruptionObservation = NotificationCenter.default.publisher(for: AVAudioSession.interruptionNotification)
+                .receive(on: DispatchQueue.main)
+                .sink { note in
+                    let info = note.userInfo
+                    let type = info?[AVAudioSessionInterruptionTypeKey] as? UInt
+                    DiagnosticLog.app.record("Player", PlaybackEventLine.interruption(
+                        began: type == AVAudioSession.InterruptionType.began.rawValue,
+                        reason: info?[AVAudioSessionInterruptionReasonKey] as? UInt,
+                        options: info?[AVAudioSessionInterruptionOptionKey] as? UInt))
+                }
+        }
+
         /// Writes each audio route change to the journal as a reason code and where the sound goes now: switching from AirPlay to the phone's speaker paused
         /// playback, and the reason the system gave is what decides whether the player should carry on.
         private func watchRouteChanges() {
@@ -291,6 +336,7 @@ import UniformTypeIdentifiers
             guard liveSource == .shifted, !isPlayingArchive, wantsPlayback else { return }
             guard case .direct(let reason) = LivePlan.choose(source: playbackSource(), recordingAvailable: true) else { return }
             capabilities = PlaybackCapabilities(plan: .direct(reason))
+            currentPlan = .direct(reason)
             DiagnosticLog.app.record("Player", "live plan: direct (\(reason.rawValue)), the route changed while the recording played")
             itemTask.task = Task { [weak self] in _ = await self?.playLiveDirectly(because: reason) }
         }
@@ -463,6 +509,7 @@ import UniformTypeIdentifiers
         private func playLiveDirectly(because reason: DirectReason = .evidenceFallBack) async -> AVPlayerItem? {
             guard let player, !isPlayingArchive, let liveLink else { return nil }
             capabilities = PlaybackCapabilities(plan: .direct(reason))
+            currentPlan = .direct(reason)
             shiftTask.task?.cancel()
             stopWatchingLag()
             if liveSource == .shifted { setTransportControls(nil) }
@@ -654,6 +701,7 @@ import UniformTypeIdentifiers
             // cannot reach it, and a route not known here might be one. The stream's public address works from anywhere. The controls are decided with the plan.
             let plan = LivePlan.choose(source: playbackSource(), recordingAvailable: liveShift != nil)
             capabilities = PlaybackCapabilities(plan: plan)
+            currentPlan = plan
             guard case .recording = plan, let liveShift else {
                 if case .direct(let reason) = plan { DiagnosticLog.app.record("Player", "live plan: direct (\(reason.rawValue))") }
                 liveSource = .direct
@@ -668,6 +716,13 @@ import UniformTypeIdentifiers
             let address = await liveShift.start()
             guard !isPlayingArchive, !Task.isCancelled else {
                 liveSource = .unresolved
+                return
+            }
+            // The recording takes a moment to start, and the route can change in it: from a display's cold launch the route was the speaker at the tap and
+            // AirPlay two seconds later, and the receiver was handed the loopback address, which cost 23 seconds. The plan is chosen again with the route as it is.
+            if address != nil, case .direct(let reason) = LivePlan.choose(source: playbackSource(), recordingAvailable: true) {
+                DiagnosticLog.app.record("Player", "live plan: direct (\(reason.rawValue)), the route changed while the recording started")
+                if let item = await playLiveDirectly(because: reason) { measureLiveStart(of: item) }
                 return
             }
             if let address {
@@ -1048,6 +1103,23 @@ private final class TaskHolder {
 
 /// What became of the artwork for a track, as a fixed phrase for the journal: the person reading a report needs to tell "none offered" from "blocked"
 /// from "could not be loaded", and nothing else records it.
+/// The journal's lines for what the system and the player's items do on their own, as fixed phrases with codes: a pause or a vanished item that nothing
+/// recorded (15:06 and 15:07 on 2026-11-18) cannot be explained afterwards from a status change alone.
+enum PlaybackEventLine {
+    static func interruption(began: Bool, reason: UInt?, options: UInt?) -> String {
+        if began { return "interruption began, reason \(reason.map(String.init) ?? "none")" }
+        // `AVAudioSession.InterruptionOptions.shouldResume` is the one option, bit 0.
+        return "interruption ended, should resume \((options ?? 0) & 1 == 1)"
+    }
+
+    static let itemPlayedToEnd = "an item played to its end"
+
+    static func itemFailed(domain: String?, code: Int?) -> String {
+        guard let domain, let code else { return "an item failed to play to its end (no error)" }
+        return "an item failed to play to its end (\(domain) \(code))"
+    }
+}
+
 struct ArtworkOutcome: Equatable {
     /// Whether the track came with an artwork address.
     let offered: Bool

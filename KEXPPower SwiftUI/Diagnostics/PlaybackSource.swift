@@ -31,6 +31,15 @@ enum PlaybackSource: Sendable, Equatable {
         case .other: self = .unknown
         }
     }
+
+    /// The source as a code for a report.
+    var code: String {
+        switch self {
+        case .phone: "phone"
+        case .receiver: "receiver"
+        case .unknown: "unknown"
+        }
+    }
 }
 
 /// Why live is played from the stream itself and not through the recording: a code, for the journal and a report.
@@ -57,6 +66,20 @@ enum LivePlan: Sendable, Equatable {
         case .unknown: .direct(.unknownRoute)
         case .phone: recordingAvailable ? .recording : .direct(.recordingUnavailable)
         }
+    }
+
+    /// The plan as a code for a report: `recording` or `direct`.
+    var code: String {
+        switch self {
+        case .recording: "recording"
+        case .direct: "direct"
+        }
+    }
+
+    /// Why the stream played, or `nil` for the recording.
+    var reason: DirectReason? {
+        guard case .direct(let reason) = self else { return nil }
+        return reason
     }
 }
 
