@@ -177,7 +177,7 @@ None new. `AVAudioSession` and `AVPlayer` (system), `StationKit`'s `AudioSession
 1. ~~**Unknown routes play the stream (recording only where the phone is positively the source). Agreed?**~~ **Decided 2026-11-17 (owner): yes, "unknown plays the stream is the right fallback."**
 2. **When the route moves from the phone to a receiver mid-playback, switching to the live edge is accepted?**
 3. **A real car:** the owner's CarPlay sessions came from the display, not a `CarAudio` route. Can one be tried (or the Xcode CarPlay simulator), before `CarAudio` is allow-listed as `.phone`?
-4. **A phone call while a receiver plays:** the owner raised it (*"I'd have to pause playback for the entire house"*). Untested; should it be tested now, on the display?
+4. **A phone call while a receiver plays:** the owner raised it (*"I'd have to pause playback for the entire house"*). **Tested 2026-11-17 on the Kitchen display (direct stream, build `65f872f`):** an answered FaceTime Audio call to the phone did not interrupt playback, and the journal recorded nothing across ring, answer and hang-up (no route change, no audio-session action, no stall). Not tested: a cellular call, a declined call, a call made from the phone.
 5. **Black / blank Now Playing during the swap** (the metadata part was fixed in `9575285`; the owner confirmed the display now shows it) (owner's video, second CarPlay session): only the stall misclassification was fixed (`4873978`); publishing Now Playing from intent (§3, piece 3) is the proposed fix, not yet verified to cover it.
 6. **Event fields:** `plan` and `reason` on `liveStart`, provisionally on the development key, then `schema apply`?
 
