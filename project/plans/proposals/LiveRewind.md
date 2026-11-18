@@ -170,3 +170,7 @@ screen is its own small design proposal when the window setting is built; this s
 
 On approval: this file's status; the master plan's Roadmap item; the README's "not built yet" list; `ArchiveTransport.md`
 §5, which already points here. An ADR for the local server and the buffer once Phase 0 has said whether it works.
+
+## 10. Which surfaces get the recording (added 2026-11-18, ADR-011)
+
+The recording is served on the phone's own loopback address, so it plays only where the phone renders the sound (the speaker, headphones, Bluetooth, CarPlay as `CarAudio`). An AirPlay receiver, such as the Kitchen display, fetches the item itself and cannot reach it; there, and on any route the app does not recognise, live plays the stream directly, with no rewind window, and the controls say so from the start. If the sound moves to a receiver while the recording plays, playback switches once to the stream at the live edge. See `ExternalSurfaces.md`.

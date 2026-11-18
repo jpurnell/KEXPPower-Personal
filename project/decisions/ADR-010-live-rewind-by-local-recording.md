@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-08
 **Category:** architecture
-**Status:** Accepted
+**Status:** Accepted; amended by ADR-011 (2026-11-17): the recording is used only where the phone renders the sound; an AirPlay receiver or an unknown route plays the stream directly.
 
 ## Decision
 The live stream is read by the app itself (`LiveRecorder`), cut at ADTS frame boundaries into segments of about two
