@@ -494,6 +494,24 @@ struct PlayerControllerTests {
         #expect(identifiers.contains(.commonIdentifierTitle))
     }
 
+    @Test("A direct start for a receiver plays a fresh item made with the track's metadata, not the one made at launch and edited since")
+    func directStartMakesAFreshItemWithMetadata() async {
+        let bytes = jpegBytes()
+        let controller = PlayerController(artworkLoader: ArtworkLoader(allowedDomains: ["kexp.org"], fetch: { _ in bytes }), publisher: FakePublisher())
+        controller.initPlayer(link: direct)
+        controller.outputRoute = { .airPlay }
+        let launched = controller.player?.currentItem
+        let art = URL(string: "https://kexp.org/art.jpg") ?? .temporaryDirectory
+        await controller.updateNowPlaying(.program(ProgramInfo(title: "The Afternoon Show", host: nil, artworkURL: art)))
+        controller.liveShift = FakeShift(address: local)
+        await controller.playLive()
+        let item = controller.player?.currentItem
+        #expect(item != nil && item !== launched)
+        #expect(itemURL(controller) == direct)
+        let identifiers: [AVMetadataIdentifier] = (item?.externalMetadata ?? []).compactMap { $0.identifier }
+        #expect(identifiers.contains(.commonIdentifierArtwork) && identifiers.contains(.commonIdentifierTitle))
+    }
+
     @Test("The journal says what became of the artwork, as a fixed phrase")
     func artworkOutcomes() {
         #expect(ArtworkOutcome(offered: false, allowed: false, loaded: nil).line == "none offered")

@@ -633,6 +633,9 @@ import UniformTypeIdentifiers
             guard case .recording = plan, let liveShift else {
                 if case .direct(let reason) = plan { DiagnosticLog.app.record("Player", "live plan: direct (\(reason.rawValue))") }
                 liveSource = .direct
+                // A receiver reads the item's metadata as it starts the item; the item made at launch has had it edited in since, which the display did
+                // not show. A fresh one is made with the track on it, as every other live start does.
+                if let liveLink, !snapshot.title.isEmpty { replaceItems(with: liveItem(url: liveLink)) }
                 player.play()
                 if let item = player.currentItem { measureLiveStart(of: item) }
                 return
