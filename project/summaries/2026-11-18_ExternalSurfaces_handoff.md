@@ -64,6 +64,12 @@ Nothing is in flight. If continuing this area, start with **measurement, not cod
 - The queue player reports an empty state more than once for one loss; `liveItemWentAway` ignores calls while a put-back is already in flight, which a test depends on.
 - Fact-checking: several earlier statements in the proposal are marked (device), (repo) or *unverified*; keep that discipline, and do not reword an unverified hypothesis as fact.
 
+## Addendum, 2026-11-18 night: the hub side (hub 0.8.1)
+
+- **Hub 0.8.1 is live on Chromedome** (tag 0.8.1, `main` `3c0c590`). It fixes the read API reporting the schema version the hub started with (Spinner read 5 after v7 was applied; ingest was never affected). `ReadSurface` now asks the registry when read. Spinner reads 7 on the hub. The fix is proved by tests over a real socket; **live, a fresh start cannot show a reload**, so the next `schema apply` + `SIGHUP` is the proof. The hub's `README` has a "What reloads" table: the apps file reloads, `hub.json` needs a restart.
+- Still unproven on the hub: a real `liveStart` carrying `plan`, `reason`, `surface`, and any `playbackStall` or `streamOutage`. They need a live start from the display on Brawn (a cold launch also tests the 23 s re-plan fix; look for `live plan: direct (receiver), the route changed while the recording started` in the journal).
+- Development-channel events raise no hub alert by design, so nothing will tell the owner when these arrive. The hub has no command-line push sender (the sender is Swift code in `PushHubAlertSender`), so a "tell me when it arrives" job needs a small `diagnostics-hub-admin` addition, which is a proposal of its own and was not built.
+
 ## Metrics
 
 | Metric | Before | After |
