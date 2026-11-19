@@ -13,7 +13,12 @@ struct RootView: View {
     let archive: ArchiveBrowserModel
 
     @Environment(SongSavingModel.self) private var saving
-    @State private var selection: AppSection? = AppSection.defaultSection
+    /// Where the app is, which a `spinner://` link can move.
+    @Environment(AppNavigation.self) private var navigation
+    private var selection: AppSection? {
+        get { navigation.section }
+        nonmutating set { navigation.section = newValue }
+    }
     #if !os(macOS) && !os(tvOS)
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     #endif
@@ -25,6 +30,10 @@ struct RootView: View {
 
     var body: some View {
         layout
+        #if os(iOS)
+        // One sheet for the whole app, so a link and the gears in the sections ask for the same one.
+        .sheet(isPresented: Bindable(navigation).showingSettings) { SettingsView(model: model) }
+        #endif
     }
 
     @ViewBuilder
@@ -45,7 +54,7 @@ struct RootView: View {
 
     private var sidebarLayout: some View {
         NavigationSplitView {
-            List(AppSection.visible(canSaveToPlaylists: AppSongSaver.canSaveToPlaylists), selection: $selection) { section in
+            List(AppSection.visible(canSaveToPlaylists: AppSongSaver.canSaveToPlaylists), selection: Bindable(navigation).section) { section in
                 Label(section.title, systemImage: section.systemImage)
                     .tag(section)
             }
@@ -202,4 +211,5 @@ struct SectionDestination: View {
     let model = ResultRetriever()
     return RootView(model: model, archive: .standard(player: model.playerController))
         .environment(AppSongSaver.makeModel())
+        .environment(AppNavigation())
 }

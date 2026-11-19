@@ -24,6 +24,8 @@ struct KEXPPowerExampleSwiftUIApp: App {
     @State private var saving: SongSavingModel
     /// The archive's browser, shared with CarPlay through the registry.
     @State private var archive: ArchiveBrowserModel
+    /// Where the app is, which a `spinner://` link from a notification can move.
+    @State private var navigation = AppNavigation()
     #if os(iOS)
     /// Lets CarPlay connect: the system asks the app delegate for the car's scene configuration.
     @UIApplicationDelegateAdaptor(CarPlayAppDelegate.self) private var appDelegate
@@ -58,6 +60,8 @@ struct KEXPPowerExampleSwiftUIApp: App {
         Window("Spinner", id: SceneID.main) {
             RootView(model: model, archive: archive)
                 .environment(saving)
+                .environment(navigation)
+                .onOpenURL { navigation.handle($0) }
                 .tracksRunState()
                 .asksAboutDiagnostics(model: FieldConsent.model, appName: "Spinner")
         }
@@ -83,6 +87,11 @@ struct KEXPPowerExampleSwiftUIApp: App {
         WindowGroup {
             RootView(model: model, archive: archive)
                 .environment(saving)
+                .environment(navigation)
+                // tvOS reads its own links (the Top Shelf's Play) in RootView, where a link may act; this path never does.
+                #if !os(tvOS)
+                .onOpenURL { navigation.handle($0) }
+                #endif
                 .tracksRunState()
                 .asksAboutDiagnostics(model: FieldConsent.model, appName: "Spinner")
         }

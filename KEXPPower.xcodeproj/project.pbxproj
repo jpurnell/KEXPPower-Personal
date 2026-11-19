@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E5A1C0DE5A1C0DE5A1C0DE01 /* TopShelfContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A289AAD994E8809701D3D91E /* TopShelfContent.swift */; };
 		009E54D1B6359B9A32CF4B22 /* AppModelRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83C963EFEC4E9CFEC269C64 /* AppModelRegistry.swift */; };
 		00EED869C31BDA645785F908 /* ListeningSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF4789FE916418BD66D2F836 /* ListeningSettingsTests.swift */; };
 		00F8F15E4160F547E343807F /* WidgetArtworkResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F198EB0F7925DC8A03086E6 /* WidgetArtworkResolver.swift */; };
@@ -1914,6 +1915,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5A1C0DE5A1C0DE5A1C0DE01 /* TopShelfContent.swift in Sources */,
 				F7986FAF4417DD58534B919C /* ContentView.swift in Sources */,
 				D89EFD31CB085F66D7A3BFFB /* VideoPlayer.swift in Sources */,
 				9E9E8012F5AD04EB5AB1208C /* ShowStore.swift in Sources */,

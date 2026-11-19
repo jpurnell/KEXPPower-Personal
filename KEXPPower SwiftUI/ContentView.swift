@@ -32,7 +32,7 @@ struct ContentView: View {
                 ShowView(show: resultsRetriever.show).padding([.horizontal, .top])
                 Spacer()
                 #if os(iOS)
-                SettingsButton(model: resultsRetriever).padding([.horizontal, .top])
+                SettingsButton().padding([.horizontal, .top])
                 #endif
             }
             #if os(macOS)

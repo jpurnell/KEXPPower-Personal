@@ -5,6 +5,21 @@
 ### Changed
 - **Live is played through the recording only where the phone is the source of the sound (ExternalSurfaces).** `PlaybackSource` sorts the route into phone (speaker, headphones, Bluetooth, CarPlay), receiver (AirPlay or external playback) or unknown, and `LivePlan` chooses the recording or the stream from it: **a receiver, or a route the app does not know, plays the stream**, which works from anywhere. The recording's controls (`PlaybackCapabilities`) are decided with the plan, before the item is swapped, so they no longer change mid-start. If the sound moves from the phone to a receiver while the recording plays, the stream takes over at the live edge, once; a move back to the phone is not switched back on its own. Every live start journals its phases (item ready, player playing, audio moving) so the direct start can be measured and tuned. Replaces the AirPlay-only route check. 15 new tests.
 
+### Added
+- **`spinner://` links to a place** (DeepLinks step 4 of 5, `Tools/SwiftPush/project/plans/upcoming/DeepLinks.md`, Appendix A). A notification can now take the person
+  to the Live section (`spinner://live`), the Archive (`spinner://archive`), one archive day (`spinner://archive/2026-11-18`, the station's calendar day) or Settings
+  (`spinner://settings`), and on a debug install to a probe panel (`spinner://probe/archive`, `spinner://probe/live`: compiled out of a release build, where the
+  link is not read). `SpinnerLink` gains a *kind*: a place navigates and never acts; `spinner://live/play` (the Top Shelf's Play) acts. A link from a
+  notification is read with `SpinnerLink(notificationURL:)`, which refuses every link that acts, so a stray tap never starts audio; the Top Shelf, where the person
+  pressed Play, keeps reading all of them. `AppNavigation` holds where the app is (section, a requested archive day, Settings, a debug panel) so a link can reach state that
+  lived inside views: the root view, the Archive and the gear all read it, and Settings is now one sheet at the root that the gear and a link both ask for. The
+  Archive opens a requested day once its days are loaded, and ignores a day older than it reaches. The scheme is registered in the iPhone/iPad and Mac Info.plists
+  (it was the Apple TV's only). The Mac target now compiles `TopShelfContent.swift`, where `SpinnerLink` lives, because the Top Shelf extension needs it there.
+- 17 new tests (the grammar, the day parser, kinds, the notification path, navigation, the station's midnight across the autumn clock change). The suite is 660.
+- **Not verified on a device:** the whole path. Whether a link a notification carries reaches the app from the Inbox, cold and warm, is DeepLinks Phase 0 (owner,
+  on Brawn). A link to a single show is not defined yet: the archive's show identifier has not been chosen (a link to its day is).
+- A show-level link and the Mac's Settings window (a separate scene, so `spinner://settings` does nothing on the Mac) are not done.
+
 ### Fixed
 - **A receiver now gets the track's title and artwork.** The title and artwork for an AirPlay receiver (the home display) come from the *item* being played, and the app attached them only to whichever item existed when a track arrived; every live start makes a new item, so the display showed no art, title or artist (the phone's lock screen, which reads the system's Now Playing info, was fine). Live items now carry the current track's metadata when they are made. The journal records what became of each track's artwork (none offered, host not allowed, not loaded, or loaded with its size).
 - **A route that becomes a receiver while the recording is starting plays the stream.** On a cold launch from the display the route was the speaker at the tap and AirPlay two seconds later, while the recording was still starting; the display was handed the phone's loopback address and the start took 23 seconds (2026-11-18, 14:51). The plan is now chosen again once the recording has started.

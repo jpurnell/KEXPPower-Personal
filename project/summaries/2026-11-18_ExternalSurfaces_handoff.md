@@ -68,13 +68,23 @@ Nothing is in flight. If continuing this area, start with **measurement, not cod
 
 - **Hub 0.8.1 is live on Chromedome** (tag 0.8.1, `main` `3c0c590`). It fixes the read API reporting the schema version the hub started with (Spinner read 5 after v7 was applied; ingest was never affected). `ReadSurface` now asks the registry when read. Spinner reads 7 on the hub. The fix is proved by tests over a real socket; **live, a fresh start cannot show a reload**, so the next `schema apply` + `SIGHUP` is the proof. The hub's `README` has a "What reloads" table: the apps file reloads, `hub.json` needs a restart.
 - Still unproven on the hub: a real `liveStart` carrying `plan`, `reason`, `surface`, and any `playbackStall` or `streamOutage`. They need a live start from the display on Brawn (a cold launch also tests the 23 s re-plan fix; look for `live plan: direct (receiver), the route changed while the recording started` in the journal).
-- Development-channel events raise no hub alert by design, so nothing will tell the owner when these arrive. The hub has no command-line push sender (the sender is Swift code in `PushHubAlertSender`), so a "tell me when it arrives" job needs a small `diagnostics-hub-admin` addition, which is a proposal of its own and was not built.
+- Development-channel events raise no hub alert by design, so nothing will tell the owner when these arrive. A command-line sender exists: `swiftpush-hub send` (SwiftPushHub; `--credentials --channel --severity --title --body --collapse-key --resolves`). An earlier version of this note said none existed; that was wrong, from searching only the hub repo. A bare unsigned copy is probably refused on the LAN by Local Network privacy (unverified), so a host job wants a signed bundle. The better route is two proposals: hub watches (alert on a matching event, in the hub) and DeepLinks (`SwiftPush/project/plans/proposals/DeepLinks.md`, to take precedence), neither built.
+
+## Addendum, 2026-11-19: links into the app (DeepLinks)
+
+- Alerts can now carry a link that opens a place in an app: SwiftPush 1.0.0-beta.3 (`PushNotification.link`), the push hub 1.2.0 (per-channel `linkSchemes`,
+  `swiftpush-hub send --link`; **not deployed**; deploying also brings 1.1.1 and swift-oauth beta.11's one-way schema migration, so copy `oauth.db` first), the Inbox
+  (`LinkRouter`, its own scheme list; on the branch `feat/channel-sync`, not installed), and Spinner's URL structure (`SpinnerLink`, `AppNavigation`).
+- Spinner links: `spinner://live`, `archive`, `archive/2026-11-18`, `settings`, and on a debug install `probe/archive`, `probe/live`. A notification's link is read with
+  `SpinnerLink(notificationURL:)` and never acts (`spinner://live/play` is refused there).
+- **Owner steps that remain:** install the Inbox and this build on Brawn and tap a link (cold and warm); deploy the hub; define a show-level link (needs the archive's
+  show identifier); then the hub's "watches" so the Spinner `liveStart` and stall alerts exist. Until Spinner takes direct push (owner direction), Spinner links go through the Inbox.
 
 ## Metrics
 
 | Metric | Before | After |
 | :--- | :--- | :--- |
-| App tests (iOS simulator) | 534 (2026-11-14) | 643 |
+| App tests (iOS simulator) | 534 (2026-11-14) | 660 (2026-11-19) |
 | Display live start | ~24 s, stuttering | 4.3 to 6.2 s |
 | Display title and art | none | shown (confirmed 2026-11-17) |
 

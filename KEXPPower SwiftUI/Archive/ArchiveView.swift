@@ -16,10 +16,8 @@ struct ArchiveView: View {
     /// Owned by the app's root, so the player outlives this screen.
     let browser: ArchiveBrowserModel
     @State private var selection: ArchiveSelection?
-    #if os(iOS) && DEBUG
-    @State private var showingProbe = false
-    @State private var showingLiveProbe = false
-    #endif
+    /// Where the app is: a link can ask for a day, or for a debug panel.
+    @Environment(AppNavigation.self) private var navigation
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -47,12 +45,30 @@ struct ArchiveView: View {
         }
         .task {
             if browser.phase == .idle { await browser.load() }
+            openRequestedDay()
         }
+        // A link that arrives while the archive is already showing.
+        .onChange(of: navigation.archiveDay) { openRequestedDay() }
         #if os(iOS) && DEBUG
-        .sheet(isPresented: $showingProbe) { ArchiveProbeView(model: model) }
-        .sheet(isPresented: $showingLiveProbe) { LiveRewindProbeView(appPlayer: model.playerController) }
+        .sheet(isPresented: probeBinding(.archive)) { ArchiveProbeView(model: model) }
+        .sheet(isPresented: probeBinding(.live)) { LiveRewindProbeView(appPlayer: model.playerController) }
         #endif
     }
+
+    /// Opens the day a link asked for, once the archive has its days. A day older than the archive reaches is dropped: the
+    /// archive shows its list instead.
+    private func openRequestedDay() {
+        guard browser.phase == .loaded, let day = navigation.takeArchiveDay() else { return }
+        guard browser.tiles.contains(where: { $0.id == day }) else { return }
+        browser.mode = .date
+        selection = .day(day)
+    }
+
+    #if os(iOS) && DEBUG
+    private func probeBinding(_ probe: SpinnerLink.Probe) -> Binding<Bool> {
+        Binding(get: { navigation.probe == probe }, set: { if !$0 { navigation.probe = nil } })
+    }
+    #endif
 
     /// One column on a phone; as many 320-point columns as fit on an iPad or Mac. On tvOS, whose type is about twice
     /// the size, 520: at 320 a host's name broke a syllable per line.
@@ -82,11 +98,11 @@ struct ArchiveView: View {
             Text(selection.map { browser.title(for: $0) } ?? "Archive").font(.title2.weight(.bold))
             Spacer()
             #if os(iOS) && DEBUG
-            Button("Probe") { showingProbe = true }
-            Button("Live") { showingLiveProbe = true }
+            Button("Probe") { navigation.probe = .archive }
+            Button("Live") { navigation.probe = .live }
             #endif
             #if os(iOS)
-            SettingsButton(model: model)
+            SettingsButton()
             #endif
         }
         .padding(.horizontal)
